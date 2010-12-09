@@ -1,0 +1,21 @@
+catatan:
+1. table item : field op_code, sup_code, entry_date dan status didelete,
+2. buat table item_mutasi untuk data mutasi masuk, berikut strukturnya:
+item_mutasi {
+    item_code
+    sup_code
+    qty
+    date_entry
+    status_print_mutasi
+    op_code
+}
+create table item_mutasi(
+    kode_mutasi varchar(128) not null,
+    item_code varchar(128) not null,
+    sup_code varchar(128) not null,
+    qty int(11) not null,
+    date_entry date not null,
+    status_print_mutasi tinyint not null
+)ENGINE=InnoDB;
+
+3. tambahin satu field lg kode_mutasi
