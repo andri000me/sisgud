@@ -28,7 +28,7 @@ class Kategori extends Controller {
 			'type' => 'text/css',
 			'media' => 'screen'
 		);
-		$this->data['link_tag'] = link_tag($link1).link_tag($link2);
+		$this->data['link_tag'] = link_tag($link1).link_tag($link2);        
 		$this->data['page_title'] = 'Sistem Inventori Gudang';
 		$this->data['pages']='kategori';
         if($this->session->userdata('logged_in') != TRUE)
@@ -60,28 +60,20 @@ class Kategori extends Controller {
                 //ambil data form
                 $this->data['cat_code'] = $this->input->post('cat_code');
                 $this->data['cat_name']= $this->input->post('cat_name');
+                $this->data['cat_desc']= $this->input->post('cat_desc');
                 //insert data ke database
                 if($this->insert_data())
                 {
-                    $this->data['notify'] = 'Data kelompok barang berhasil ditambahkan';
-                    $this->load->view('kb_tambah',$this->data);
+                    $this->data['err_msg'] = '<span style="color:green">Data kelompok barang berhasil ditambahkan</span>';                    
                 }
                 else
                 {
-                    $this->data['notify'] = 'Gagal menambahkan, terjadi kesalahan data';
-                    $this->load->view('kb_tambah',$this->data);
+                    $this->data['err_msg'] = '<span style="color:red">Gagal menambahkan, kode kelompok barang sudah dipakai</span>';                    
                 }
-            } 
-            else
-            {
-                $this->load->view('kb_tambah',$this->data);
-            }
-        }
-        else 
-        {
-        	$this->data['page_title'] .= ':. Menambah Kelompok Barang';
-            $this->load->view('kb_tambah',$this->data);
-        }
+            }            
+        }        
+        $this->data['page_title'] .= ':. Menambah Kelompok Barang';
+        $this->load->view(config_item('template').'kb_tambah',$this->data);        
 	}
     /**
     *Insert data ke dalam database
@@ -91,36 +83,29 @@ class Kategori extends Controller {
         $data = array(
                 'cat_code'=>$this->data['cat_code'],
                 'cat_name'=>$this->data['cat_name'],
+                'cat_desc'=>$this->data['cat_desc'],
                 'op_code'=>$this->session->userdata('p_id'),
                 'entry_date'=>date("Y-m-d")
             );
-        $check = $this->db->get_where('category',array('cat_code'=>$data['cat_code']));
-	if($check->num_rows == 0)
-	{
-		if($this->db->insert('category',$data))
-		{
-		    //make note for every action done by operator, writing it to database
-		    $data = array(
-		            'trans_name'=>'Menambah kelompok barang',
-		            'log_time'=> time(),
-		            'p_id'=>$this->session->userdata('p_id')
-		        );
-		        
-		    if($this->db->insert('log_transaksi',$data))
-		    {
-		        return TRUE;
-		    }          
-		    
-		}
-		else
-		{
-		    return FALSE;
-		}
-	}
-	else
-	{
-		return FALSE;
-	}
+        $this->load->model('category');
+        $check = $this->category->get_category($data['cat_code']);
+        if($check->num_rows == 0)
+        {
+            if($this->category->add_category($data))
+            {
+                //make note for every action done by operator, writing it to database
+                $data = array(
+                        'trans_name'=>'Menambah kelompok barang',
+                        'log_time'=> time(),
+                        'p_id'=>$this->session->userdata('p_id')
+                    );       
+                return TRUE;             
+            }            
+        }
+        else
+        {
+            return FALSE;
+        }
     }
     /**
     *Validasi form tambah kategori
@@ -129,12 +114,12 @@ class Kategori extends Controller {
     {
         $this->load->library('form_validation');
         //setting rules
-        $this->form_validation->set_rules('cat_code', 'kode kelompok barang','required|exact_length[2]|numeric');
+        $this->form_validation->set_rules('cat_code', 'kode kelompok barang','required|exact_length[3]|numeric');
         $this->form_validation->set_rules('cat_name', 'nama kelompok barang','required');
         //running validation
         if($this->form_validation->run() == FALSE)
         {
-            $this->data['err_vald'] = 'Ada kesalahan input'.validation_errors();
+            $this->data['err_msg'] = '<span style="color:red">Terjadi kesalahan. Pastikan bahwa informasi yang diminta sudah ditulis dengan benar.</span>';
             return FALSE;
         }
         else
@@ -143,160 +128,118 @@ class Kategori extends Controller {
         }
     }
     /**
-    *method untuk membuat list kategori barang
-    **/
-    function list_category($page="")
-    {
-        $this->data['list_cat'] = '<table id="search" width = "85%" cellspacing = "7">
-                                    <tr id ="head">
-                                        <td width ="15%"> Kode </td>
-                                        <td width ="40%"> Nama Kelompok Barang </td>
-                                        <td width ="15%"> Operator </td>
-                                        <td width ="15%"> Tanggal </td>
-                                    </tr>';
-        $query = $this->db->get('category');
-	//make pagination
-	$this->load->library('pagination');
-	$config['base_url'] = base_url().'index.php/kategori/cari';
-	$config['total_rows'] = $query->num_rows();
-	$config['per_page'] = '20'; 
-	$this->pagination->initialize($config);	
-	if(!empty($page))
-	{
-		$upper = $page + $config['per_page'] ;
-		$lower = $page + 1;
-	}
-	else
-	{
-		$upper = $config['per_page'];
-		$lower = 1;
-	}
-	$i=1;
-	foreach($query->result() as $row)
-        {
-            $temp = $this->db->get_where('pengguna',array('p_id'=>$row->op_code));
-            $operator = $temp->row();
-		if($i >= $lower && $i <=$upper)
-		{
-			$this->data['list_cat'] .= '<tr>
-                                            <td>'.$row->cat_code.'</td>
-                                            <td>'.ucwords($row->cat_name).'</td>
-                                            <td>'.$operator->p_username.'</td>
-                                            <td>'.$row->entry_date.'</td>
-                                        </tr>';   
-		}
-		$i++;
-        }
-        $this->data['list_cat'] .= '<tr><td>Page: '.$this->pagination->create_links().'</td></tr></table>';
-    }
-	/**
 	*Method untuk mencari/melihat kategori/kelompok barang yang sudah ada di dalam database
 	*/
-	function cari($page="")
+	function cari($param='')
 	{
-		
-		if(isset($_POST['submit_cari_kategori']))
+		//ambil keywords yang diktikkan
+		if($this->input->post('submit_cari_kategori'))
 		{
 		    $keywords = $this->input->post('keywords');
-		    $key = $this->input->post('key');
-		    if(!empty($keywords))
-		    {
-			$this->db->like('cat_name',$keywords);
-			$this->db->or_like('cat_code',$keywords);
-		    }
-			$query = $this->db->get('category');						
-		    $i = 0;
-		    $this->data['list_cat'] = '<table id="search" width = "85%" cellspacing = "7">
-					    <tr id ="head">
-						<td width ="5%"> Kode </td>
-						<td width ="40%"> Nama Supplier </td>
-						<td width ="15%"> Operator </td>
-						<td width ="15%"> Tanggal </td>
-						<td width = "10%"> Action </td>
-					    </tr>';
-		    foreach($query->result() as $row)
-		    {
-			$temp = $this->db->get_where('pengguna',array('p_id'=>$row->op_code));
-			$operator = $temp->row();
-			$this->data['list_cat'] .= '<tr>
-							<td>'.$row->cat_code.'</td>
-							<td>'.ucwords($row->cat_name).'</td>
-							<td>'.$operator->p_username.'</td>
-							<td>'.$row->entry_date.'</td>
-							<td><a href="'.base_url().'index.php/kategori/ubah/'.$row->cat_code.'">Ubah</a></td>
-						    </tr>';
-			$i++;
-		    }
-		    $this->data['list_cat'] .= '</table>';
-		    if($i == 0)
-		    {
-			$this->data['list_cat'] = '<p>Maaf pencarian dengan kata kunci <b>'.$keywords.'</b> tidak ditemukan</p>';
-		    }
-		}
-		else 
-		{
-			$this->data['page_title'] .= ':. Mencari Kelompok Barang';
-			$this->list_category($page);		    
-		}
-		$this->load->view('kb_cari',$this->data);
+        }
+        else
+        {
+            $keywords = '';
+        }
+        //ambil data kategori berdasarkan keywords
+        $this->load->model('category');
+        $query = $this->category->search($keywords);
+        if($query->num_rows() > 0)
+        {
+            $this->data['total_item'] = $query->num_rows();
+            //setting up pagination
+            $this->load->library('pagination');
+            $config['base_url'] = base_url().'kategori/cari/';
+            $config['total_rows'] = $this->data['total_item'];
+            $config['per_page'] = 20;
+            $this->pagination->initialize($config);
+            $this->data['page'] = $this->pagination->create_links();
+            //applying pagination on displaying result            
+            if(isset($param) && intval($param) > 0)
+            {
+                $page_min = $param;
+                $page_max = $page_min + $config['per_page'];
+            }
+            else
+            {
+                $page_min = 0;
+                $page_max = $config['per_page'];
+            }
+            $i = 0;
+            $this->data['row_data'] = ''; 
+            foreach($query->result() as $row)
+            {
+                if($i>=$page_min && $i<$page_max)
+                {
+                    $this->data['row_data'] .= '<tr>
+                                                    <td>'.++$i.'</td>
+                                                    <td>'.$row->cat_code.'</td>
+                                                    <td>'.$row->cat_name.'</td>
+                                                    <td>'.date_to_string($row->entry_date).'</td>
+                                                    <td>
+                                                        '.form_open('kategori/ubah').'
+                                                            <input type="hidden" name="cat_code" value="'.$row->cat_code.'" />
+                                                            <span class="button"><input type="submit" name="submit_ubah" class="button" value="Ubah"/></span>
+                                                        '.form_close().'
+                                                    </td>
+                                                </tr>';  
+                }
+                else
+                {
+                    $i++;
+                }
+            }
+        }
+        else
+        {
+            $this->data['err_msg'] = '<span style="color:red">Data tidak ditemukan, coba kata kunci yang lain</span>';
+		}		
+        $this->data['page_title'] .= ':. Mencari Kelompok Barang';	
+        $this->load->view(config_item('template').'kb_cari',$this->data);
 	}
 	/**
 	* Method untuk melakukan fungsionalitas ubah kelompok barang / edit kelompok barang
 	*/
-	function ubah($cat_code="")
+	function ubah()
 	{
-		if(!empty($cat_code))
-		{
-			if(isset($_POST['submit_ubah_kategori']))
-			{
-				if($this->validate_form_tambah_kategori())
-				{
-					$data = array(
-							'cat_code'=>$this->input->post('cat_code'),
-							'cat_name'=>$this->input->post('cat_name')
-							);							
-					$query = $this->db->get_where('category',array('cat_code'=>$data['cat_code']));
-					if($cat_code == $data['cat_code'] || $query->num_rows == 0)
-					{
-						$this->db->where('cat_code',$cat_code);
-						if($this->db->update('category',$data))
-						{
-							$this->data['notify'] = 'Data kelompok barang telah disimpan';
-						}
-						else
-						{
-							$this->data['notify'] =  'Gagal menyimpan data';
-						}
-					}
-					else
-					{
-						$this->data['notify'] = 'Data kelompok barang dengan kode <b>'.$data['cat_code'].'</b> sudah pernah dimasukkan ke dalam database';
-					}
-				}				
-			}
-			else
-			{
-				$query = $this->db->get_where('category',array('cat_code'=>$cat_code));
-				if($query->num_rows() > 0)
-				{
-					$data = $query->row();
-					$this->data['cat_code'] = $data->cat_code;
-					$this->data['cat_name'] = $data->cat_name;
-				}
-				else
-				{
-					$this->data['notify'] = 'Kelompok barang tidak ditemukan';
-					$this->data['readonly'] = 'yes';
-				}
-			}
-		}
-		else
-		{
-			$this->data['notify'] = 'Gunakan fungsi ubah kelompok barang dari menu cari kelompok';
-			$this->data['readonly'] = 'yes';
-		}
+		if($this->input->post('submit_ubah'))
+        {
+            $cat_code = $this->input->post('cat_code');
+            //ambil data category
+            $this->load->model('category');
+            $query = $this->category->get_category($cat_code);
+            if($query->num_rows() > 0)
+            {
+                $this->data['kategori'] = $query->row();
+            }
+        }
+        if($this->input->post('submit_ubah_kategori'))
+        {
+            $this->load->model('category');
+            //simpan datanya
+            $cat_code = $this->input->post('cat_code');
+            $data = array(
+                'cat_code'=>$cat_code,
+                'cat_name'=>$this->input->post('cat_name'),
+                'cat_desc'=>$this->input->post('cat_desc')
+            );
+            if($this->category->update_category($data))
+            {
+                $this->data['err_msg'] = '<span style="color:green">Perubahan data telah disimpan</span>';
+            }
+            else
+            {
+                $this->data['err_msg'] = '<span style="color:green">Gagal menyimpan, silahkan coba lagi.</span>';
+            }
+            //tampilin lagi                
+            $query = $this->category->get_category($cat_code);
+            if($query->num_rows() > 0)
+            {
+                $this->data['kategori'] = $query->row();
+            }
+        }
 		//render to browser
-		$this->load->view('kb_ubah',$this->data);
+		$this->load->view(config_item('template').'kb_ubah',$this->data);
 	}
 }
 /* End of file kategori.php */

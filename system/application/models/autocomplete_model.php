@@ -19,11 +19,37 @@ class Autocomplete_model extends Model {
 		$query = $this->db->get('supplier');        
 		return $query;
 	}
+    /**
+    * Retrieve data item
+    */
 	function get_item($key="")
 	{
-		$this->db->like('item_code',$key,'after');
-		$this->db->order_by('item_code','desc');
-		$query = $this->db->get('item');
+		$query = 'select * from item left join supplier on item.sup_code=supplier.sup_code where item_code like "'.$key.'%"';
+		return $this->db->query($query);
+	}
+    /**
+    * Retrieve data item untuk mutasi keluar, harus yang stoknya > 0
+    */
+	function get_item_for_mutasi_keluar($key="")
+	{
+		$query = 'select * from item left join supplier on item.sup_code=supplier.sup_code where item_code like "'.$key.'%" and item_qty_stock > 0';
+		return $this->db->query($query);
+	}
+    /**
+    * Retrieve data item untuk retur, harga jual > 0
+    */
+    function get_item_for_retur($key="")
+	{
+		$query = 'select * from item left join supplier on item.sup_code=supplier.sup_code where item_code like "'.$key.'%" and item_hj > 0';
+		return $this->db->query($query);
+	}
+    /**
+	*Retrieve data shop for autocomplete
+	*/
+	function get_shop($key="")
+	{
+		$this->db->like('shop_name',$key,'after')->order_by('shop_name','asc');		    
+		$query = $this->db->get('shop');        
 		return $query;
 	}
 }

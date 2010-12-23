@@ -1,0 +1,19 @@
+Admin 
+- Pengguna (all)
+- Help
+Supervisor :
+- Gudang (Stok Gudang)
+- Toko (All)
+- Help
+
+User
+- Gudang (Mutasi Keluar, Cetak Label, Cetak Bon, Eksport data, Stok GUdang)
+- Toko (Stok Toko, Detail TOko)
+- Help
+
+Operator
+- Gudang (Mutasi Masuk, Print Mutasi, Rekap Mutasi, Retur Barang, Stok Gudang)
+- Kelompok Barang (all)
+- Supplier (all)
+- Toko (Stok Toko, Detail Toko)
+- Help

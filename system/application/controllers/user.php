@@ -45,55 +45,51 @@ class User extends Controller {
 	*/
 	function tambah() 
 	{
-		if(isset($_POST['submit_tambah_user']))
+		if($this->input->post('submit_tambah_user'))
 		{
 			if($this->validate_form_tambah_user())
 			{
 				//retrieve data form 
 				$data_user = array(
-					'p_username'=>$this->input->post('username'),
-					'p_passwd'=>md5($this->input->post('password')),					
+					'p_username'=>$this->input->post('p_username'),
+					'p_passwd'=>md5($this->input->post('p_passwd')),
+					'p_role'=>$this->input->post('p_role'),
 					'p_active'=>'1'
-				);
-				if($this->session->userdata('p_role')=='admin')
-				{
-					$data_user['p_role'] = $this->input->post('role');
-				}
-				else 
-				{
-					$data_user['p_role'] = 'user';
-				}
+				);				
 				$data_op = array(
-					'op_name'=>$this->input->post('nama'),
-					'op_address'=>$this->input->post('alamat'),
-					'op_phone'=>$this->input->post('telepon'),
+					'op_name'=>$this->input->post('op_name'),
+					'op_address'=>$this->input->post('op_address'),
+					'op_phone'=>$this->input->post('op_phone'),
 				);				
 				//check dulu apakah data username sudah ada 
-				$query = $this->db->get_where('pengguna',array('p_username'=>$data_user['p_username']));
+                $this->load->model('pengguna');
+				$query = $this->pengguna->get_pengguna_by_username($data_user['p_username']);
 				if($query->num_rows() == 0)
 				{
 					//insert data user
-					if($this->db->insert('pengguna',$data_user))
+					if($this->pengguna->insert($data_user))
 					{
 						//insert data profile
 						//ambil op_id dari p_id
-						$query = $this->db->get_where('pengguna',array('p_username'=>$data_user['p_username']));
-						if($query->num_rows())
+						$query = $this->pengguna->get_pengguna_by_username($data_user['p_username']);
+						if($query->num_rows() > 0)
 						{
 							$user = $query->row();
 							$data_op['op_id'] = $user->p_id;
-							$this->db->insert('operator',$data_op);
-							$this->data['notify'] = 'Pengguna berhasil ditambahkan';
+							if($this->pengguna->insert_operator($data_op))
+                            {
+							    $this->data['err_msg'] = '<span style="color:green">Data pengguna telah disimpan</span>';
+                            }
 						}
 					}
 				}
 				else
 				{
-					$this->data['notify'] = 'Username yang dimasukan sudah dipakai';
+					$this->data['err_msg'] = '<span style="color:red">Gagal menyimpan data. Username sudah pernah dipergunakan, pilih username yang lain ! </span>';
 				}
 			}		
 		}
-		$this->load->view('user_tambah',$this->data);
+		$this->load->view(config_item('template').'user_tambah',$this->data);
 	}
 	/**
 	* validasi form input tambah user
@@ -102,14 +98,14 @@ class User extends Controller {
 	{
 		$this->load->library('form_validation');
 		//setting rules
-		$this->form_validation->set_rules('nama', 'Nama','required');
-		$this->form_validation->set_rules('username', 'Username','required|alpha_numeric');
-		$this->form_validation->set_rules('password','password','required');
-		$this->form_validation->set_rules('konfirmasi_password','konfirmasi password','required|matches[password]');		
+		$this->form_validation->set_rules('op_name', 'Nama','required');
+		$this->form_validation->set_rules('p_username', 'Username','required|alpha_numeric');
+		$this->form_validation->set_rules('p_passwd','password','required');
+		$this->form_validation->set_rules('confirm','konfirmasi password','required|matches[p_passwd]');		
 		//running validation
 		if($this->form_validation->run() == FALSE)
 		{
-		    $this->data['err_vald'] = 'Ada kesalahan input'.validation_errors();
+		    $this->data['err_msg'] = '<span style="color:red">Ada kesalahan input data. Pastikan bahwa informasi yang anda berikan sudah benar</span>';
 		    return FALSE;
 		}
 		else
@@ -118,29 +114,101 @@ class User extends Controller {
 		}		
 	}
 	/**
-	*membuat list dftar user untuk keperluan rud
-	*/
-	function lihat($page="")
-	{
-		$query = $this->db->query('select * from pengguna, operator where pengguna.p_id = operator.op_id');
-		 $this->data['list_user'] = '<table id="search" width = "100%" cellspacing = "7">
-					    <tr id ="head">
-						<td width ="10%"> User ID </td>
-						<td width ="35%"> Username </td>
-						<td width ="15%"> Nama </td>
-						<td width ="15%"> Jabatan </td>
-						<td width ="10%"> Action </td>
-					    </tr>';
-		foreach($query->result() as $row)
-		{
-			$this->data['list_user'] .= '<tr><td>'.$row->p_id.'</td>
-								<td>'.$row->p_username.'</td>
-								<td>'.$row->op_name.'</td>
-								<td>'.ucwords($row->p_role).'</td>
-								<td></td>';
-		}
-		$this->data['list_user'] .= '</table>';
-		$this->load->view('user_cari',$this->data);
-	}
+    * Manajemen pengguna (RUD)
+    */
+    function manage($param='')
+    {
+        $this->load->model('pengguna');
+        $query = $this->pengguna->get_all();
+        if($query->num_rows() > 0)
+        {
+            $this->data['total_item'] = $query->num_rows();
+            //setting up pagination
+            $this->load->library('pagination');
+            $config['base_url'] = base_url().'user/manage/';
+            $config['total_rows'] = $this->data['total_item'];
+            $config['per_page'] = 10;
+            $this->pagination->initialize($config);
+            $this->data['page'] = $this->pagination->create_links();
+            //applying pagination on displaying result            
+            if(isset($param) && intval($param) > 0)
+            {
+                $page_min = $param;
+                $page_max = $page_min + $config['per_page'];
+            }
+            else
+            {
+                $page_min = 0;
+                $page_max = $config['per_page'];
+            }
+            $i = 0;
+            $this->data['row_data'] = ''; 
+            foreach($query->result() as $row)
+            {
+                if($i>=$page_min && $i<$page_max)
+                {
+                    $this->data['row_data'] .= '<tr>
+                                                    <td>'.$row->p_id.'</td>                                                    
+                                                    <td>'.$row->p_username.'</td>
+                                                    <td>'.ucwords($row->op_name).'</td>
+                                                    <td>'.$row->p_role.'</td>
+                                                    <td>'.$row->op_address.'</td>
+                                                    <td>'.$row->op_phone.'</td>
+                                                    <td>
+                                                        '.form_open('user/ubah').'
+                                                            <input type="hidden" name="p_id" value="'.$row->p_id.'" />
+                                                            <span class="button"><input type="submit" name="submit_ubah" class="button" value="Ubah"/></span>
+                                                        '.form_close().'
+                                                    </td>
+                                                </td>';
+                }                
+                $i++;                
+            }
+        }
+        $this->load->view(config_item('template').'user_manage',$this->data);
+    }
+    /**
+    * Fungsi ubah pengguna
+    */
+    function ubah()
+    {
+        //tampilkan data yang akan diubah
+        $this->load->model('pengguna');
+        if($this->input->post('submit_ubah'))
+        {
+            $query = $this->pengguna->get_pengguna(array('p_id'=>$this->input->post('p_id')));            
+            $this->data['pengguna'] = $query->row();
+        }
+        //simpan data perubahan
+        if($this->input->post('submit_ubah_user'))
+        {
+            if($this->validate_form_tambah_user())
+			{
+                //retrieve data form 
+				$data_user = array(					
+					'p_role'=>$this->input->post('p_role')					
+				);				
+				$data_op = array(
+					'op_name'=>$this->input->post('op_name'),
+					'op_address'=>$this->input->post('op_address'),
+					'op_phone'=>$this->input->post('op_phone'),
+				);
+                //ambil userid
+                $query = $this->pengguna->get_pengguna_by_username($this->input->post('p_username'));
+                $user = $query->row();
+                //update
+                if($this->pengguna->update_pengguna($data_user,$user->p_id))
+                {
+                    if($this->pengguna->update_operator($data_op,$user->p_id))
+                    {
+                        $this->data['err_msg'] = '<span style="color:green">Perubahan data telah disimpan</span>';
+                    }
+                }
+                $query = $this->pengguna->get_pengguna(array('p_id'=>$user->p_id));
+                $this->data['pengguna'] = $query->row();
+            }
+        }
+        $this->load->view(config_item('template').'user_ubah',$this->data);
+    }
 }
 //end of user.php

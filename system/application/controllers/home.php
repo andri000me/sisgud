@@ -26,7 +26,7 @@ class Home extends Controller {
 		$this->data['link_tag'] = link_tag($link1).link_tag($link2);
 		
 		$this->data['page_title'] = 'Sistem Inventori Gudang';
-		$this->data['pages']='gudang';
+		$this->data['pages']='gudang';        
         if($this->session->userdata('logged_in')==TRUE)
         {
             $this->load->helper('sisgud');
@@ -36,15 +36,15 @@ class Home extends Controller {
 	}
     /*default function to be caled*/
 	function index()
-	{
+	{        
         if($this->session->userdata('logged_in'))
         {
-	        $this->load->view('index',$this->data);	
+	        $this->load->view(config_item('template').'index',$this->data);
         }
         else
         {
             $this->data['link_tag'] = link_tag($this->data['link3']);
-            $this->load->view('login',$this->data);
+            $this->load->view(config_item('template').'login',$this->data);
         }
 	}
     /*login function*/
@@ -76,18 +76,16 @@ class Home extends Controller {
                 else
                 {
                     $this->data['err_login'] = 'Kesalahan username atau password';
-                    $this->data['link_tag'] = link_tag($this->data['link3']);
-                    $this->load->view('login',$this->data);
+                    $this->data['link_tag'] = link_tag($this->data['link3']);                    
                 }
             }
             else
             {
-                $this->data['link_tag'] = link_tag($this->data['link3']);
-                $this->load->view('login',$this->data);
+                $this->data['link_tag'] = link_tag($this->data['link3']);                
             }
             //cek username sm password di dtabase
         }
-        
+        $this->load->view(config_item('template').'login',$this->data);
     }
     /*fungsi untuk memastikan bahwa form login telah diisi dengan benar*/
     function validate_login_form()

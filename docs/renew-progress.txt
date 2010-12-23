@@ -1,0 +1,7 @@
+progress report:
+----------------
+finished:
+ - gudang -> mutasi masuk, print mutasi, mutasi keluar
+ 
+ enhancement:
+ - adding print preview on print mutasi

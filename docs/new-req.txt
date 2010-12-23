@@ -3,7 +3,7 @@ Role: Operator
 1. Kelompok Barang jadi 3 digit 000-999 --ok
 2. Mutasi masuk --> kode label cukup masukin 3 digit kelompok barang, sisanya otomatis diisi oleh sistem, tambahin tanggal bon --ok
 Role; User
-1. Mutasi keluar --> input kode label dibuat autocomplete, sama kaya input kode supplier di mutasi masuk
-2. Cetak Label --> pada hasil export file txt untuk cetak label ditambah kolom nama (mode fashion/modiest)
+1. Mutasi keluar --> input kode label dibuat autocomplete, sama kaya input kode supplier di mutasi masuk--ok
+2. Cetak Label --> pada hasil export file txt untuk cetak label ditambah kolom nama (mode fashion/modiest) --ok
 3. Cetak BON ---> ketika barang sudah dicetak label, otomatis sudah masuk ke bon dan siap di cetak. bon yang sudah
-   dicetak dihilangkan dari daftar
+   dicetak dihilangkan dari daftar -ok

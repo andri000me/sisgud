@@ -49,9 +49,8 @@ class Toko extends Controller {
 	*Method untuk menambahkan toko baru
 	*/
 	function tambah()
-	{
-        $this->data['page_title'] .= ':. Menambah Toko';
-		if(isset($_POST['submit_tambah_toko']))
+	{        
+		if($this->input->post('submit_tambah_toko'))
         {
             if($this->validate_form_tambah_toko())
             {
@@ -64,15 +63,25 @@ class Toko extends Controller {
                 //insert data ke database
                 if($this->insert_data())
                 {
-                    $this->data['notify']='Data berhasil ditambahkan';
+                    //upload shop img
+                    $config['upload_path'] = 'css/images/toko/';
+                    $config['allowed_types'] = 'jpg';
+                    $config['overwrite'] = TRUE;
+                    $config['file_name'] = strtolower($this->data['shop_code']); 
+                    $this->load->library('upload', $config);
+                    //do upload
+                    $this->upload->do_upload('shop_img');
+                    //pesan sukses
+                    $this->data['err_msg']='<span style="color:green">Data toko telah disimpan</span>';
                 }
                 else
                 {
-                    $this->data['notify']='Gagal menambahkan data';
+                    $this->data['err_msg']='<span style="color:red">Gagal disimpan. Kode toko sudah pernah digunakan.</span>';
                 }
             }
-        }        
-		$this->load->view('tok_tambah',$this->data);
+        }
+        $this->data['page_title'] .= ':. Menambah Toko';
+		$this->load->view(config_item('template').'tok_tambah',$this->data);
 	}
     /**
     *Method untuk insert data
@@ -87,9 +96,15 @@ class Toko extends Controller {
                     'shop_phone'=>$this->data['shop_phone'],
                     'shop_supervisor'=>$this->data['shop_supervisor']
                 );
-        if($this->db->insert('shop',$data))
+        //check dulu
+        $this->load->model('shop');
+        $check = $this->shop->get_shop($data['shop_code']);
+        if($check->num_rows() == 0)
         {
-            return TRUE;
+            if($this->shop->insert($data))
+            {
+                return TRUE;
+            }
         }
         else
         {
@@ -110,7 +125,7 @@ class Toko extends Controller {
         $this->form_validation->set_rules('shop_supervisor','supervisor','required');
         if($this->form_validation->run()==FALSE)
         {
-            $this->data['err_vald'] = 'Terjadi beberapa kesalahan input :'.validation_errors();
+            $this->data['err_msg'] = '<span style="color:red">Terjadi kesalahan input data. Pastikan bahwa informasi yang diminta telah dimasukkan dengan benar</span>';
             return FALSE;
         }
         else
@@ -121,65 +136,113 @@ class Toko extends Controller {
 	/**
 	*Method untuk melihat stok toko
 	*/
-	function stok()
+	function stok($param='')
 	{
-		if(isset($_POST['submit_search_toko']))
-		{
-			//ambil data form
-			$shop_code = $this->input->post('shop_code');
-			$query = $this->db->get_where('shop',array('shop_code'=>$shop_code));
-			$shop = $query->row();
-			$this->data['shop_name'] = ucwords($shop->shop_name);
-			$keywords = $this->input->post('keywords');
-			$key = $this->input->post('key');
-			if(!empty($keywords))
-			{
-				$sql = 'select toko.*,toko.stok_toko,(toko.stok_toko-retur.qty_retur) as sisa
-					from (select item.item_code, item.sup_code, item.item_name, item.item_hj,  sum(item_distribution.quantity) as stok_toko
-					from item, item_distribution where item.item_code = item_distribution.item_code and item_distribution.shop_code ="'.$shop_code.'" group by item.item_code) 
-					as toko left join (select item_retur.item_code, sum(item_retur.quantity) as qty_retur from item_retur group by item_retur.item_code) as retur on toko.item_code = retur.item_code
-					where toko.item_code like "%'.$keywords.'%" or toko.sup_code like "%'.$keywords.'%" or toko.item_name like "%'.$keywords.'%"';
-			}
-			else
-			{
-				$sql = 'select toko.*,toko.stok_toko,(toko.stok_toko-retur.qty_retur) as sisa
-					from (select item.item_code, item.sup_code, item.item_name, item.item_hj,  sum(item_distribution.quantity) as stok_toko
-					from item, item_distribution where item.item_code = item_distribution.item_code and item_distribution.shop_code ="'.$shop_code.'" group by item.item_code) 
-					as toko left join (select item_retur.item_code, sum(item_retur.quantity) as qty_retur from item_retur group by item_retur.item_code) as retur on toko.item_code = retur.item_code';
-			}
-			$query = $this->db->query($sql);
-			//echo $this->db->last_query();exit;
-			$tr = '';
-			foreach($query->result() as $row)
-			{
-				$temp = $this->db->get_where('supplier',array('sup_code'=>$row->sup_code));
-				$sup = $temp->row();
-				if(!empty($row->sisa))
-				{
-					$row->stok_toko = $row->sisa;
-				}
-				$tr .= '<tr>
-				    <td>'.$row->item_code.'</td>
-				    <td>'.$row->item_name.'</td>
-				    <td>'.$row->stok_toko.'</td>
-				    <td>-</td>
-				    <td style="text-align:right">'.number_format($row->item_hj,'0',',','.').',- &nbsp;</td>
-				    <td>'.ucwords($sup->sup_name).'</td>		
-				</tr>';
-			} 
-			$this->data['tr'] = $tr;
-			//echo $tr;exit;            
-		}
+        //setting parameter for searching
+        if($this->input->post('submit_cari_stok'))
+        {
+            $shop_code = $this->input->post('shop_code');
+            $keywords = $this->input->post('keywords');            
+           
+            $this->session->set_userdata('shop_code',$shop_code);
+            $this->session->set_userdata('keywords',$keywords);
+            
+        }
+        else 
+        {
+            //klo udh pernah searching ambil dari session
+            if($this->session->userdata('shop_code'))
+            {
+                $shop_code = $this->session->userdata('shop_code');
+                $keywords = $this->session->userdata('keywords');
+            }
+        }
+        //klo belum pernah searching ambil langsung dari database
+        if(isset($keywords) && isset($shop_code))
+        {
+            $this->load->model('shop');
+            $query = $this->shop->search_stok($keywords, $shop_code);
+            //proses untuk ditampilkan
+            if(isset($query))
+            {
+                if($query->num_rows() > 0)
+                {
+                    $this->data['total_item'] = $query->num_rows();
+                    //setting up pagination
+                    $this->load->library('pagination');
+                    $config['base_url'] = base_url().'toko/stok/';
+                    $config['total_rows'] = $this->data['total_item'];
+                    $config['per_page'] = 10;
+                    $this->pagination->initialize($config);
+                    $this->data['page'] = $this->pagination->create_links();
+                    //applying pagination on displaying result            
+                    if(isset($param) && intval($param) > 0)
+                    {
+                        $page_min = $param;
+                        $page_max = $page_min + $config['per_page'];
+                    }
+                    else
+                    {
+                        $page_min = 0;
+                        $page_max = $config['per_page'];
+                    }
+                    $i = 0;
+                    $this->data['row_data'] = '';
+                    $this->data['total_jumlah'] = 0;
+                    $this->data['total_retur'] = 0;
+                    foreach($query->result() as $row)
+                    {
+                        if($i>=$page_min && $i<$page_max)
+                        {
+                            if(empty($row->stok))
+                            {
+                                $row->stok = 0;
+                            }
+                            if(empty($row->retur))
+                            {
+                                $row->retur = 0;
+                            }
+                            $this->data['row_data'] .= '<tr>
+                                                            <td>'.++$i.'</td>
+                                                            <td>'.$row->item_code.'</td>
+                                                            <td>'.$row->item_name.'</td>
+                                                            <td>'.$row->sup_code.'</td>
+                                                            <td class="right">'.number_format($row->item_hj,0,',','.').',-</td>
+                                                            <td>'.$row->stok.'</td>
+                                                            <td>'.$row->retur.'</td>
+                                                        </tr>';                            
+                        }
+                        else
+                        {
+                            $i++;
+                        }
+                        $this->data['total_jumlah'] += $row->stok;
+                        $this->data['total_retur'] += $row->retur;
+                    }
+                }
+                else
+                {
+                    $this->data['err_msg'] = '<span style="color:red">Data tidak ditemukan, silahkan pilih toko yang lain</span>';
+                }
+            }            
+            //ambil data toko
+            $query = $this->shop->get_shop($shop_code);
+            if($query->num_rows() > 0)
+            {
+                $this->data['shop'] = $query->row();
+            }
+        }
 		$this->list_toko();
 		$this->data['page_title'] .= ':. Melihat Stok Toko';
-		$this->load->view('tok_stok',$this->data);
+		$this->load->view(config_item('template').'tok_stok',$this->data);
 	}
     /**
     *Membuat list toko
     **/
     function list_toko()
     {
-        $query = $this->db->get('shop');            
+        $this->load->model('shop');
+        $query = $this->shop->get_shop();            
         if($query->num_rows())
         {
             $this->data['list_toko'] ='<select name="shop_code">';
@@ -191,37 +254,124 @@ class Toko extends Controller {
             
         }
     }
-	/**
-	*Method untuk melihat detail toko
-	*/
-	function detail()
-	{
-		if(isset($_POST['submit_detail_toko']))
+    /**
+    *Lihat detail toko
+    */
+    function detail()
+    {
+        if($this->input->post('submit_detail_toko'))
 		{
-			$query = $this->db->get_where('shop', array('shop_code'=>$this->input->post('shop_code')));
-			$data = $query->row();
-			//mecah alamat jadi dua
-			$array = explode(" ", $data->shop_address);
-			$alamat1='';
-			for($i=0;$i<count($array)-1;$i++)
-			{
-				$alamat1 .= $array[$i].' ';
-			}
-			//mecah nomor telepon, nyelipin tanda kurung
-			$kode_area = substr($data->shop_phone,0,3);
-			$bag1 = substr($data->shop_phone,3,4);
-			$bag2 =  substr($data->shop_phone,6,4);
-			$this->data['shop_phone'] = '('.$kode_area.') '.$bag1.' '.$bag2;
-			$this->data['alamat1'] = $alamat1;
-			$this->data['alamat2'] =  $array[count($array)-1];
-			$this->data['shop_code'] = $data->shop_code;
-			$this->data['shop_name'] = $data->shop_name;
-			$this->data['shop_initial'] = $data->shop_initial;
-			$this->data['shop_supervisor'] = $data->shop_supervisor;			
+            $this->load->model('shop');
+			$query = $this->shop->detail($this->input->post('shop_code'));
+            if($query->num_rows > 0)
+            {
+			    $this->data['toko'] = $query->row();
+                $file_name = 'css/images/toko/'.strtolower($this->data['toko']->shop_code).'.jpg';
+                if(file_exists($file_name))
+                {
+                    $this->data['shop_pict'] = base_url().$file_name;                    
+                }
+                else
+                {
+                    $this->data['shop_pict'] = base_url().'css/images/toko/default.png';
+                }
+                if(empty($this->data['toko']->total))
+                {
+                    $this->data['toko']->total = 0;
+                }
+            }
 		}
-		$this->data['page_title'] .= ':. Melihat Detail Toko';
-		$this->list_toko();
-		$this->load->view('tok_detail',$this->data);
+        $this->data['page_title'] .= ':. Melihat Detail Toko';		
+		$this->load->view(config_item('template').'tok_detail',$this->data);
+    }
+	/**
+	*Method untuk cari toko
+	*/
+	function cari($param='')
+	{
+        $this->load->model('shop');		
+        
+        //ambil dta toko
+        if($this->input->post('submit_cari_toko'))
+        {
+            $keywords = $this->input->post('keywords');
+        }
+        else
+        {
+            $keywords='';
+        }
+        $query = $this->shop->cari($keywords);
+        if($query->num_rows() > 0)
+        {            
+            $this->data['total_item'] = $query->num_rows();
+            //setting up pagination
+            $this->load->library('pagination');
+            $config['base_url'] = base_url().'toko/cari/';
+            $config['total_rows'] = $this->data['total_item'];
+            $config['per_page'] = 10;
+            $this->pagination->initialize($config);
+            $this->data['page'] = $this->pagination->create_links();
+            //applying pagination on displaying result            
+            if(isset($param) && intval($param) > 0)
+            {
+                $page_min = $param;
+                $page_max = $page_min + $config['per_page'];
+            }
+            else
+            {
+                $page_min = 0;
+                $page_max = $config['per_page'];
+            }
+            $i = 0;
+            $this->data['row_data'] = ''; 
+            foreach($query->result() as $row)
+            {
+                if($i>=$page_min && $i<$page_max)
+                {
+                    //ambil data retur
+                    $temp = $this->shop->cari_retur($row->shop_code);
+                    if($temp->num_rows() > 0)
+                    {
+                        $tmp = $temp->row();
+                        $retur = $tmp->retur;
+                    }
+                    else
+                    {
+                        $retur = 0;
+                    }
+                    //stok = total - retur
+                    if(empty($row->total))
+                    {
+                        $row->total = 0;
+                    }
+                    $stok = $row->total - $retur;
+                    $this->data['row_data'] .= '<tr>
+                                                    <td>'.++$i.'</td>
+                                                    <td>'.$row->shop_code.'</td>
+                                                    <td>'.$row->shop_name.'</td>
+                                                    <td>'.$row->total.'</td>
+                                                    <td>'.$retur.'</td>
+                                                    <td>'.$stok.'</td>
+                                                    <td>
+                                                    '.form_open('toko/detail').'
+                                                        <input type="hidden" name="shop_code" value="'.$row->shop_code.'" />
+                                                        <span class="button"><input type="submit" name="submit_detail_toko" class="button" value="Lihat"/></span>
+                                                    '.form_close().'
+                                                    '.form_open('toko/ubah').'
+                                                        <input type="hidden" name="shop_code" value="'.$row->shop_code.'" />
+                                                        <span class="button"><input type="submit" name="submit_ubah" class="button" value="Ubah"/></span>
+                                                    '.form_close().'
+                                                    </td>
+                                                </tr>';
+                }
+                else
+                {
+                    $i++;
+                }
+            }
+        }
+		$this->data['page_title'] .= ':. Melihat Detail Toko';		
+		$this->load->view(config_item('template').'tok_cari',$this->data);
 	}
 	/**
 	*Method untuk mengubah data toko, 
@@ -229,42 +379,54 @@ class Toko extends Controller {
 	*/
 	function ubah()
 	{
-		//retrieve data toko yang akan diedit berdasar kode toko
-		if(isset($_POST['submit_search_toko']))
+		//tampilin data toko yang akan diubah
+        $this->load->model('shop');
+        if($this->input->post('submit_ubah'))
+        {            
+            $query = $this->shop->get_shop($this->input->post('shop_code'));            
+            if($query->num_rows() > 0)
+            {
+                $this->data['shop'] = $query->row();
+            }
+        }        
+		if($this->input->post('submit_ubah_toko'))
 		{
-			$shop_code = $this->input->post('shop_code');
-			$query = $this->db->get_where('shop',array('shop_code'=>$shop_code));
-			$row = $query->row();
-			$this->data['shop_code'] = $row->shop_code;
-			$this->data['shop_name'] = $row->shop_name;
-			$this->data['shop_initial'] = $row->shop_initial;
-			$this->data['shop_address'] = $row->shop_address;
-			$this->data['shop_phone'] = $row->shop_phone;
-			$this->data['shop_supervisor'] = $row->shop_supervisor;
-		}
-		if(isset($_POST['submit_ubah_toko']))
-		{
-			$shop_code = $this->input->post('shop_code');
 			if($this->validate_form_tambah_toko())
 			{
 				$data = array(
+                    'shop_code'=>$this->input->post('shop_code'),
+                    'shop_name'=>$this->input->post('shop_name'),
+                    'shop_initial'=>$this->input->post('shop_initial'),
 					'shop_address'=>$this->input->post('shop_address'),
 					'shop_phone'=>$this->input->post('shop_phone'),
-					'shop_supervisor'=>$this->input->post('shop_supervisor')					
-				);
-				$this->db->where('shop_code',$shop_code);
-				if($this->db->update('shop',$data))
+					'shop_supervisor'=>$this->input->post('shop_supervisor')
+				);				
+				if($this->shop->update($data))
 				{
-					$this->data['notify'] = 'Data toko telah disimpan';
+                    //upload image update klo emang ada                    
+                    $config['upload_path'] = 'css/images/toko/';
+                    $config['allowed_types'] = 'jpg';
+                    $config['overwrite'] = TRUE;
+                    $config['file_name'] = strtolower($data['shop_code']); 
+                    $this->load->library('upload', $config);
+                    //do upload
+                    $this->upload->do_upload('shop_img');
+                    
+					$this->data['err_msg'] = '<span style="color:green">Perubahan telah disimpan</span>';
 				}
 				else
 				{
-					$this->data['notify'] = 'Data toko gagal disimpan, terjadi error';
+					$this->data['err_msg'] = '<span style="color:red">Data toko gagal disimpan, terjadi error</span>';
 				}
 			}
-		}		
-		$this->list_toko();		
-		$this->load->view('tok_ubah',$this->data);
+            $query = $this->shop->get_shop($data['shop_code']);            
+            if($query->num_rows() > 0)
+            {
+                $this->data['shop'] = $query->row();
+            }
+		}	
+			
+		$this->load->view(config_item('template').'tok_ubah',$this->data);
 	}
 }
 /* End of file toko.php */

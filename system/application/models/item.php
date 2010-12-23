@@ -17,12 +17,47 @@ class Item extends Model {
 		return $this->db->get_where('item',array('cat_code'=>$cat_code));
 	}
     /**
+    *get item
+    */
+    function get_item($param)
+    {
+        return $this->db->get_where('item',$param);
+    }
+    
+    /**
     *insert new item
     *@param : $data -> array item data
     */
     function add_item($data)
     {
         return $this->db->insert('item',$data);
+    }
+    /*
+    * update item setelah mutasi keluar
+    * kurangi stok dan isi harga jual
+    */
+    function update_item($param)
+    {
+        $query = 'update item set item_hj="'.$param['item_hj'].'", item_qty_stock="'.$param['item_qty_stok'].'" where item_code="'.$param['item_code'].'"';
+        return $this->db->query($query);
+    }
+    /**
+    *update item setelah retur, nambahin stok barang
+    */
+    function update_after_retur($param)
+    {
+        $query = 'update item set item_qty_stock = item_qty_stock + '.$param['quantity'].' where item_code="'.$param['item_code'].'"';
+        return $this->db->query($query);
+    }
+    /**
+    *Fungsi untuk search item
+    */
+    function search_item($param)
+    {
+        $query = 'select * from (select item.*,supplier.sup_name from item left join supplier on item.sup_code=supplier.sup_code 
+                where item.item_code like "'.$param['keywords'].'%" or item.item_name like"'.$param['keywords'].'%") as search 
+                left join category on search.cat_code = category.cat_code';
+        return $this->db->query($query);
     }
 }
 //end of file gudang_model.php

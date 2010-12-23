@@ -27,6 +27,33 @@
         }
     }
     /**
+    *Nampilin tanggal sekarang
+    **/
+    if(!function_exists('date_to_string')) 
+    {
+        function date_to_string($date)
+        {
+            $date_arr = explode('-',$date);
+            $date = $date_arr[2].' ';
+            switch($date_arr[1])
+            {
+                case '01': $date .= 'Januari';break;
+                case '02': $date .= 'Februari';break;
+                case '03': $date .= 'Maret';break;
+                case '04': $date .= 'April';break;
+                case '05': $date .= 'Mei';break;
+                case '06': $date .= 'Juni';break;
+                case '07': $date .= 'Juli';break;
+                case '08': $date .= 'Agustus';break;
+                case '09': $date .= 'September';break;
+                case '10': $date .= 'Oktober';break;
+                case '11': $date .= 'November';break;
+                case '12': $date .= 'Desember';break;
+            }
+            return $date.' '.$date_arr[0];
+        }
+    }
+    /**
     *Nampilin userinfo
     **/
     if(!function_exists('get_userinfo')) 

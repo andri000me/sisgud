@@ -1,0 +1,17 @@
+catatan:
+- tertukar alamat dan telepon, manajemen pengguna - ok
+- supplier, dibedakan antara medan dan luar medan. luar medan hm+15% -ok
+- harga jual > harga modal, buat peringatan --ok
+- yang ditampiln di mutasi keluar hanya barang yang masih ada stok, --ok
+- jika ada baris barang yang dobel kode, digabung saja --ok
+- yang boleh diretur adalah barang yang sudah pernah di mutasi keluar (tandanya harga jual >0) --ok
+- rekap retur per supplier -- ok
+- cetak mutasi -> ctak mutasikeluar, rekap mutasi->rekap mutasi keluar. di pdf judulnya diganti bon mutasi keluar --ok
+- rekap retur dibuat antara tanggal brp smp brp --ok
+- tulisan selamat datang diganti assalamu'alaikum --ok
+- tulisan mode fashion dibuat yang standar(yang gambar) --ok
+- search stok gudang kok gak jalan --ok
+- export data -ok
+- validasi form retur barang -- ok
+
+rekap mutasi bisa dicari berdasr: tgl bon,tgl mutasi masuk, supplier
