@@ -1,3 +1,5 @@
+- kode barang jadi 10 digit. ok
+xxx-xx-xxxxx
 catatan:
 - tertukar alamat dan telepon, manajemen pengguna - ok
 - supplier, dibedakan antara medan dan luar medan. luar medan hm+15% -ok
@@ -14,4 +16,4 @@ catatan:
 - export data -ok
 - validasi form retur barang -- ok
 
-rekap mutasi bisa dicari berdasr: tgl bon,tgl mutasi masuk, supplier
+rekap mutasi bisa dicari berdasr: tgl bon,tgl mutasi masuk, supplier -ok

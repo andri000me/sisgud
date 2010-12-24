@@ -17,7 +17,7 @@
                 echo $this->session->userdata('form_notify');
                 $this->session->unset_userdata('form_notify');
             }
-            ?></p>
+            ?></p>            
             <table class="table-data">
                 <tr>
                     <td class="header">No</td>

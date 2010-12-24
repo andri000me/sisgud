@@ -16,6 +16,15 @@ class Item extends Model {
         $this->db->order_by('item_code','desc');
 		return $this->db->get_where('item',array('cat_code'=>$cat_code));
 	}
+    /*
+    * ambildata item berdasar kode klompok barang dan tahun
+    * untuk generate kode item baru
+    */
+    function get_item_by_catnyear($catnyear)
+    {
+        $this->db->like('item_code',$catnyear,'after')->order_by('item_code','desc');
+        return $this->db->get('item');
+    }
     /**
     *get item
     */

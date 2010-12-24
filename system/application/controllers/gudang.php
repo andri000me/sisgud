@@ -438,6 +438,7 @@ class Gudang extends Controller {
         $this->data['form_notify']='';
         $time = time();
         $tgl_mutasi = date('Y-m-d');
+        $thn = date('y');
         $success = '';
         $failed='';
         $qty_nol = '';
@@ -446,7 +447,7 @@ class Gudang extends Controller {
             if(!empty($this->data['cat_code'][$i]))
             {
                 
-                //tentuin kode kelompok barangya dulu, kelompok barang adalah 3 digit awal
+                //tentuin kode kelompok barangya dulu, kelompok barang adalah 3 digit awal                
                 $cat_code = $this->data['cat_code'][$i];
                 if($this->data['item_qty'][$i] > 0)
                 {
@@ -467,31 +468,24 @@ class Gudang extends Controller {
                     if($query->num_rows() > 0)
                     {
                         //semua item yang dimutasikan dianggap sebagai item baru, tidak pernah ada update item
-                        //sistem kode label yang ada : 8 digit, dengan ketentuan, 3 digit awal adalah kategori barang, dan sisanya no urut barang
-                        //8 digit = xxx-xxxxx
+                        //sistem kode label yang ada : 10 digit, dengan ketentuan, 3 digit awal adalah kategori barang, 2 digit tahun dan sisanya no urut barang
+                        //10 digit = xxx-xx-xxxxx
                         //5 digit terakhir diotomasi sistem                    
                         
                         //check apakah barang dengan kategori tersebut sudah pernah ada, klo udh pernah ada trus ambil dan tinggal naikin no urut kode labelnya
                         $this->load->model('item');
-                        $query = $this->item->get_item_by_cat($cat_code);
+                        $query = $this->item->get_item_by_catnyear($cat_code.$thn);
                         if($query->num_rows() > 0)
                         {
                             $data_item = $query->row();
-                            $temp = ++$data_item->item_code;
-                            if(strlen($temp) < 8)
-                            {
-                                $start = strlen($temp) - 5;
-                                $item_next = substr($temp, $start, 5);
-                                $data['item_code'] = $cat_code.$item_next;                                
-                            }
-                            else 
-                            {
-                                $data['item_code'] = $temp;
-                            }
+                            $temp = ++$data_item->item_code; //klo ada di database terus langsung di
+                            $start = strlen($temp) - 5;
+                            $item_next = substr($temp, $start, 5);
+                            $data['item_code'] = $cat_code.$thn.$item_next;                        
                         }            
-                        else
+                        else //klo bblum ada mulai dari 00001
                         {
-                            $data['item_code'] = $cat_code.'00001';
+                            $data['item_code'] = $cat_code.$thn.'00001';
                         }
                         //save item to database
                         $this->load->model('item');
