@@ -37,10 +37,10 @@
                     </td>                                
                 </tr> 
                 <tr>
-                    <td>Telepon </td><td>: <input type="text" name="op_phone" /> <span class="note"></span></td>                                
+                    <td>Telepon </td><td>: <input type="text" name="op_phone" /> <span class="note">*)</span></td>                                
                 </tr>               
                 <tr>
-                    <td>Alamat</td><td>: <textarea name="op_address" style="vertical-align:text-top"></textarea> <span class="note"></span></td>                                
+                    <td>Alamat</td><td>: <textarea name="op_address" style="vertical-align:text-top"></textarea> <span class="note">*)</span></td>                                
                 </tr> 
                 <tr>
                     <td colspan="2">

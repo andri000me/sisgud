@@ -1,7 +1,7 @@
 <div id="templatemo_content_area_top">
     <div class="templatemo_left_top">
         <div class="templatemo_news">
-            <p><?php echo $now_date ?> .:. <?php echo $userinfo.'('.ucwords($this->session->userdata('p_role')).')' ?> .:. <a href="<?php echo base_url().'index.php/home/logout'?>" class="comments">Log Out</a></p>
+            <p><?php echo $now_date ?> .:. <a href="<?php echo base_url().'profile' ?>"><?php echo $userinfo.'('.ucwords($this->session->userdata('p_role')).')' ?></a>.:. <a href="<?php echo base_url().'index.php/home/logout'?>" class="comments">Log Out</a></p>
         </div>               
     </div>            
     <div class="templatemo_right_top">

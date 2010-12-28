@@ -65,6 +65,10 @@ class Pengguna extends Model {
         $this->db->where('op_id',$op_id);
         return $this->db->update('operator',$data);
     }
+    /**
+    *update passwd
+    */
+   
 }
 
 /*End of file pengguna.php*/
