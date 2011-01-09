@@ -36,12 +36,14 @@
                 </tr>                
                 <?php echo $row_data ?>                
             </table>
-            <?php echo form_open('gudang/cetak/bon') ?>
+            <!--<?php echo form_open('gudang/cetak/bon') ?>-->
             <p style="text-align:center"><input type="hidden" name="dist_code" value="<?php echo $dist_code ?>"/>
-            <span class="button"><input class="button" type="submit" name="submit_cetak_bon" value="Cetak"></span>
+            <a href="<?php echo base_url().'gudang/cetak/bon/'.$dist_code ?>" target="new">
+                <span class="button"><input class="button" type="submit" name="submit_cetak_bon" value="Cetak"></span>
+            </a>
             </p>
-            <?php echo form_close() ?>
-            </div>
+            <!--<?php echo form_close() ?>-->
+            </div>            
             <?php } ?>
       </div>                
         <div class="tempatemo_right_bottom">

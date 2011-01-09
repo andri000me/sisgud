@@ -32,7 +32,15 @@ class Item extends Model {
     {
         return $this->db->get_where('item',$param);
     }
-    
+    /**
+    *ambil barang sisa mutasi
+    */
+    function get_sisa($keywords='')
+    {
+        $query = 'select i.*, sm.kode_mutasi from item i left join sisa_mutasi sm on i.item_code = sm.item_code 
+        where i.item_qty_stock > 0 and i.item_hj > 0 and (i.item_code like "'.$keywords.'%" or i.item_name like "'.$keywords.'%") group by i.item_code';
+        return $this->db->query($query);
+    }
     /**
     *insert new item
     *@param : $data -> array item data
@@ -68,5 +76,38 @@ class Item extends Model {
                 left join category on search.cat_code = category.cat_code';
         return $this->db->query($query);
     }
+    /**
+    * fungsi untuk edit item yang salah2
+    * opsi 1: operator
+    * opsi 2: supervisor
+    */
+    function edit_item($param, $opsi)
+    {
+        //opsi 1 ubah table item dan item mutasi        
+        if($opsi == 1)
+        {
+            if($this->edit_item_mutasi($param))
+            {
+                $query = 'update item set item_name="'.$param['item_name'].'", item_hp="'.$param['item_hp'].'", item_qty_stock="'.$param['quantity'].'", 
+                item_qty_total="'.$param['quantity'].'", item_hm = ('.$param['item_hp'].'*'.$param['quantity'].'), sup_code="'.$param['sup_code'].'" 
+                where item_code="'.$param['item_code'].'"';
+            }
+        }
+        //opsi 2 ubah table item saja
+        else if($opsi==2)
+        {
+            $query = 'update item set item_name="'.$param['item_name'].'", sup_code="'.$param['sup_code'].'", item_hj="'.$param['item_hj'].'" where item_code="'.$param['item_code'].'"';
+        }
+        return $this->db->query($query);
+    }
+    /**
+    * fungsi untuk edit item mutasi
+    */
+    function edit_item_mutasi($param)
+    {
+        $query = 'update item_mutasi set sup_code="'.$param['sup_code'].'", qty="'.$param['quantity'].'" where item_code="'.$param['item_code'].'"';
+        return $this->db->query($query);
+    }
+    
 }
 //end of file gudang_model.php

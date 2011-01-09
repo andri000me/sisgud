@@ -31,7 +31,7 @@ class Autocomplete extends Controller {
 		$query = $this->autocomplete->get_item_for_mutasi_keluar($key);		
 		foreach($query->result() as $row)
 		{
-			echo ucwords($row->item_code).'|'.$row->item_name.'|'.$row->item_qty_stock.'|'.ucwords($row->sup_name).'|'.number_format($row->item_hj,0,',','.').',-'.'|'.$row->item_hp.chr(10);
+			echo ucwords($row->item_code).'|'.$row->item_name.'|'.$row->item_qty_stock.'|'.ucwords($row->sup_name).'|'.number_format($row->item_hj,0,',','.').',-'.'|'.$row->item_hp.'|'.$row->item_hj.chr(10);
 		}
 	}
     /*

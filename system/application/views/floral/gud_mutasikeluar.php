@@ -34,14 +34,14 @@
                         echo '<tr class="row-data">
                                 <td>'.++$i.'</td>
                                 <td>
-                                    <input type="text" class="item_code ac_input" name="item_code[]" maxlength="8" style="width:80px" onkeyup="setFocus('.$i.')"/>
+                                    <input type="text" class="item_code ac_input" name="item_code[]" maxlength="10" style="width:80px" onkeyup="setFocus('.$i.')"/>
                                     <span id="item_code_'.$i.'" style="display:none"></span>
                                 </td>
                                 <td><input type="text" id="item_name_'.$i.'" style="width:130px" readonly="readonly"/></td>
                                 <td><input type="text" id="qty_first_'.$i.'" style="width: 25px;" readonly="readonly"/></td>                                
                                 '.str_replace('#',$i,$row_qty).'
                                 <td><input type="text" name="qty_stok[]" id="qty_stok_'.$i.'" style="width: 25px;" readonly="yes"/></td>
-                                <td><input type="hidden" id="item_hp_'.$i.'"/><input type="text" name="item_hj[]" id="hj_'.$i.'" style="width:80px" onblur="checkItemHj('.$i.')"/></td>
+                                <td><input type="hidden" id="item_hp_'.$i.'"/><input type="text" name="item_hj[]" id="hj_'.$i.'" style="width:80px" onblur="checkItemHj('.$i.')" onkeyup="setFocus('.$i.')"/></td>
                                 <td><input type="text" name="item_disc[]" id="disc_'.$i.'" style="width:80px"/></td>
                             </tr>';
                     }

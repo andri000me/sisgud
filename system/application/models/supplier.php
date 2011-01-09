@@ -25,7 +25,10 @@ class Supplier extends Model {
     {
         if($role != 'admin')
         {
-            $query = 'select * from supplier where supplier.sup_code in(select item.sup_code from item left join item_mutasi on item.item_code = item_mutasi.item_code where item_mutasi.status_print_mutasi=0 group by item.sup_code)';
+            $query = 'select supplier.* from 
+                        (select item.sup_code from item left join item_mutasi on item.item_code = item_mutasi.item_code where item_mutasi.status_print_mutasi=0 group by item.sup_code) as sup
+                        left join supplier
+                        on sup.sup_code = supplier.sup_code';
         }
         else
         {

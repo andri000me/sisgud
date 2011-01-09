@@ -31,7 +31,9 @@
                 <?php echo $row_data ?>
             </table> 
             <?php } ?>
-           
+            <div id="dialog-msg" title="Notifikasi" style="display:none">
+            <p id="msg"></p>
+            </div>
       </div>                
         <div class="tempatemo_right_bottom">
         </div>

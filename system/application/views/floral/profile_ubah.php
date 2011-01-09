@@ -31,7 +31,7 @@
                 <tr>
                     <td>Jabatan</td>
                     <td>: 
-                        <select name="p_role" style="width:155px;margin-left: 2px;">
+                        <select name="p_role" style="width:155px;margin-left: 2px;" readonly="readonly">
                             <option value="1" <?php if($pengguna->p_role == 'admin') echo 'selected="selected"' ?> >Administrator</option>
                             <option value="2" <?php if($pengguna->p_role == 'supervisor') echo 'selected="selected"' ?> >Supervisor</option>
                             <option value="3" <?php if($pengguna->p_role == 'operator') echo 'selected="selected"' ?> >Operator</option>

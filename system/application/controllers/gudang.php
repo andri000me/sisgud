@@ -152,78 +152,97 @@ class Gudang extends Controller {
 				$query = $this->supplier->get_supplier($this->input->post('sup_code'));
 				$sup = $query->row();
                 $query = $this->item_mutasi->get_item_mutasi(array('sup_code'=>$this->input->post('sup_code'))); 
-                $data = $query->row();
-				$head = '<div style="margin-top: 5px;">
-						    <h3 style="text-align: center;">BON MUTASI KELUAR</h3>
-						    <table style="width: 700px;">
-							<tr><td style="width: 50px;">SUPPLIER</td><td style="width:300px;">: '.strtoupper($sup->sup_name).'</td>
-							<td style="width: 120px;text-align:right;">Tanggal Mutasi</td><td style="width:100px;text-align:right">: '.date_to_string($data->date_entry).'</td></tr>							                              
-						    </table>
-						</div><br />';
-				
-                //retrieve data toko
-				$query = $this->shop->get_shop();
-				$jumlah_toko = $query->num_rows();
-				$width = $jumlah_toko * 20;				
-				$head .= '<table style="width: 600px;" border="1" cellpadding="3">
-					    <tr>
-						<td style="width: 60px;text-align: center; vertical-align: middle;" rowspan="2">Kode Label</td>
-						<td style="width: 100px;text-align: center;" rowspan="2">Nama</td>
-						<td style="width: 25px;text-align: center;" rowspan="2">Qty</td>
-						<td style="width: '.$width.'px;text-align: center;" colspan="15">Distribusi</td>
-						<td style="width: 50px;text-align: center;" rowspan="2">HM</td>
-						<td style="width: 50px;text-align: center;" rowspan="2">Harga Jual</td>						
-					    </tr>
-					    <tr>';
-                foreach($query->result() as $row)
+                if($query->num_rows() > 0)
                 {
-                    $head .= '<td style="width: 20px;text-align: center; font-size: 17px;">'.strtoupper($row->shop_initial).'</td>';
-                }
-                $head.='</tr>';
+                    $data = $query->row();
+                    $head = '<div style="margin-top: 5px;">
+                                <h3 style="text-align: center;">BON ORDER BARANG</h3>
+                                <table style="width: 700px;">
+                                <tr><td style="width: 50px;">SUPPLIER</td><td style="width:300px;">: '.strtoupper($sup->sup_name).'</td></tr>							                              
+                                <tr><td style="width: 50px;">TANGGAL</td><td style="width:300px;">: '.date_to_string($data->date_entry).'</td></tr>							                              
+                                </table>
+                            </div>';
                     
-				//retrieving data item untuk diprint				
-                $query = $this->item_mutasi->get_item_mutasi(array('sup_code'=>$this->input->post('sup_code'))); 
-               
-				$data='';
-				if($query->num_rows() > 0)
-				{
-					foreach($query->result() as $row)
-					{
-						$data .='<tr>
-								<td style="width: 60px;text-align: center;">'.$row->item_code.'</td>
-								<td style="width: 100px;text-align: center;">'.$row->item_name.'</td>
-								<td style="width: 25px;text-align: center">'.$row->item_qty_stock.'</td>';
-						for($i=0;$i<$jumlah_toko;$i++)
-						{
-							$data .= '<td style="width: 20px;text-align: center; font-size: 17px;"></td>';
-						}
-                        //check barang medan atau luar kota
-                        if(!$this->check_if_medan($this->input->post('sup_code')))
+                    //retrieve data toko
+                    $query = $this->shop->get_shop();
+                    $jumlah_toko = $query->num_rows();
+                    $this->data['shop_count'] = $query->num_rows();
+                    $width = $jumlah_toko * 25;				
+                    $head .= '<br /><table style="width: 600px;" border="1" cellpadding="3">
+                            <tr>
+                            <td style="width: 20px;text-align: center;" rowspan="2">No</td>
+                            <td style="width: 60px;text-align: center; vertical-align: middle;" rowspan="2">Kode Label</td>
+                            <td style="width: 100px;text-align: center;" rowspan="2">Nama</td>
+                            <td style="width: 25px;text-align: center;" rowspan="2">Qty</td>
+                            <td style="width: '.$width.'px;text-align: center;" colspan="15">Distribusi</td>
+                            <td style="width: 50px;text-align: center;" rowspan="2">HM</td>
+                            <td style="width: 60px;text-align: center;" rowspan="2">Harga Jual</td>						
+                            </tr>
+                            <tr>';
+                    $row_shop = '';
+                    foreach($query->result() as $row)
+                    {
+                        $head .= '<td style="width: 25px;text-align: center; font-size: 17px;">'.strtoupper($row->shop_initial).'</td>';
+                        $row_shop .= '<td style="width: 25px;text-align: center; font-size: 17px;"></td>';
+                    }
+                    $head.='</tr>';
+                        
+                    //retrieving data item untuk diprint				
+                    $query = $this->item_mutasi->get_item_mutasi(array('sup_code'=>$this->input->post('sup_code')));                
+                    if($query->num_rows() > 0)
+                    {
+                        $j=0;
+                        $data='';
+                        foreach($query->result() as $row)
                         {
-						    $hp = floor($row->item_hp + 0.15*$row->item_hp);
+                            $data .='<tr>
+                                    <td style="width: 20px;text-align: center;">'.++$j.'</td>
+                                    <td style="width: 60px;text-align: center;">'.$row->item_code.'</td>
+                                    <td style="width: 100px;text-align: center;">'.$row->item_name.'</td>
+                                    <td style="width: 25px;text-align: center">'.$row->qty.'</td>
+                                    '.$row_shop;	
+                            //check barang medan atau luar kota
+                            if(!$this->check_if_medan($row->sup_code))
+                            {
+                                $hp = floor($row->item_hp + 0.15*$row->item_hp);
+                            }
+                             else
+                            {
+                                $hp = $row->item_hp;
+                            }
+                            $data .= '	<td style="width: 50px;text-align: right;">'.number_format($hp,'0',',','.').',-</td>
+                                    <td style="width: 60px;text-align: center;"></td>		
+                                    </tr>';                        
+                            
+                            if($jumlah_toko <= 10 && $j%15 == 0)
+                            {
+                                $list_data[] = $data;
+                                $data = '';
+                            }
+                            else if($jumlah_toko > 10 && $j%25 == 0)
+                            {
+                                $list_data[] = $data;
+                                $data = '';
+                            }
                         }
-                         else
+                        //klo data tak kosong, tambahkan
+                        if(!empty($data))
                         {
-                            $hp = $row->item_hp;
+                            $list_data[] =$data;
                         }
-						$data .= '	<td style="width: 50px;text-align: right;">'.number_format($hp,'0',',','.').',-</td>
-								<td style="width: 50px;text-align: center;"></td>		
-							    </tr>';
-					}
-                    $data .='</table>';
-                    $footer = '<br /><br /><table style="text-align:center;">
-                            <tr><td>(. . . . . . . . . . . . . .)</td><td>(. . . . . . . . . . . . . .)</td></tr>                            
-                        </table>';
-                    //update status item yang udh pernah diprint mutasi jadi 1
-                    $this->item_mutasi->update_status(array('sup_code'=>$this->input->post('sup_code')));                    
-                    $this->cetak_mutasi_pdf($head, $data, $footer);            
-				}
-                else
-                {
-                    $this->data['notifikasi'] = 'Tidak ada data mutasi barang masuk pada tanggal tersebut';                    
+                        $footer = '</table><br /><table style="text-align:center;">
+                                <tr><td>(Bagian Mutasi Masuk)</td><td>(Bagian Distribusi)</td></tr>                            
+                            </table>';
+                        //update status item yang udh pernah diprint mutasi jadi 1
+                        $this->item_mutasi->update_status(array('sup_code'=>$this->input->post('sup_code')));                    
+                        $this->cetak_mutasi_pdf($head, $list_data, $footer);            
+                    }
+                    else
+                    {
+                        $this->data['notifikasi'] = 'Tidak ada data mutasi barang masuk pada tanggal tersebut';                    
+                    }
+                    //----------------------------------------------------
                 }
-				//----------------------------------------------------
-				
 			}
             //print preview untuk mutasi
             if($this->input->post('submit_preview_mutasi'))
@@ -347,29 +366,33 @@ class Gudang extends Controller {
                 $query = $this->item_mutasi->get_item_mutasi(array('kode_mutasi'=>$kode_mutasi));                
 				$data = $query->row();
 				$head = '<div style="margin-top: 5px;">
-						    <h3 style="text-align: center;">BON MUTASI MASUK</h3>
+						    <h3 style="text-align: center;">BON ORDER BARANG</h3>
 						    <table style="width: 700px;">
-							<tr><td style="width: 50px;">SUPPLIER</td><td style="width:300px;">: '.strtoupper($data->sup_name).'</td>
-							<td style="width: 120px;text-align:right;">Tanggal Mutasi</td><td style="width:100px;text-align:right">: '.date_to_string($data->date_entry).'</td></tr>							                              
+							<tr><td style="width: 50px;">SUPPLIER</td><td style="width:300px;">: '.strtoupper($data->sup_name).'</td></tr>							                              
+							<tr><td style="width: 50px;">TANGGAL</td><td style="width:300px;">: '.date_to_string($data->date_entry).'</td></tr>							                              
 						    </table>
 						</div><br />';
 				//retrieve data toko
 				$query = $this->shop->get_shop();
 				$jumlah_toko = $query->num_rows();
-				$width = $jumlah_toko * 20;				
+                $this->data['shop_count'] = $query->num_rows();
+				$width = $jumlah_toko * 25;				
 				$head .= '<table style="width: 600px;" border="1" cellpadding="3">
 					    <tr>
+                        <td style="width: 20px;text-align: center;" rowspan="2">No</td>
 						<td style="width: 60px;text-align: center; vertical-align: middle;" rowspan="2">Kode Label</td>
 						<td style="width: 100px;text-align: center;" rowspan="2">Nama</td>
 						<td style="width: 25px;text-align: center;" rowspan="2">Qty</td>
 						<td style="width: '.$width.'px;text-align: center;" colspan="15">Distribusi</td>
 						<td style="width: 50px;text-align: center;" rowspan="2">HM (Rp)</td>
-						<td style="width: 50px;text-align: center;" rowspan="2">Harga Jual</td>						
+						<td style="width: 60px;text-align: center;" rowspan="2">Harga Jual</td>						
 					    </tr>
 					    <tr>';
+                $row_shop = '';
                 foreach($query->result() as $row)
                 {
-                    $head .= '<td style="width: 20px;text-align: center; font-size: 17px;">'.strtoupper($row->shop_initial).'</td>';
+                    $head .= '<td style="width: 25px;text-align: center; font-size: 17px;">'.strtoupper($row->shop_initial).'</td>';
+                    $row_shop .= '<td style="width: 25px;text-align: center; font-size: 17px;"></td>';
                 }
                 $head.='</tr>';
                     
@@ -378,17 +401,18 @@ class Gudang extends Controller {
 				$data='';
 				if($query->num_rows() > 0)
 				{
+                    $row_data = '';
+                    $j = 0;
 					foreach($query->result() as $row)
 					{
 						$data .='<tr>
+                                <td style="width: 20px;text-align: center;">'.++$j.'</td>
 								<td style="width: 60px;text-align: center;">'.$row->item_code.'</td>
 								<td style="width: 100px;text-align: center;">'.$row->item_name.'</td>
-								<td style="width: 25px;text-align: center">'.$row->item_qty_stock.'</td>';
-						for($i=0;$i<$jumlah_toko;$i++)
-						{
-							$data .= '<td style="width: 20px;text-align: center; font-size: 17px;"></td>';
-						}
-						if(!$this->check_if_medan($this->input->post('sup_code')))
+								<td style="width: 25px;text-align: center">'.$row->qty.'</td>
+                                '.$row_shop;
+						
+						if(!$this->check_if_medan($row->sup_code))
                         {
 						    $hp = floor($row->item_hp + 0.15*$row->item_hp);
                         }
@@ -397,21 +421,303 @@ class Gudang extends Controller {
                             $hp = $row->item_hp;
                         }
 						$data .= '	<td style="width: 50px;text-align: right;">'.number_format($hp,'0',',','.').',-</td>
-								<td style="width: 50px;text-align: center;"></td>		
+								<td style="width: 60px;text-align: center;"></td>		
 							    </tr>';
+                        if($jumlah_toko <=10 && $j%15==0)
+                        {
+                            $list_data[] = $data;
+                            $data = '';
+                        }
+                        else if($jumlah_toko > 10 && $j%25 == 0)
+                        {
+                            $list_data[] = $data;
+                            $data = '';
+                        }
 					}
-                    $data .='</table>';
-                    $footer = '<br /><br /><table style="text-align:center;">
-                            <tr><td>(. . . . . . . . . . . . . .)</td><td>(. . . . . . . . . . . . . .)</td></tr>                            
-                        </table>';                   
-                    $this->cetak_mutasi_pdf($head, $data, $footer);
+                    //klo data tak kosong, tambahkan
+                    if(!empty($data))
+                    {
+                        $list_data[] =$data;
+                    }
+                    $footer = '</table><br /><table style="text-align:center;">
+                            <tr><td>(Bagian Mutasi Masuk)</td><td>(Bagian Distribusi)</td></tr>                            
+                        </table>';                  
+                    $this->cetak_mutasi_pdf($head, $list_data, $footer);
 				}                
 				//----------------------------------------------------
 				
 			}			
 			$this->load->view(config_item('template').'gud_rekapmutasi',$this->data);
 		}
+        
 	}
+    /**
+    *Fungsi untuk cetak barang yang sisa sisa, mutasi sisa
+    */
+    function sisa($param='')
+    {
+        $this->load->model('item');
+        $this->load->model('sisa_mutasi');
+        //cetak ke pdf
+        if($this->input->post('submit_cetak_sisa') || $this->uri->segment(3) == 'cetak')
+        {
+            $this->load->model('shop');
+            $this->load->model('supplier');
+            //ambil data untuk cetak sisa mutasi ke pdf
+           
+                $query = $this->sisa_mutasi->get_sisa_mutasi(); 
+                if($query->num_rows() > 0)
+                {
+                    $data = $query->row();
+                    $head = '<div style="margin-top: 5px;">
+                                <h3 style="text-align: center;">BON ORDER BARANG (SISA)</h3>
+                                <table style="width: 700px;">
+                                <tr><td style="width: 50px;">SUPPLIER</td><td style="width:300px;">: CAMPUR-CAMPUR</td></tr>							                              
+                                <tr><td style="width: 50px;">TANGGAL</td><td style="width:300px;">: '.date_to_string($data->date_entry).'</td></tr>							                              
+                                </table>
+                            </div><br />';
+                    
+                    //retrieve data toko
+                    $query = $this->shop->get_shop();
+                    $jumlah_toko = $query->num_rows();
+                    $this->data['shop_count'] = $query->num_rows();
+                    $width = $jumlah_toko * 25;				
+                    $head .= '<table style="width: 600px;" border="1" cellpadding="3">
+                            <tr>
+                            <td style="width: 20px;text-align: center;" rowspan="2">No</td>
+                            <td style="width: 60px;text-align: center; vertical-align: middle;" rowspan="2">Kode Label</td>
+                            <td style="width: 100px;text-align: center;" rowspan="2">Nama</td>
+                            <td style="width: 25px;text-align: center;" rowspan="2">Qty</td>
+                            <td style="width: '.$width.'px;text-align: center;" colspan="15">Distribusi</td>
+                            <td style="width: 50px;text-align: center;" rowspan="2">HM</td>
+                            <td style="width: 60px;text-align: center;" rowspan="2">Harga Jual</td>						
+                            </tr>
+                            <tr>';
+                    $row_shop = '';
+                    foreach($query->result() as $row)
+                    {
+                        $head .= '<td style="width: 25px;text-align: center; font-size: 17px;">'.strtoupper($row->shop_initial).'</td>';
+                        $row_shop .= '<td style="width: 25x;text-align: center; font-size: 17px;"></td>';
+                    }
+                    $head.='</tr>';
+                        
+                    //retrieving data item untuk diprint				
+                    $query = $this->sisa_mutasi->get_sisa_mutasi();                
+                    $data='';
+                    if($query->num_rows() > 0)
+                    {
+                        $kode_mutasi = time();
+                        $j = 0;
+                        foreach($query->result() as $row)
+                        {
+                            $temp = $this->item->get_item(array('item_code'=>$row->item_code));
+                            $item = $temp->row();                        
+                            $data .='<tr>
+                                    <td style="width: 20px;text-align: center;">'.++$j.'</td>
+                                    <td style="width: 60px;text-align: center;">'.$row->item_code.'</td>
+                                    <td style="width: 100px;text-align: center;">'.$item->item_name.'</td>
+                                    <td style="width: 25px;text-align: center">'.$row->qty.'</td>
+                                    '.$row_shop;
+                            
+                            //check barang medan atau luar kota
+                            if(!$this->check_if_medan($row->sup_code))
+                            {
+                                $hp = floor($item->item_hp + 0.15*$item->item_hp);
+                            }
+                             else
+                            {
+                                $hp = $item->item_hp;
+                            }
+                            $data .= '	<td style="width: 50px;text-align: right;">'.number_format($hp,'0',',','.').',-</td>
+                                    <td style="width: 60px;text-align: right;">'.number_format($item->item_hj,'0',',','.').',-</td>		
+                                    </tr>';
+                            $this->sisa_mutasi->update_status(array('kode_mutasi'=>$kode_mutasi,'item_code'=>$row->item_code));
+                            //atur paging
+                            if($jumlah_toko <= 10 && $j%15 == 0)
+                            {
+                                $list_data[] = $data;
+                                $data = '';
+                            }
+                            else if($jumlah_toko > 10 && $j%25 == 0)
+                            {
+                                $list_data[] = $data;
+                                $data = '';
+                            }
+                        }
+                        //klo data tak kosong, tambahkan
+                        if(!empty($data))
+                        {
+                            $list_data[] = $data;
+                        }
+                        $footer = '</table><br /><table style="text-align:center;">
+                                <tr><td>(Bagian Mutasi Masuk)</td><td>(Bagian Distribusi)</td></tr>                            
+                            </table>';
+                        if(count($list_data) > 0)
+                        {
+                            $this->cetak_mutasi_pdf($head, $list_data, $footer); 
+                        }
+                    }
+                }
+        }
+        //preview sebelum cetak mutasi sisa
+        if($this->input->post('submit_preview_sisa'))
+        {            
+            $this->load->model('shop');            
+            $this->load->model('supplier');            
+            //get all the  shop
+            $query = $this->shop->get_shop();
+            if($query->num_rows() > 0)
+            {
+                //setting the initial shop,
+                $this->data['shop_count'] = $query->num_rows();
+                $shop = '';                    
+                $row_shop='';
+                $i=0;
+                foreach($query->result() as $row)
+                {
+                    $shop .= '<td class="header">'.strtoupper($row->shop_initial).'</td>';
+                    $row_shop .= '<td></td>';
+                }
+                $this->data['shop_name'] = $shop;                                              
+            }
+            //get data for preview
+            $query = $this->sisa_mutasi->get_sisa_mutasi();
+            if($query->num_rows() > 0)
+            {
+                $this->data['row_data'] = '';
+                $i = 0;
+                foreach($query->result() as $row)
+                {
+                    $temp = $this->supplier->get_supplier($row->sup_code);
+                    $sup = $temp->row();
+                    $temp = $this->item->get_item(array('item_code'=>$row->item_code));
+                    $item = $temp->row();
+                    $this->data['row_data'] .= '<tr>
+                                                    <td>'.++$i.'</td>
+                                                    <td>'.$row->item_code.'</td>
+                                                    <td>'.ucwords($item->item_name).'</td>
+                                                    <td>'.ucwords($sup->sup_name).'('.$sup->sup_code.')</td>
+                                                    <td>'.$row->qty.'</td>
+                                                    '.$row_shop.'
+                                                    <td></td>
+                                                </tr>';
+                }
+                $this->data['tgl_bon'] = date_to_string($row->date_entry);
+            }
+            
+            $this->load->view(config_item('template').'gud_printsisa',$this->data);
+            
+        }
+        //insert atw delete dari table
+        if($this->input->post('opsi'))
+        {
+            $this->load->model('sisa_mutasi');
+            $data = array(
+                'kode_mutasi'=> 0,
+                'item_code'=>$this->input->post('item_code'),
+                'sup_code'=>$this->input->post('sup_code'),
+                'qty'=>$this->input->post('qty'),
+                'date_entry'=>date('Y-m-d'),
+                'status_print_mutasi'=>0
+            );
+            $opsi = $this->input->post('opsi');
+            //opsi 1 insert
+            if($opsi == 1)
+            {
+                if($this->sisa_mutasi->insert_sisa_mutasi($data))
+                {
+                    echo 1;
+                }
+                else
+                {
+                    echo 0;
+                }
+            }
+            //opsi 2 delete
+            else if($opsi==2)
+            {
+                 if($this->sisa_mutasi->remove($data))
+                {
+                    echo 1;
+                }
+                else
+                {
+                    echo 0;
+                }
+            }
+            exit;   
+        }
+        //search dari form
+        if($this->input->post('submit_cari_sisa'))
+        {
+            $keywords = $this->input->post('keywords');
+            $this->session->set_userdata('keywords');
+            $query = $this->item->get_sisa($keywords);            
+        }
+        else
+        {
+            //search dari session, untuk lihat page
+            $keywords = $this->session->userdata('keywords');
+            if(isset($keywords))
+            {
+                $query = $this->item->get_sisa($keywords);
+            }            
+        }
+        //tampilin data untuk ke browser
+        if(isset($query) && $query->num_rows() > 0)
+        {
+            $this->data['total_item'] = $query->num_rows(); 
+            //setting up pagination
+            $this->load->library('pagination');
+            $config['base_url'] = base_url().'gudang/sisa/';
+            $config['total_rows'] = $this->data['total_item'];
+            $config['per_page'] = 20;
+            $this->pagination->initialize($config);
+            $this->data['page'] = $this->pagination->create_links();
+            //applying pagination on displaying result            
+            if(isset($param) && intval($param) > 0)
+            {
+                $page_min = $param;
+                $page_max = $page_min + $config['per_page'];
+            }
+            else
+            {
+                $page_min = 0;
+                $page_max = $config['per_page'];
+            }
+            $i = 0;
+            $this->data['row_data'] = '';            
+            foreach($query->result() as $row)
+            {                         
+                if($i>=$page_min && $i <$page_max)
+                {
+                    $checkbox = '<input type="checkbox" name="opsi_'.++$i.'" value="'.$row->item_code.'" onchange="addRemoveMutasi('.$i.')"/>';
+                    if($row->kode_mutasi == '0')
+                    {
+                        $checkbox = '<input type="checkbox" name="opsi_'.$i.'" value="'.$row->item_code.'" onchange="addRemoveMutasi('.$i.')" checked="checked"/>';
+                    }
+                    $this->data['row_data'] .= '<tr>
+                                                    <td>'.$i.'</td>
+                                                    <td>'.$row->item_code.'</td>
+                                                    <td>'.$row->item_name.'</td>
+                                                    <td>'.$row->cat_code.'</td>
+                                                    <td>'.$row->sup_code.'</td>
+                                                    <td>'.number_format($row->item_hp,0,',','.').'</td>
+                                                    <td>'.$row->item_qty_stock.'</td>
+                                                    <td>'.$checkbox.'</td>
+                                                </tr>';
+                }
+                else
+                {
+                    $i++;
+                }
+            }            
+        }
+        if(!isset($_POST['submit_preview_sisa']))        
+        {
+            $this->load->view(config_item('template').'gud_sisa',$this->data);
+        }
+    }
     function check_if_medan($sup_code)
     {
         $query = $this->supplier->get_supplier($sup_code);
@@ -737,19 +1043,27 @@ class Gudang extends Controller {
                                         <td class="right">'.number_format($jumlah,0,',','.').',-</td>
                                     </tr>';
                         $total_rupiah += $jumlah;
-                        $total_qty += $row->quantity;
+                        $total_qty += $row->quantity;                        
                     }
                     $row_data .= '<tr><td colspan="6">T O T A L</td><td>'.$total_qty.' item</td><td class="right">'.number_format($total_rupiah,0,',','.').',-</td></tr>';
                     $this->data['row_data'] = $row_data;
+                }
+                else
+                {
+                    $this->data['err_msg'] = '<span style="color:red">Tidak dapat mencetak bon. Anda belum mencetak label atau bon sudah pernah dicetak</span>';
                 }
                 //buat bon untuk toko yang sedang ditampilkan
                 $this->item_distribution->create_bon(array('shop_code'=>$this->input->post('shop_code'),'dist_code'=>$this->data['dist_code']));
 			}			
 			//cetak bon setelah preview
-            if($this->input->post('submit_cetak_bon'))
+            $kode_bon = $this->uri->segment(4);
+            if($this->input->post('submit_cetak_bon') || (!empty($kode_bon) && is_numeric($kode_bon)))
 			{
                 //ambil barang untuk dicetak bonnya
-                $kode_bon = $this->input->post('dist_code');
+                if(empty($kode_bon))
+                {
+                    $kode_bon = $this->input->post('dist_code');
+                }                
                 $this->load->model('item_distribution');
                 $this->load->model('shop');
                 $this->load->model('item');
@@ -758,20 +1072,22 @@ class Gudang extends Controller {
 				$mutasi = $query->row();
 				$temp = $this->shop->get_shop($mutasi->shop_code);
 				$shop = $temp->row();
+                $this->data['shop_code'] = $shop->shop_code;
 				$head = '<div style="margin-top: 5px;">
 					    <h3 style="text-align: center;">BON MUTASI KELUAR GUDANG</h3>
 					    <table style="width: 700px;">
 						<tr><td style="width: 80px;">Kode Bon</td><td style="width:260px;">: '.$kode_bon.'</td>
-						<td style="width: 70px;text-align:right;">Tanggal Mutasi</td><td style="width:100px;text-align:right">: '.date_to_string($mutasi->dist_out).'</td></tr>
+						<td style="width: 70px;text-align:right;">Tanggal</td><td style="width:100px;text-align:right">: '.date_to_string($mutasi->dist_out).'</td></tr>
 						<tr><td style="width: 80px; ">Toko Tujuan</td><td>: '.strtoupper($shop->shop_name).'</td></tr>                                
 					    </table>
 					</div><br />';
 					
 				$head .= '<table style="width: 600px;" border="1" cellpadding="3">
 					    <tr>
-						<td style="width: 40px;text-align: center;">No Urut</td>
-						<td style="width: 60px;text-align: center;">Kode Supplier</td>
+						<td style="width: 20px;text-align: center;">No</td>						
 						<td style="width: 70px;text-align: center">Kode Barang</td>
+                        <td style="width: 70px;text-align: center;">Kelompok Brg</td>
+						<td style="width: 50px;text-align: center;">Supplier</td>
 						<td style="width: 110px;text-align: center;">Nama Barang</td>
                         <td style="width: 50px;text-align: center;">Disc %</td> 
                         <td style="width: 75px;text-align: center;">Harga Jual (Rp.)</td>
@@ -794,9 +1110,10 @@ class Gudang extends Controller {
 						$list_item[$index] = '';
 					}
 					$list_item[$index].= '<tr>
-						<td style="width: 40px;height:;text-align: center;">'.++$i.'</td>
-						<td style="width: 60px;text-align: center;">'.$item->sup_code.'</td>
-						<td style="width: 70px">'.$item->item_code.'</td>
+						<td style="width: 20px;height:;text-align: center;">'.++$i.'</td>						
+						<td style="width: 70px;text-align:center">'.$item->item_code.'</td>
+                        <td style="width: 70px;height:;text-align: center;">'.$item->cat_code.'</td>
+						<td style="width: 50px;text-align: center;">'.$item->sup_code.'</td>
 						<td style="width: 110px;">'.strtoupper($item->item_name).'</td>
                         <td style="width: 50px;text-align: center;">'.$row->item_disc.'</td>                        
 						<td style="width: 75px;text-align: right;">'.number_format($item->item_hj,'0',',','.').',-</td>
@@ -813,7 +1130,7 @@ class Gudang extends Controller {
 				}
 				
 				$list_item[$index] .= '<tr>						
-                                            <td style="width: 405px;text-align:right" colspan="6"> T O T A L</td>
+                                            <td style="width: 445px;text-align:right" colspan="6"> T O T A L</td>
                                              <td style="width: 40px;text-align:right">'.$jumlah_item.'</td>
                                             <td style="width: 75px;text-align: right;">'.number_format($total,'0',',','.').',-</td>
                                             </tr>
@@ -843,10 +1160,10 @@ class Gudang extends Controller {
                                             <td>'.$row->jenis_brg.' macam</td>
                                             <td>'.$row->jumlah_brg.' item</td>
                                             <td>
-                                            '.form_open('gudang/cetak/bon').'
+                                            <!--'.form_open('gudang/cetak/bon').'-->
                                                 <input type="hidden" name="dist_code" value="'.$row->dist_code.'"/>
-                                                <span class="button"><input class="button" type="submit" name="submit_cetak_bon" value="Cetak"></span>
-                                            '.form_close().'
+                                                <a href="'.base_url().'gudang/cetak/bon/'.$row->dist_code.'" target="new"/><span class="button"><input class="button" type="submit" name="submit_cetak_bon" value="Cetak"></span></a>
+                                            <!--'.form_close().'-->
                                             </td>
                                         </tr>';
                         }
@@ -871,11 +1188,11 @@ class Gudang extends Controller {
     /**
     *Cetak mutasi pdf
     */
-	function cetak_mutasi_pdf($head, $data, $footer)
+	function cetak_mutasi_pdf($head, $list_data, $footer)
 	{
 		require_once('lib/tcpdf/config/lang/eng.php');
 		require_once('lib/tcpdf/tcpdf.php');
-
+        $jumlah_toko = $this->data['shop_count'];
 		// create new PDF document
 		$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false); 
 
@@ -897,14 +1214,23 @@ class Gudang extends Controller {
 		$pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
 
 		//set margins (left,,right)
-		$pdf->SetMargins(5, 20, 5);
+		$pdf->SetMargins(9, 20, 9);
 		$pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
 		$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
 
 		//set auto page breaks
-		$pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+		$pdf->SetAutoPageBreak(TRUE, 10);
 		$pdf->setPageUnit('mm');
-		$size = array(216,165);
+        if($jumlah_toko <= 10)
+        {
+		    $size = array(216,165);
+        }
+        else
+        {
+            $width = 216 + (($jumlah_toko - 10)*10);
+            
+            $size = array($width,216);
+        }
 		$pdf->setPageFormat($size,'P');
 		//set image scale factor
 		$pdf->setImageScale(PDF_IMAGE_SCALE_RATIO); 
@@ -916,8 +1242,13 @@ class Gudang extends Controller {
 		// set font
 		$pdf->SetFont('dejavusans', '', 8);
 		//print page
-		$pdf->AddPage();
-		$pdf->writeHTML($head.$data.$footer, true, 0, true, 0);
+        
+        foreach($list_data as $data)
+        {
+            $pdf->AddPage();            
+            $pdf->writeHTML($head.$data.$footer, true, 0, true, 0);
+        }
+        
 		//-------------------------------------------------------------------------------------
 		//Close and output PDF document
 		$pdf->Output('print_mutasi.pdf', 'I');   
@@ -1228,7 +1559,7 @@ class Gudang extends Controller {
         $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
 
         //set margins
-        $pdf->SetMargins(PDF_MARGIN_LEFT, 20, PDF_MARGIN_RIGHT);
+        $pdf->SetMargins(9, 20, 9);
         $pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
         $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
 
@@ -1255,6 +1586,7 @@ class Gudang extends Controller {
             $html = $head.$rows.$footer;
             //echo $html; 
             $pdf->writeHTML($head.$rows.$footer, true, 0, true, 0);
+            $pdf->writeHTMLCell(15,15,188,5,'<span style="font-size:30pt">'.$this->data['shop_code'].'</span>','right');
         }
         
         // ---------------------------------------------------------
@@ -1392,14 +1724,29 @@ class Gudang extends Controller {
                     {
                         $item_hj = number_format($row->item_hj,0,',','.').',-';
                     }
+                    if($this->session->userdata('p_role') == 'supervisor')
+                    {
+                        $hm = '<td style="text-align:right"> '.number_format($row->item_hp,0,',','.').',-'.'&nbsp;</td>';
+                    }
+                    else 
+                    {
+                        $hm = '';
+                    }
                     $this->data['row_data'] .= '<tr>
                                                     <td>'.++$i.'</td>
                                                     <td>'.$row->item_code.'</td>
                                                     <td class="left">'.ucwords($row->item_name).'</td>                                                    
                                                     <td class="left">'.ucwords($row->cat_name).'</td>                                                    
                                                     <td class="left">'.ucwords($row->sup_name).'</td>                                                 
+                                                    '.$hm.'
                                                     <td style="text-align:right"> '.$item_hj.'&nbsp;</td>
                                                     <td>'.$row->item_qty_stock.'</td>
+                                                    <td>
+                                                    '.form_open('gudang/ubah').'
+                                                    <input type="hidden" name="item_code" value="'.$row->item_code.'"/>
+                                                    <span class="button"><input type="submit" name="submit_ubah" value="Ubah" class="button"/></span>
+                                                    '.form_close().'
+                                                    </td>
                                                 </tr>';
                 }
                 else
@@ -1415,7 +1762,65 @@ class Gudang extends Controller {
         $this->data['page_title'] .= ' :. Stok Gudang';
 		$this->load->view(config_item('template').'gud_stok',$this->data);
 	}
-    
+    /**
+    *ubah data barang, kalau2 ada salah input
+    */
+    function ubah()
+    {
+        //simpan perubahan
+        $this->load->model('item');
+        if($this->input->post('submit_ubah_barang'))
+        {
+            $data = array(
+                'item_code'=> $this->input->post('item_code'),
+                'item_name'=> $this->input->post('item_name'),
+                'sup_code'=> $this->input->post('sup_code'),
+                'item_hp'=> $this->input->post('item_hp'),
+                'item_hj'=> $this->input->post('item_hj'),
+                'quantity'=> $this->input->post('quantity')
+            );
+            //kalau operator yang diedit adalah hp, qty, sup_code, name
+            if($this->session->userdata('p_role') == 'operator')
+            {
+                if($this->item->edit_item($data,1))
+                {
+                    $this->data['err_msg'] = '<span style="color:green">Data telah disimpan</span>';
+                }
+                else
+                {
+                    $this->data['err_msg'] = '<span style="color:red">Terjadi kesalahan data, pastikan informasi yang diberikan sudah benar</span>';
+                }
+            }
+            //kalau operator yang diedit adalah hj, disc
+            else if($this->session->userdata('p_role') == 'supervisor')
+            {
+                if($this->item->edit_item($data,2))
+                {
+                    $this->data['err_msg'] = '<span style="color:green">Data telah disimpan</span>';
+                }
+                else
+                {
+                    $this->data['err_msg'] = '<span style="color:red">Terjadi kesalahan data, pastikan informasi yang diberikan sudah benar</span>';
+                }
+            }            
+            //tampilin barang setelah diedit
+            $query = $this->item->get_item(array('item_code'=>$this->input->post('item_code')));
+            if($query->num_rows() > 0)
+            {
+                $this->data['item'] = $query->row();                
+            }
+        }
+        //tampilin untuk diubah
+        if($this->input->post('submit_ubah'))
+        {            
+            $query = $this->item->get_item(array('item_code'=>$this->input->post('item_code')));
+            if($query->num_rows() > 0)
+            {
+                $this->data['item'] = $query->row();                
+            }
+        }
+        $this->load->view(config_item('template').'gud_ubah',$this->data);
+    }
     /**
     *ekspor data ke csv
     */

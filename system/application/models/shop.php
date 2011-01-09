@@ -15,11 +15,11 @@ class Shop extends Model {
 	{
         if(!empty($shop_code))
         {
-		    return $this->db->get_where('shop',array('shop_code'=>$shop_code));
+		    return $this->db->get_where('shop',array('shop_code'=>$shop_code,'flag_hapus'=> 0));
         }
         else
         {
-            return $this->db->get('shop');
+            return $this->db->get_where('shop',array('flag_hapus'=>0));
         }
 	}
     /**
@@ -36,7 +36,7 @@ class Shop extends Model {
     {
         $query = 'select shop.shop_code, shop.shop_name, sum(ids.quantity) as total from shop 
                 left join item_distribution ids on shop.shop_code = ids.shop_code 
-                where shop.shop_code like "'.$keywords.'%" or shop.shop_name like "'.$keywords.'%"
+                where (shop.shop_code like "'.$keywords.'%" or shop.shop_name like "'.$keywords.'%") and shop.flag_hapus = 0
                 group by shop.shop_code order by shop.shop_code';
         return $this->db->query($query);
     }
@@ -81,6 +81,14 @@ class Shop extends Model {
                     on stok_toko.item_code = retur_toko.item_code
                     where stok_toko.item_code like "'.$keywords.'%" or stok_toko.item_name like "'.$keywords.'%"';
         return $this->db->query($query);
+    }
+    /**
+    * function untuk hapus
+    */
+    function hapus($param)
+    {
+        $this->db->where('shop_code',$param['shop_code']);
+        return $this->db->update('shop',array('flag_hapus'=>1));
     }
 }
 //end of file gudang_model.php

@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Dec 21, 2010 at 02:01 AM
+-- Generation Time: Jan 06, 2011 at 10:25 AM
 -- Server version: 5.1.36
 -- PHP Version: 5.3.0
 
@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS `item_distribution` (
   `shop_code` varchar(128) NOT NULL,
   `dist_out` date NOT NULL,
   `quantity` int(11) NOT NULL,
-  `item_disc` int(11) NOT NULL,
+  `item_disc` int(2) NOT NULL,
   `status` tinyint(1) NOT NULL DEFAULT '0',
   `export` int(11) NOT NULL,
   KEY `item_code` (`item_code`),
@@ -97,7 +97,7 @@ CREATE TABLE IF NOT EXISTS `item_mutasi` (
 
 CREATE TABLE IF NOT EXISTS `item_retur` (
   `retur_code` int(11) NOT NULL,
-  `retur_date` date NOT NULL,
+  `retur_date` date DEFAULT NULL,
   `item_code` varchar(128) NOT NULL,
   `quantity` int(11) NOT NULL,
   `shop_code` varchar(128) NOT NULL,
@@ -121,7 +121,7 @@ CREATE TABLE IF NOT EXISTS `log_transaksi` (
   `keterangan` text NOT NULL,
   PRIMARY KEY (`log_id`),
   KEY `p_id` (`p_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=46 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=467 ;
 
 -- --------------------------------------------------------
 
@@ -135,7 +135,7 @@ CREATE TABLE IF NOT EXISTS `operator` (
   `op_phone` varchar(128) NOT NULL,
   `op_address` varchar(128) NOT NULL,
   PRIMARY KEY (`op_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=10 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=12 ;
 
 -- --------------------------------------------------------
 
@@ -151,7 +151,7 @@ CREATE TABLE IF NOT EXISTS `pengguna` (
   `p_active` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`p_id`),
   UNIQUE KEY `p_username` (`p_username`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=10 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=12 ;
 
 -- --------------------------------------------------------
 
@@ -169,8 +169,26 @@ CREATE TABLE IF NOT EXISTS `shop` (
   `shop_bonus` int(11) NOT NULL,
   `shop_target` int(11) NOT NULL,
   `ordered_by` int(11) NOT NULL,
-  `shop_cat` enum('MODE','MODIS','NANA') NOT NULL,
+  `shop_cat` enum('MODE','MODIEST','NANA') NOT NULL,
+  `flag_hapus` int(11) NOT NULL,
   PRIMARY KEY (`shop_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `sisa_mutasi`
+--
+
+CREATE TABLE IF NOT EXISTS `sisa_mutasi` (
+  `kode_mutasi` varchar(128) NOT NULL,
+  `item_code` varchar(128) NOT NULL,
+  `sup_code` varchar(128) NOT NULL,
+  `qty` int(11) NOT NULL,
+  `date_entry` date NOT NULL,
+  `status_print_mutasi` tinyint(4) NOT NULL,
+  KEY `item_code` (`item_code`),
+  KEY `sup_code``` (`sup_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -184,6 +202,7 @@ CREATE TABLE IF NOT EXISTS `supplier` (
   `sup_name` varchar(128) NOT NULL,
   `sup_address` varchar(128) NOT NULL,
   `sup_phone` varchar(128) NOT NULL,
+  `sup_type` enum('medan','luar medan') NOT NULL,
   `op_code` int(11) NOT NULL,
   `entry_date` date NOT NULL,
   PRIMARY KEY (`sup_code`),
@@ -219,7 +238,10 @@ ALTER TABLE `item_distribution`
 -- Constraints for table `item_mutasi`
 --
 ALTER TABLE `item_mutasi`
-  ADD CONSTRAINT `item_mutasi_ibfk_1` FOREIGN KEY (`item_code`) REFERENCES `item` (`item_code`);
+  ADD CONSTRAINT `sisa_mutasi_ibfk_1` FOREIGN KEY (`item_code`) REFERENCES `item` (`item_code`),
+  ADD CONSTRAINT `sisa_mutasi_ibfk_2` FOREIGN KEY (`sup_code`) REFERENCES `supplier` (`sup_code`),
+  ADD CONSTRAINT `item_mutasi_ibfk_1` FOREIGN KEY (`item_code`) REFERENCES `item` (`item_code`),
+  ADD CONSTRAINT `item_mutasi_ibfk_2` FOREIGN KEY (`sup_code`) REFERENCES `supplier` (`sup_code`);
 
 --
 -- Constraints for table `item_retur`

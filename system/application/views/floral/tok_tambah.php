@@ -16,12 +16,21 @@
                 </tr>                
                 <tr>
                     <td>Initial Toko</td><td>: <input type="text" name="shop_initial" /> <span class="note">*)</span></td>                                
-                </tr> 
+                </tr>
+                <tr>
+                    <td>Cabang</td><td>: 
+                    <select name="shop_cat" style="width:146px">
+                        <option value="1">MODE</option>
+                        <option value="2">MODIEST</option>
+                        <!--<option value="3">NANA</option>-->
+                    </select>
+                    <span class="note">*)</span></td>                                
+                </tr>
                 <tr>
                     <td>Telepon</td><td>: <input type="text" name="shop_phone" /> <span class="note">*) Harus angka</span></td>                                
                 </tr>
                 <tr>
-                    <td>Supervisor</td><td>: <input type="text" name="shop_supervisor" /> <span class="note">*) Harus angka</span></td>                                
+                    <td>Supervisor</td><td>: <input type="text" name="shop_supervisor" /> <span class="note">*) Nama supervisor</span></td>                                
                 </tr> 
                 <tr>
                     <td>Alamat </td><td>: <textarea name="shop_address" style="vertical-align:text-top"></textarea> <span class="note">*)</span></td>                                

@@ -128,7 +128,7 @@ if (!defined('K_TCPDF_EXTERNAL_CONFIG')) {
 	/**
 	 * header description string
 	 */
-	define ('PDF_HEADER_STRING', "GUDANG PUSAT : \nJalan Kotabaru, Medan");
+	define ('PDF_HEADER_STRING', "Jln. Laksana No 68 ABC, Medan \nTelp. (061) 6643780");
 	
 	/**
 	 * image logo

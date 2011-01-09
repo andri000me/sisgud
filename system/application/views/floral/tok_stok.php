@@ -12,7 +12,7 @@
                     <td></td>
                 </tr>
                 <tr>
-                    <td>Keywords</td><td>: <input type="text" name="keywords" style="width: 205px"/></td>
+                    <td>Keywords</td><td>: <input type="text" name="keywords" style="width: 193px"/></td>
                     <td><span class="button"><input class="button" type="submit" name="submit_cari_stok" value="Search"/></span></td>
                 </tr>                                
             </table>            

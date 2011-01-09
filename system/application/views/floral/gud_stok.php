@@ -13,6 +13,7 @@
                 </tr>                                
             </table>
             <p><?php if(isset($err_msg)) echo $err_msg ?></p>
+            <?php echo form_close() ?>
             <?php if(isset($row_data)) { ?>
             <p>Total : <?php echo $total_item ?> item</p>
             <p><?php if(!empty($page)) echo 'Page : '.$page ?></p>
@@ -23,13 +24,16 @@
                     <td class="header">Nama Barang</td>
                     <td class="header">Kelompok Barang</td>
                     <td class="header">Supplier</td>
+                    <?php if($this->session->userdata('p_role') == 'supervisor') { ?>
+                    <td class="header">Harga Modal (Rp)</td>
+                    <?php } ?>
                     <td class="header">Harga Jual (Rp)</td>
                     <td class="header">Stok (item)</td>
+                    <td class="header">Action</td>
                 </tr>
                 <?php echo $row_data ?>
             </table> 
-            <?php } ?>
-            <?php echo form_close() ?>
+            <?php } ?>            
       </div>                
         <div class="tempatemo_right_bottom">
         </div>

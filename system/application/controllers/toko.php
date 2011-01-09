@@ -29,6 +29,11 @@ class Toko extends Controller {
 		$this->data['link_tag'] = link_tag($link1).link_tag($link2);
 		$this->data['page_title'] = 'Sistem Inventori Gudang';
 		$this->data['pages']='toko';
+        $this->data['lib_js'] = '	<script src="'.base_url().'lib/jquery-1.4.4.min.js"></script>
+                        <script src="'.base_url().'lib/jquery-ui-1.8.7.custom.min.js"></script>												
+						<script src="'.base_url().'lib/config.js"></script>						
+						<script src="'.base_url().'lib/functions.js"></script>						
+					';
 		if($this->session->userdata('logged_in') != TRUE)
 		{
 		     redirect('/home/', 'refresh');
@@ -59,6 +64,7 @@ class Toko extends Controller {
                 $this->data['shop_initial'] = $this->input->post('shop_initial');
                 $this->data['shop_address'] = $this->input->post('shop_address');
                 $this->data['shop_phone'] = $this->input->post('shop_phone');
+                $this->data['shop_cat'] = $this->input->post('shop_cat');
                 $this->data['shop_supervisor'] = $this->input->post('shop_supervisor');
                 //insert data ke database
                 if($this->insert_data())
@@ -345,8 +351,17 @@ class Toko extends Controller {
                         $row->total = 0;
                     }
                     $stok = $row->total - $retur;
+                    if($this->session->userdata('p_role') == 'supervisor')
+                    {
+                        $line  = ++$i%10;
+                        $hapus = '<span class="button"><input type="submit" name="submit_ubah" class="button" value="Hapus" onclick="hapusToko(\''.$row->shop_code.'\','.$line.',\''.$row->shop_name.'\')"/></span>';
+                    }
+                    else
+                    {
+                        $hapus = '';
+                    }
                     $this->data['row_data'] .= '<tr>
-                                                    <td>'.++$i.'</td>
+                                                    <td>'.$i.'</td>
                                                     <td>'.$row->shop_code.'</td>
                                                     <td>'.$row->shop_name.'</td>
                                                     <td>'.$row->total.'</td>
@@ -360,7 +375,7 @@ class Toko extends Controller {
                                                     '.form_open('toko/ubah').'
                                                         <input type="hidden" name="shop_code" value="'.$row->shop_code.'" />
                                                         <span class="button"><input type="submit" name="submit_ubah" class="button" value="Ubah"/></span>
-                                                    '.form_close().'
+                                                    '.form_close().$hapus.'                                                        
                                                     </td>
                                                 </tr>';
                 }
@@ -428,6 +443,21 @@ class Toko extends Controller {
 			
 		$this->load->view(config_item('template').'tok_ubah',$this->data);
 	}
+    /**
+    * fungsi hapus toko
+    */
+    function hapus()
+    {
+        $this->load->model('shop');
+        if($this->shop->hapus(array('shop_code'=>$this->input->post('shop_code'))))
+        {
+            echo 1;
+        }
+        else
+        {
+            echo 0;
+        }
+    }
 }
 /* End of file toko.php */
 /* Location: ./system/application/controllers/toko.php */

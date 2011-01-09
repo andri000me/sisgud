@@ -44,7 +44,7 @@ class Home extends Controller {
         else
         {
             $this->data['link_tag'] = link_tag($this->data['link3']);
-            $this->load->view(config_item('template').'login',$this->data);
+            redirect('home/login');
         }
 	}
     /*login function*/

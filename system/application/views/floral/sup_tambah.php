@@ -9,7 +9,7 @@
             <table class="table-form">
                 <tr><td><span class="note">Yang bertanda *) wajib diisi.</span></td></tr>
                 <tr>
-                    <td>Kode Supplier</td><td>: <input type="text" name="sup_code" /> <span class="note">*) Harus 3 digit angka dan huruf</span></td>                                
+                    <td>Kode Supplier</td><td>: <input type="text" name="sup_code" maxlength="4"/> <span class="note">*) Harus 4 digit angka dan huruf</span></td>                                
                 </tr>
                 <tr>
                     <td>Nama Supplier</td><td>: <input type="text" name="sup_name" /> <span class="note">*)</span></td>                                

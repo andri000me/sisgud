@@ -112,7 +112,7 @@ class Suppliers extends Controller {
     {
         $this->load->library('form_validation');
         //setting rules
-        $this->form_validation->set_rules('sup_code', 'Kode Supplier','required|exact_length[3]|alpha_numeric');
+        $this->form_validation->set_rules('sup_code', 'Kode Supplier','required|max_length[4]|alpha_numeric');
         $this->form_validation->set_rules('sup_name', 'Nama Supplier','required');
         $this->form_validation->set_rules('sup_address','Alamat','required');
         $this->form_validation->set_rules('sup_phone','Telepon','required|numeric');

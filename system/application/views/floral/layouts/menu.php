@@ -68,6 +68,7 @@
             <?php } if($role=='supervisor') { ?>
             <ul class="sub">                              
                 <li><a href="<?php echo base_url() ?>gudang/stok">Stok Gudang</a></li>
+                <li><a href="<?php echo base_url() ?>gudang/sisa">Cetak Mutasi Sisa</a></li>
             </ul>
             <?php } ?>
         </div>

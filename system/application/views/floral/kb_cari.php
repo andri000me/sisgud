@@ -12,7 +12,7 @@
                     <td><span class="button"><input class="button" type="submit" name="submit_cari_kategori" value="Search"/></span></td>
                 </tr>                                
             </table>
-            <?php if(isset($err_msg)) echo $err_msg ?>
+            <p><?php if(isset($err_msg)) echo $err_msg ?></p>
             <?php echo form_close() ?>
             
             <?php if(isset($row_data)) { ?>
