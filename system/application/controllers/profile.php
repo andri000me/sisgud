@@ -74,28 +74,49 @@ class Profile extends Controller {
                     'op_address'=> $this->input->post('op_address')
                 );
                 //cek kalau isi password berarti ubah password
-                if($this->input->post('p_passwd') && $this->input->post('new_passwd') == $this->input->post('new_passwd_confirm'))
+                if($this->input->post('p_passwd') && $this->input->post('new_passwd') && $this->input->post('new_passwd') == $this->input->post('new_passwd_confirm'))
                 {
-                    if($this->pengguna->update_pengguna($pengguna,$this->session->userdata('p_id')))
+                    //cek apakah username dan password lamanya benar
+                    $query = $this->pengguna->validate_pengguna($pengguna['p_username'],$this->input->post('p_passwd'));                    
+                    if($query->num_rows() == 1)
                     {
-                        $msg = 'password';   
+                        if($this->pengguna->update_pengguna($pengguna,$this->session->userdata('p_id')))
+                        {
+                            $msg = 'password';   
+                        }
+                    }
+                    else
+                    {
+                        $msg = 'error1';                        
                     }
                 }
                 else
                 {
-                    $this->data['err_msg'] = '<span style="color:red">Password yang diisikan tidak cocok</span>';
+                    if($this->input->post('p_passwd') && $this->input->post('new_passwd') && $this->input->post('new_passwd_confirm'))
+                    {
+                        $msg = 'error2';         
+                    }
                 }
                 //ubah data operator
                 if($this->pengguna->update_operator($operator,$this->session->userdata('p_id')))
                 {
-                    if(isset($msg))
+                    if(isset($msg) && $msg == 'password')
                     {
-                        $this->data['err_msg'] = '<span style="color:green">Profile dan password yang diperbaharui telah disimpan</span>';
+                        $this->data['err_msg'] = '<span style="color:green">Password berhasil diperbaharui</span><br />';
                     }
-                    else
+                    else if(isset($msg) && $msg == 'error1')
                     {
-                        $this->data['err_msg'] = '<span style="color:green">Profile yang diperbaharui telah disimpan</span>';
+                        $this->data['err_msg'] = '<span style="color:red">Password lama tidak cocok</span><br />';
                     }
+                    else if(isset($msg) && $msg == 'error2')
+                    {
+                        $this->data['err_msg'] = '<span style="color:red">Password baru dan konfirmasi yang diisikan tidak cocok</span><br />';
+                    }
+                    else 
+                    {
+                        $this->data['err_msg'] = '';
+                    }
+                    $this->data['err_msg'] .= '<span style="color:green">Profile yang diperbaharui telah disimpan</span>';                    
                 }
             }
             else

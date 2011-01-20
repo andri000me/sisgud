@@ -414,6 +414,7 @@ class Toko extends Controller {
                     'shop_initial'=>$this->input->post('shop_initial'),
 					'shop_address'=>$this->input->post('shop_address'),
 					'shop_phone'=>$this->input->post('shop_phone'),
+					'shop_cat'=>$this->input->post('shop_cat'),
 					'shop_supervisor'=>$this->input->post('shop_supervisor')
 				);				
 				if($this->shop->update($data))

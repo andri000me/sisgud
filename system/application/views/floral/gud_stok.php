@@ -17,23 +17,29 @@
             <?php if(isset($row_data)) { ?>
             <p>Total : <?php echo $total_item ?> item</p>
             <p><?php if(!empty($page)) echo 'Page : '.$page ?></p>
+            <p><?php if($this->session->userdata('msg')) { echo $this->session->userdata('msg');$this->session->unset_userdata('msg'); } ?></p>
             <table class="table-data">
                 <tr>
                     <td class="header">No</td>
                     <td class="header">Kode Barang</td>
                     <td class="header">Nama Barang</td>
-                    <td class="header">Kelompok Barang</td>
+                    <td class="header">Kelompok <br /> Barang</td>
                     <td class="header">Supplier</td>
                     <?php if($this->session->userdata('p_role') == 'supervisor') { ?>
                     <td class="header">Harga Modal (Rp)</td>
                     <?php } ?>
                     <td class="header">Harga Jual (Rp)</td>
                     <td class="header">Stok (item)</td>
+                    <?php if($this->session->userdata('p_role') == 'supervisor' || $this->session->userdata('p_role') == 'operator') { ?>
                     <td class="header">Action</td>
+                    <?php } ?>
                 </tr>
                 <?php echo $row_data ?>
-            </table> 
-            <?php } ?>            
+            </table>
+            <p><?php if(!empty($page)) echo 'Page : '.$page ?></p>
+            <?php } ?>
+            <div id="dialog-confirm" title="Konfirmasi">
+            </div>
       </div>                
         <div class="tempatemo_right_bottom">
         </div>

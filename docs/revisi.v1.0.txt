@@ -1,0 +1,7 @@
+revisi 1.0
+- ilangin tombol ubah di stok gudang pada role user -ok
+- benerin ganti password -ok
+- buat fungsi untuk hapus barang yang salah input. milik supervisor -ok
+- di cetak label, untuk yang mode ganti tab kosong, modis ganti titik(.). Ada konfigurasi tambahan di custom.php -ok
+- maxlength nama barang di mutasi masuk jadi 25 -ok
+- benerin ubah toko, sama tambah toko, ada opsi mode/modiest -ok

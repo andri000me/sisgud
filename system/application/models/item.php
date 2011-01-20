@@ -108,6 +108,13 @@ class Item extends Model {
         $query = 'update item_mutasi set sup_code="'.$param['sup_code'].'", qty="'.$param['quantity'].'" where item_code="'.$param['item_code'].'"';
         return $this->db->query($query);
     }
-    
+    /**
+    * hapus item / barang
+    */
+    function hapus($item_code)
+    {
+        $this->db->where('item_code',$item_code);
+        return $this->db->delete('item');
+    }    
 }
 //end of file gudang_model.php

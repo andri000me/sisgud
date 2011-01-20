@@ -19,7 +19,7 @@
                 </tr>
                 <tr>
                     <td>Cabang</td><td>: 
-                    <select name="shop_cat" style="width:146px">
+                    <select name="shop_cat" style="width:155px;margin:2px;">
                         <option value="1">MODE</option>
                         <option value="2">MODIEST</option>
                         <!--<option value="3">NANA</option>-->

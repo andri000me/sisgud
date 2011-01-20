@@ -66,9 +66,15 @@ class Pengguna extends Model {
         return $this->db->update('operator',$data);
     }
     /**
-    *update passwd
+    * validate pengguna
     */
-   
+    function validate_pengguna($username,$password)
+    {
+        $username = md5($username);
+        $password = md5($password);
+        $this->db->where('md5(p_username)',$username)->where('p_passwd',$password);
+        return $this->db->get('pengguna');
+    }
 }
 
 /*End of file pengguna.php*/

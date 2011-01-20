@@ -32,7 +32,7 @@
                         echo '<tr>
                                 <td>'.++$i.'</td>
                                 <td><input type="text" name="cat_code[]" size="12" maxlength="3"/></td>
-                                <td><input type="text" name="item_name[]" size="50" maxlength="18"/></td>
+                                <td><input type="text" name="item_name[]" size="50" maxlength="25"/></td>
                                 <td><input type="text" name="item_hp[]" size="20"/></td>
                                 <td><input type="text" name="item_qty[]" size="5"/></td>
                             </tr>';

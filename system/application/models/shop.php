@@ -65,8 +65,9 @@ class Shop extends Model {
     */
     function update($data)
     {
-        $query = 'update shop set shop_initial="'.$data['shop_initial'].'", shop_name="'.$data['shop_name'].'", shop_phone="'.$data['shop_phone'].'", shop_address="'.$data['shop_address'].'", shop_supervisor="'.$data['shop_supervisor'].'" where shop_code="'.$data['shop_code'].'"';
-        return $this->db->query($query);
+        //$query = 'update shop set shop_initial="'.$data['shop_initial'].'", shop_name="'.$data['shop_name'].'", shop_phone="'.$data['shop_phone'].'", shop_address="'.$data['shop_address'].'", shop_supervisor="'.$data['shop_supervisor'].'" where shop_code="'.$data['shop_code'].'"';
+        $this->db->where('shop_code',$data['shop_code']);
+        return $this->db->update('shop',$data);
     }
     /**
     *fungsi cari stok toko

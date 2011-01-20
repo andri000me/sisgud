@@ -978,8 +978,18 @@ class Gudang extends Controller {
                     {
                         for($i=0;$i < $row->quantity; $i++)
                         {
-                            
-                            $data_txt .= strtoupper($row->shop_cat).chr(9).strtoupper($row->item_name).chr(9).$row->item_code.chr(9).number_format($row->item_hj,0,',','.').',-'.chr(9).
+                            if(config_item('label') == 1)
+                            {
+                                if($row->shop_cat = 'MODE')
+                                    $shop_cat = '';
+                                else if($row->shop_cat = 'MODIEST')
+                                    $shop_cat = '.';
+                            }
+                            else if(config_item('label') == 2)
+                            {
+                                $shop_cat = $row->shop_cat;
+                            }
+                            $data_txt .= strtoupper($shop_cat).chr(9).strtoupper($row->item_name).chr(9).$row->item_code.chr(9).number_format($row->item_hj,0,',','.').',-'.chr(9).
                                         strtoupper($row->sup_code).chr(9).date("dmy").chr(9).$row->shop_code .chr(10);
                                           
                         }                        
@@ -1724,13 +1734,24 @@ class Gudang extends Controller {
                     {
                         $item_hj = number_format($row->item_hj,0,',','.').',-';
                     }
+                    //hanya supervisor yang boleh lihat harga modal
+                    $hm = '';
                     if($this->session->userdata('p_role') == 'supervisor')
                     {
                         $hm = '<td style="text-align:right"> '.number_format($row->item_hp,0,',','.').',-'.'&nbsp;</td>';
                     }
-                    else 
+                    //yang boleh hapus hanya supervisor
+                    if($this->session->userdata('p_role') == 'supervisor')                    
+                        $button_del = '<span class="button"><input type="button" name="submit_hapus" value="Hapus" class="button" onclick="removeItem(\''.$row->item_code.'\')"/></span>';
+                    //yang boleh ubah hanya supervisor dan operator
+                    $button_ubah='';
+                    if($this->session->userdata('p_role') == 'supervisor' || $this->session->userdata('p_role') == 'operator')
                     {
-                        $hm = '';
+                        $button_ubah = '<td>'.form_open('gudang/ubah').'
+                                        <input type="hidden" name="item_code" value="'.$row->item_code.'"/>
+                                        <span class="button"><input type="submit" name="submit_ubah" value="Ubah" class="button"/></span>
+                                        '.$button_del.'
+                                        '.form_close().'</td>';
                     }
                     $this->data['row_data'] .= '<tr>
                                                     <td>'.++$i.'</td>
@@ -1740,13 +1761,8 @@ class Gudang extends Controller {
                                                     <td class="left">'.ucwords($row->sup_name).'</td>                                                 
                                                     '.$hm.'
                                                     <td style="text-align:right"> '.$item_hj.'&nbsp;</td>
-                                                    <td>'.$row->item_qty_stock.'</td>
-                                                    <td>
-                                                    '.form_open('gudang/ubah').'
-                                                    <input type="hidden" name="item_code" value="'.$row->item_code.'"/>
-                                                    <span class="button"><input type="submit" name="submit_ubah" value="Ubah" class="button"/></span>
-                                                    '.form_close().'
-                                                    </td>
+                                                    <td>'.$row->item_qty_stock.'</td>                                                    
+                                                    '.$button_ubah.'                                                    
                                                 </tr>';
                 }
                 else
@@ -1762,6 +1778,29 @@ class Gudang extends Controller {
         $this->data['page_title'] .= ' :. Stok Gudang';
 		$this->load->view(config_item('template').'gud_stok',$this->data);
 	}
+    /**
+    * Fungsi untuk hapus barang yang dianggap salah
+    */
+    function hapus($param='')
+    {
+        if(!empty($param))
+        {
+            $this->load->model('item');
+            if($this->item->hapus($param))
+            {
+                $this->session->set_userdata('msg','<span style="color:green">Kode barang <b>'.$param.'</b> telah dihapus</span>');
+            }
+            else
+            {
+                $this->session->set_userdata('msg','<span style="color:red">Data tidak ditemukan</span>');     
+            }
+        }
+        else
+        {
+            $this->session->set_userdata('msg','<span style="color:red">Data tidak ditemukan</span>');           
+        }
+        redirect('gudang/stok');
+    }
     /**
     *ubah data barang, kalau2 ada salah input
     */

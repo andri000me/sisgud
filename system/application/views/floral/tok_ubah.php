@@ -16,7 +16,16 @@
                 </tr>                
                 <tr>
                     <td>Initial Toko</td><td>: <input type="text" name="shop_initial" value="<?php echo $shop->shop_initial ?>"/> <span class="note">*)</span></td>                                
-                </tr> 
+                </tr>
+                <tr>
+                    <td>Cabang</td><td>:
+                    <select name="shop_cat" style="width:155px;margin:2px;">
+                        <option value="1" <?php if($shop->shop_cat == 'MODE') echo 'selected="selected"'; ?> >MODE</option>
+                        <option value="2" <?php if($shop->shop_cat == 'MODIEST') echo 'selected="selected"'; ?> >MODIEST</option>
+                        <!--<option value="3">NANA</option>-->
+                    </select>
+                    <span class="note">*)</span></td>                                
+                </tr>
                 <tr>
                     <td>Telepon</td><td>: <input type="text" name="shop_phone" value="<?php echo $shop->shop_phone ?>"/> <span class="note">*) Harus angka</span></td>                                
                 </tr>
