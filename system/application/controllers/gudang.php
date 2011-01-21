@@ -980,9 +980,9 @@ class Gudang extends Controller {
                         {
                             if(config_item('label') == 1)
                             {
-                                if($row->shop_cat = 'MODE')
+                                if($row->shop_cat == 'MODE')
                                     $shop_cat = '';
-                                else if($row->shop_cat = 'MODIEST')
+                                else if($row->shop_cat == 'MODIEST')
                                     $shop_cat = '.';
                             }
                             else if(config_item('label') == 2)
