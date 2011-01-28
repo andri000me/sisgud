@@ -29,6 +29,11 @@ class Suppliers extends Controller {
 		$this->data['link_tag'] = link_tag($link1).link_tag($link2);
 		$this->data['page_title'] = 'Sistem Inventori Gudang';
 		$this->data['pages']='supplier';
+        $this->data['lib_js'] = '	<script src="'.base_url().'lib/jquery-1.4.4.min.js"></script>
+                        <script src="'.base_url().'lib/jquery-ui-1.8.7.custom.min.js"></script>
+						<script src="'.base_url().'lib/jquery.autocomplete.js"></script>						
+						<script src="'.base_url().'lib/config.js"></script>						
+						<script src="'.base_url().'lib/functions.js"></script>	';
         if($this->session->userdata('logged_in') != TRUE)
         {
              redirect('/home/', 'refresh');

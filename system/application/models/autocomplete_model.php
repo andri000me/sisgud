@@ -20,6 +20,14 @@ class Autocomplete_model extends Model {
 		return $query;
 	}
     /**
+    * get suppleir by code, retrieve the last supplier
+    */
+    function get_last_sup($key)
+    {
+        $this->db->like('sup_code',$key,'after')->order_by('sup_code','desc');
+        return $this->db->get('supplier');
+    }
+    /**
     * Retrieve data item
     */
 	function get_item($key="")

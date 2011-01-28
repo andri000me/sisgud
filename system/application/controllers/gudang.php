@@ -1741,6 +1741,7 @@ class Gudang extends Controller {
                         $hm = '<td style="text-align:right"> '.number_format($row->item_hp,0,',','.').',-'.'&nbsp;</td>';
                     }
                     //yang boleh hapus hanya supervisor
+                    $button_del = '';
                     if($this->session->userdata('p_role') == 'supervisor')                    
                         $button_del = '<span class="button"><input type="button" name="submit_hapus" value="Hapus" class="button" onclick="removeItem(\''.$row->item_code.'\')"/></span>';
                     //yang boleh ubah hanya supervisor dan operator

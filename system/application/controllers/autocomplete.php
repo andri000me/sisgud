@@ -56,6 +56,29 @@ class Autocomplete extends Controller {
 			echo ucwords($row->shop_name).'|'.$row->shop_code.chr(10);
 		}
 	}
-    
+    /** autocomplete supplier by code, for add new supplieer
+    */
+    function autocomplete_sup_add($key="")
+    {
+        $query = $this->autocomplete->get_last_sup($key);
+        if($query->num_rows() > 0)
+        {
+            $last_sup = $query->row();
+            //formating sup_code
+            $sup_code = $last_sup->sup_code;
+            $num = substr($sup_code,1,3);
+            $num++;
+            if(strlen($num) == 1)
+                $num = '00'.$num;
+            else if(strlen($num)== 2)
+                $num = '0'.$num;
+            $new_code = substr($sup_code,0,1).$num;
+            echo 'Supplier Baru |'.$new_code;            
+        }
+        else
+        {
+            echo 'Supplier Baru|'.strtoupper($key).'001';
+        }
+    }
 }
 //end of file Aucomplete controller
