@@ -1146,7 +1146,9 @@ class Gudang extends Controller {
                 if($this->input->post('submit_rekap_bon'))
                 {
                     $this->load->model('item_distribution');
-                    $query = $this->item_distribution->get_bon_by_toko($this->input->post('shop_code'));
+                    //ambil bon toko sesuai tanggal yang diquery kan
+                    $tgl = $this->input->post('date_bon');
+                    $query = $this->item_distribution->get_bon_by_toko($this->input->post('shop_code'),$tgl);
                     if($query->num_rows() > 0)
                     {
                         $i=0;
@@ -1168,6 +1170,10 @@ class Gudang extends Controller {
                                         </tr>';
                         }
                         $this->data['row_data'] = $row_data;
+                    }
+                    else
+                    {
+                        $this->data['err_msg'] = '<p><span style="color:red">Data tidak ditemukan.</span></p>';
                     }
                     //ambil data toko
                     $this->load->model('shop');
