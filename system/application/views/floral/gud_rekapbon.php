@@ -9,9 +9,11 @@
             <table class="table-form">                              
                 <tr>
                     <td>Nama Toko</td>
-                    <td>: <?php echo $list_toko_pdf ?>
-                        <span class="button"><input type="submit" name="submit_rekap_bon" value="Display" class="button"/></span>
-                    </td></tr>                
+                    <td>: <?php echo $list_toko_pdf ?>                        
+                    </td></tr>
+                <tr><td>Tanggal</td><td> : <input type="text" id="date_bon" name="date_bon" value="" readonly="readonly" style="width:190px"/>
+                <span class="button"><input type="submit" name="submit_rekap_bon" value="Display" class="button"/></span>
+                </td></tr>      
             </table>            
             <?php echo form_close() ?>
             <p><?php if(isset($err_msg)) echo $err_msg ?></p>

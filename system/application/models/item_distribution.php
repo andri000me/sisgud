@@ -113,11 +113,15 @@ class Item_distribution extends Model {
     /**
     *ambil bon yang dimiliki toko
     */
-    function get_bon_by_toko($shop_code)
+    function get_bon_by_toko($shop_code,$tgl)
     {
+        if(!empty($tgl))
+            $tgl = 'and ids.dist_out="'.$tgl.'"';
+        else
+            $tgl = '';
         $query = 'select shop.shop_name,shop.shop_address, dist_code,dist_out, count(item_code) as jenis_brg,sum(quantity) as jumlah_brg 
                 from item_distribution ids left join shop on ids.shop_code = shop.shop_code 
-                where ids.shop_code ="'.$shop_code.'" and ids.dist_code != 0
+                where ids.shop_code ="'.$shop_code.'" '.$tgl.' and ids.dist_code != 0
                 group by dist_code order by dist_out desc';
         return $this->db->query($query);
     }
