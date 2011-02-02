@@ -1078,6 +1078,7 @@ class Gudang extends Controller {
                 $this->load->model('shop');
                 $this->load->model('item');
 				$query = $this->item_distribution->get_item_for_pdf(array('dist_code'=>$kode_bon));
+                $item_jml = $query->num_rows();
                 //ambil mutasi
 				$mutasi = $query->row();
 				$temp = $this->shop->get_shop($mutasi->shop_code);
@@ -1133,21 +1134,43 @@ class Gudang extends Controller {
 					$j++;
 					if($j==15)
 					{
-						$list_item[$index] .= '</table>';
-						$j=0;$index++;
-					}
-                    
-				}
-				
-				$list_item[$index] .= '<tr>						
-                                            <td style="width: 445px;text-align:right" colspan="6"> T O T A L</td>
-                                             <td style="width: 40px;text-align:right">'.$jumlah_item.'</td>
-                                            <td style="width: 75px;text-align: right;">'.number_format($total,'0',',','.').',-</td>
-                                            </tr>
-                                    </table>';                 
+                        //yang ditutup table disini khusus yang
+                        if($item_jml%15 > 0)
+                        {                            
+                            $list_item[$index] .= '</table>';
+                        }
+                        else
+                        {                           
+                            if($index < ($item_jml/15)-1)
+                                $list_item[$index] .= '</table>';
+                        }
+						$j=0;$index++;                        
+					}                 
+				}    
+                //Jika jenis item pas kelipatan 15, maka index diturunkan satu dan harus ditutup langsung
+                if($item_jml%15 == 0)
+                {               
+                    $list_item[--$index] .= '<tr>						
+                                                <td style="width: 445px;text-align:right" colspan="7"> T O T A L</td>
+                                                 <td style="width: 40px;text-align:right">'.$jumlah_item.'</td>
+                                                <td style="width: 75px;text-align: right;">'.number_format($total,'0',',','.').',-</td>
+                                                </tr>
+                                        </table>';                 
+                }
+                //yang bukan kelipatan  15, ya normal                
+                else
+                {
+                    $list_item[$index] .= '<tr>						
+                                                <td style="width: 445px;text-align:right" colspan="7"> T O T A L</td>
+                                                 <td style="width: 40px;text-align:right">'.$jumlah_item.'</td>
+                                                <td style="width: 75px;text-align: right;">'.number_format($total,'0',',','.').',-</td>
+                                                </tr>
+                                        </table>';
+                }
 				$footer = '<br /><table style="text-align:center;">
 					                    <tr><td>Bagian Gudang</td><td>Bagian Transport</td><td>Bagian Toko</td><td>Bagian Komputer</td></tr>                            
-					            </table>';				
+					            </table>';
+                //echo htmlentities($list_item[1]);exit;
 				$this->cetak_pdf($head,$list_item,$footer);
 			}
             //rekap untuk cetak bon
@@ -1574,7 +1597,7 @@ class Gudang extends Controller {
         $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
 
         //set auto page breaks
-        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        $pdf->SetAutoPageBreak(TRUE, 10);
         $pdf->setPageUnit('mm');
         $size = array(216,165);
         $pdf->setPageFormat($size,'P');
@@ -1588,13 +1611,13 @@ class Gudang extends Controller {
 
         // set font
         $pdf->SetFont('dejavusans', '', 8);
+        
         foreach($list_item as $rows)
         {
             // add a page
             $pdf->AddPage();
             //echo $html; exit;
-            $html = $head.$rows.$footer;
-            //echo $html; 
+            $html = $head.$rows.$footer;             
             $pdf->writeHTML($head.$rows.$footer, true, 0, true, 0);
             $pdf->writeHTMLCell(15,15,188,5,'<span style="font-size:30pt">'.$this->data['shop_code'].'</span>','right');
         }

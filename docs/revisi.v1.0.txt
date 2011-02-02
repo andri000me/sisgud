@@ -5,4 +5,6 @@ revisi 1.0
 - di cetak label, untuk yang mode ganti tab kosong, modis ganti titik(.). Ada konfigurasi tambahan di custom.php -ok
 - maxlength nama barang di mutasi masuk jadi 25 -ok
 - benerin ubah toko, sama tambah toko, ada opsi mode/modiest -ok
-- tambah autocomplete untuk kode supplier ketika tambah supplier
+- tambah autocomplete untuk kode supplier ketika tambah supplier -ok
+- rekap bon dibuat perhari, biar gampang searchingnya. -ok
+- bug fixing untuk cetak bon dengan jumlah yang pas kelipatan 15
