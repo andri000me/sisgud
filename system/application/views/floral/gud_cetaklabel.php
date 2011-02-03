@@ -36,14 +36,18 @@
                     <td class="header">Nama Barang</td>                    
                     <td class="header">Harga Jual (Rp)</td>                                       
                     <td class="header">Jumlah</td>
-                    <td class="header">Action</td>
+                    <td class="header">Opsi</td>
                 </tr>                
-                <?php echo $row_data ?>
-            </table>            
+                <?php echo $row_data ?>                
+            </table>
+            <?php echo form_open('gudang/cetak/label') ?>
+            <input type="hidden" name="sup_code" value="<?php echo $sup_code ?>" />
+            <p style="text-align:center"><span class="button"><input type="submit" class="button" value = "Cetak" name="submit_cetak_txt"/></span></p>
+            <?php echo form_close() ?>
             </div>
             <?php } ?>
             <?php if($this->session->userdata('link_download')) { ?>
-            <p><span style="color:green">Untuk menyimpan hasil cetak kode label <b><?php echo $this->session->userdata('item_code') ?></b>, silahkan tekan tombol simpan di atas</span></p>
+            <p><span style="color:green">Untuk menyimpan hasil cetak kode label <b><?php echo $this->session->userdata('item_code') ?></b> silahkan tekan tombol simpan di atas</span></p>
             <?php $this->session->unset_userdata('link_download');} ?>
       </div>                
         <div class="tempatemo_right_bottom">

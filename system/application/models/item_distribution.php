@@ -20,11 +20,35 @@ class Item_distribution extends Model {
         return $this->db->insert('item_distribution',$data);
     }
     /**
+    * update status untuk akumulasi cetak label
+    */
+    function update_for_acc($item_code,$status)
+    {
+        if($status == 2)
+        {
+            $this->db->where(array('status'=>0,'dist_code'=>0,'item_code'=>$item_code));
+        }
+        else if($status == 0)
+        {
+            $this->db->where(array('status'=>2,'dist_code'=>0,'item_code'=>$item_code));
+        }
+        return $this->db->update('item_distribution',array('status'=>$status));
+    }
+    /**
+    * Ambil semua item yang dalam status terakumulasi
+    */
+    function get_item_accumulated($sup_code)
+    {        
+        $this->db->select('item.item_code')->from('item_distribution')->join('item','item.item_code = item_distribution.item_code');
+        $this->db->where(array('dist_code'=>0,'status'=>2,'sup_code'=>$sup_code))->group_by('item_code');
+        return $this->db->get();
+    }
+    /**
     *ambil supplier yang belum dicetak labelnya
     */
     function get_supplier_for_printing()
     {
-        $query = 'select * from item_distribution ids left join item i on ids.item_code = i.item_code where ids.status = 0 group by i.sup_code';
+        $query = 'select * from item_distribution ids left join item i on ids.item_code = i.item_code where ids.status != 1 group by i.sup_code';
         return $this->db->query($query);
     }
     /*
@@ -32,9 +56,9 @@ class Item_distribution extends Model {
     */
     function get_item_for_printing($sup_code)
     {
-        $query = 'select sum(ids.quantity) as qty,i.* 
+        $query = 'select sum(ids.quantity) as qty,ids.status,i.* 
                     from item_distribution ids 
-                    left join item i on ids.item_code=i.item_code where i.sup_code = "'.$sup_code.'" and ids.status=0 
+                    left join item i on ids.item_code=i.item_code where i.sup_code = "'.$sup_code.'" and ids.status != 1 
                     group by ids.item_code';
         return $this->db->query($query);
     }
@@ -45,7 +69,7 @@ class Item_distribution extends Model {
     {
         $query = 'select * from (select ids.dist_out,ids.shop_code,ids.quantity,i.* 
                     from item_distribution ids 
-                    left join item i on ids.item_code=i.item_code where i.item_code = "'.$item_code.'" and ids.status=0) as cetak
+                    left join item i on ids.item_code=i.item_code where i.item_code = "'.$item_code.'" and ids.status=2) as cetak
                 left join shop on cetak.shop_code = shop.shop_code';
                     
         return $this->db->query($query);
@@ -90,7 +114,7 @@ class Item_distribution extends Model {
     */
     function update_status($param)
     {
-        $query = 'update item_distribution set status = 1 where status = 0 and item_code = "'.$param['item_code'].'"';
+        $query = 'update item_distribution set status = 1 where status = 2 and item_code = "'.$param['item_code'].'"';
         return $this->db->query($query);
     }
     /**

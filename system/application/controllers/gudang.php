@@ -944,6 +944,7 @@ class Gudang extends Controller {
                 $this->load->model('item_distribution');
                 $query = $this->supplier->get_supplier($this->input->post('sup_code'));
                 $this->data['sup_name'] = $query->row()->sup_name;
+                $this->data['sup_code'] = $this->input->post('sup_code');
                 //ambil item punya supplier yang disubmit                
                 $query = $this->item_distribution->get_item_for_printing($this->input->post('sup_code'));
                 if($query->num_rows() > 0)
@@ -951,69 +952,93 @@ class Gudang extends Controller {
                     $row_data = '';
                     $i = 0;
                     foreach($query->result() as $row)
-                    {
+                    {                        
+                        $checkbox = '<input type="checkbox" name="opsi_'.++$i.'" value="'.$row->item_code.'" onchange="addRemoveLabel('.$i.')"/>';
+                        if($row->status == 2)
+                        {
+                            $checkbox = '<input type="checkbox" name="opsi_'.$i.'" value="'.$row->item_code.'" onchange="addRemoveLabel('.$i.')" checked="checked"/>';
+                        }
                         $row_data .= '<tr>
-                                        <td>'.++$i.'</td>
+                                        <td>'.$i.'</td>
                                         <td>'.$row->item_code.'</td>
                                         <td>'.$row->item_name.'</td>
                                         <td>'.number_format($row->item_hj,0,',','.').',-</td>
                                         <td>'.$row->qty.' item</td>
-                                        <td><span class="button"><input type="button" class="button" value = "Cetak" onclick="cetakLabel(\''.$row->item_code.'\')"/></span></td>
+                                        <td>'.$checkbox.'</td>
                                     </tr>';
                     }
                     $this->data['row_data'] = $row_data;
                 }                    
 		    }
-            
+            //retrieve item_code di table item_distribusi yang statusnya 2, trus di ambil untuk diexport
 		    $item_code = $this->uri->segment(4);
-		    if(!empty($item_code))
+		    if($this->input->post('submit_cetak_txt'))
 		    {
-                //ambil data barang yang akan dibuat label
+                //ambil data item
                 $this->load->model('item_distribution');
-                $query = $this->item_distribution->get_item_for_exporting($item_code);   
+                $query = $this->item_distribution->get_item_accumulated($this->input->post('sup_code'));  
+                $items = $query->result();
                 if($query->num_rows() > 0)
                 {
                     $data_txt = 'Cabang:'.chr(9).'Nama Barang :'.chr(9).'Kode Brg/Barcode :'.chr(9).'Input Harga :'.chr(9).'Supplier :'.chr(9).'Tanggal :'.chr(9).'Kode Toko :'.chr(10);
-                    foreach($query->result() as $row)
+                    foreach($items as $row)
                     {
-                        for($i=0;$i < $row->quantity; $i++)
-                        {
-                            if(config_item('label') == 1)
+                        //ambil data barang yang akan dibuat label                
+                        $query = $this->item_distribution->get_item_for_exporting($row->item_code);                        
+                        if($query->num_rows() > 0)
+                        {                            
+                            foreach($query->result() as $row)
                             {
-                                if($row->shop_cat == 'MODE')
-                                    $shop_cat = '';
-                                else if($row->shop_cat == 'MODIEST')
-                                    $shop_cat = '.';
-                            }
-                            else if(config_item('label') == 2)
-                            {
-                                $shop_cat = $row->shop_cat;
-                            }
-                            $data_txt .= strtoupper($shop_cat).chr(9).strtoupper($row->item_name).chr(9).$row->item_code.chr(9).number_format($row->item_hj,0,',','.').',-'.chr(9).
-                                        strtoupper($row->sup_code).chr(9).date("dmy").chr(9).$row->shop_code .chr(10);
-                                          
-                        }                        
-                        if( $row->quantity % 2 == 1)
-                        {
-                            $data_txt .= '====='.chr(9).'====='.chr(9).'====='.chr(9).'====='.chr(9).'====='.chr(9).'====='.chr(9).'====='.chr(10);                                
+                                for($i=0;$i < $row->quantity; $i++)
+                                {
+                                    if(config_item('label') == 1)
+                                    {
+                                        if($row->shop_cat == 'MODE')
+                                            $shop_cat = '';
+                                        else if($row->shop_cat == 'MODIEST')
+                                            $shop_cat = '.';
+                                    }
+                                    else if(config_item('label') == 2)
+                                    {
+                                        $shop_cat = $row->shop_cat;
+                                    }
+                                    $data_txt .= strtoupper($shop_cat).chr(9).strtoupper($row->item_name).chr(9).$row->item_code.chr(9).number_format($row->item_hj,0,',','.').',-'.chr(9).
+                                                strtoupper($row->sup_code).chr(9).date("dmy").chr(9).$row->shop_code .chr(10);
+                                                  
+                                }                        
+                                if( $row->quantity % 2 == 1)
+                                {
+                                    $data_txt .= '====='.chr(9).'====='.chr(9).'====='.chr(9).'====='.chr(9).'====='.chr(9).'====='.chr(9).'====='.chr(10);                                
+                                }
+                                
+                            }               
                         }
-                        
-                    }               
-                }
-                if($this->export_file_txt($data_txt))
-                {
-                    //update status di item_distribution jadi 1
-                    $this->load->model('item_distribution');
-                    $this->item_distribution->update_status(array('item_code'=>$item_code));
-                    //
-                    $this->session->set_userdata('link_download',base_url().'data/Mode_Fashion.doc');
-                    $this->session->set_userdata('item_code',$item_code);
-                    //simpan data 
-                    redirect('gudang/cetak/label','refresh');
+                    }
+                }                
+                if(isset($data_txt))
+                {                    
+                    if($this->export_file_txt($data_txt))
+                    {
+                        //update status di item_distribution jadi 1
+                        $this->load->model('item_distribution');
+                        foreach($items as $row)
+                        {
+                            $this->item_distribution->update_status(array('item_code'=>$row->item_code));
+                            $item_code .= $row->item_code.', ';
+                        }                        
+                        $this->session->set_userdata('link_download',base_url().'data/Mode_Fashion.doc');
+                        $this->session->set_userdata('item_code',$item_code);
+                        //simpan data 
+                        redirect('gudang/cetak/label','refresh');
+                    }
+                    else
+                    {
+                        $this->data['err_msg'] = '<span style="color:red">Gagal mencetak label, silahkan cek hak akses penulisan. Pastikan folder <b>sisgud/data/</b> bisa ditulis</span>';
+                    }
                 }
                 else
                 {
-                    $this->data['err_msg'] = '<span style="color:red">Gagal mencetak label, silahkan cek hak akses penulisan. Pastikan folder <b>sisgud/data/</b> bisa ditulis</span>';
+                    $this->data['err_msg'] = '<span style="color:red">Anda belum memilih barang yang akan dicetak label</span>';
                 }
 		    }     
 			$this->list_supplier();
@@ -1224,6 +1249,25 @@ class Gudang extends Controller {
             }
 		}
 	}
+    /**
+    * Fungsi untuk akumulasi cetak label
+    */
+    function acc_print_label()
+    {
+        if($this->input->post('item_code'))
+        {
+           
+            $this->load->model('item_distribution');
+            if($this->item_distribution->update_for_acc($this->input->post('item_code'),$this->input->post('status')))
+            {
+                echo 1;
+            }
+            else
+            {
+                echo 0;
+            }            
+        }        
+    }
     /**
     *Cetak mutasi pdf
     */
