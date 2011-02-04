@@ -6,10 +6,15 @@
         <div class="tempatemo_section_box_1">
             <h1>Gudang >> Retur Barang</h1>
             <?php echo form_open('gudang/retur/tambah/') ?>
-            <table class="table-form">
-                <tr><td>Kode Toko</td><td>: <input type="text" name="shop_code" id="shop_code" class="text_field" readonly="readonly"/></td></tr>                
-                <tr><td>Nama Toko</td><td>: <input class="ac_input text_field" type="text" id="shop_name"   value="" /></td></tr>                
-                <tr><td>Tanggal Retur</td><td>: <input type="text" id="date_bon" name="tgl_retur" value="" readonly="readonly"/></td></tr>                
+            <table class="table-form" style="width:100%">
+                <tr>
+                    <td>Kode Toko</td><td>: <input type="text" name="shop_code" id="shop_code" class="text_field" readonly="readonly"/></td>
+                    <td>Tanggal Retur</td><td>: <input type="text" id="date_bon" name="tgl_retur" value="" readonly="readonly"/></td>
+                </tr>                
+                <tr>
+                    <td>Nama Toko</td><td>: <input class="ac_input text_field" type="text" id="shop_name"   value="" /></td>
+                    <td>Kode Retur</td><td>: <input type="text" name="retur_code" value="" /></td>
+                </tr>                      
             </table>
             <p><?php
             if($this->session->userdata('form_notify'))
@@ -33,7 +38,7 @@
                         echo '<tr>
                                 <td>'.++$i.'</td>
                                 <td>
-                                    <input type="text" class="item_code_retur ac_input" name="item_code[]" maxlength="8" style="width:80px" onkeyup="setFocus('.$i.')"/>
+                                    <input type="text" class="item_code_retur ac_input" name="item_code[]" maxlength="10" style="width:80px" onkeyup="setFocus('.$i.')"/>
                                     <span id="item_code_'.$i.'" style="display:none"></span>
                                 </td>
                                 <td><span id="item_name_'.$i.'" style="width:130px"></span></td>

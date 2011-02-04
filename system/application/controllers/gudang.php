@@ -1091,7 +1091,7 @@ class Gudang extends Controller {
                 $this->item_distribution->create_bon(array('shop_code'=>$this->input->post('shop_code'),'dist_code'=>$this->data['dist_code']));
 			}			
 			//cetak bon setelah preview
-            $kode_bon = $this->uri->segment(4);
+            $kode_bon = $this->uri->segment(4);$shop_code = $this->uri->segment(5);
             if($this->input->post('submit_cetak_bon') || (!empty($kode_bon) && is_numeric($kode_bon)))
 			{
                 //ambil barang untuk dicetak bonnya
@@ -1102,101 +1102,109 @@ class Gudang extends Controller {
                 $this->load->model('item_distribution');
                 $this->load->model('shop');
                 $this->load->model('item');
-				$query = $this->item_distribution->get_item_for_pdf(array('dist_code'=>$kode_bon));
-                $item_jml = $query->num_rows();
-                //ambil mutasi
-				$mutasi = $query->row();
-				$temp = $this->shop->get_shop($mutasi->shop_code);
-				$shop = $temp->row();
-                $this->data['shop_code'] = $shop->shop_code;
-				$head = '<div style="margin-top: 5px;">
-					    <h3 style="text-align: center;">BON MUTASI KELUAR GUDANG</h3>
-					    <table style="width: 700px;">
-						<tr><td style="width: 80px;">Kode Bon</td><td style="width:260px;">: '.$kode_bon.'</td>
-						<td style="width: 70px;text-align:right;">Tanggal</td><td style="width:100px;text-align:right">: '.date_to_string($mutasi->dist_out).'</td></tr>
-						<tr><td style="width: 80px; ">Toko Tujuan</td><td>: '.strtoupper($shop->shop_name).'</td></tr>                                
-					    </table>
-					</div><br />';
-					
-				$head .= '<table style="width: 600px;" border="1" cellpadding="3">
-					    <tr>
-						<td style="width: 20px;text-align: center;">No</td>						
-						<td style="width: 70px;text-align: center">Kode Barang</td>
-                        <td style="width: 70px;text-align: center;">Kelompok Brg</td>
-						<td style="width: 50px;text-align: center;">Supplier</td>
-						<td style="width: 110px;text-align: center;">Nama Barang</td>
-                        <td style="width: 50px;text-align: center;">Disc %</td> 
-                        <td style="width: 75px;text-align: center;">Harga Jual (Rp.)</td>
-                        <td style="width: 40px;text-align: center;">Qty Brg</td>
-						<td style="width: 75px;text-align: center;">Jumlah (Rp.) </td>
-					    </tr>';
-				$i = 0;
-				$jumlah_item = 0;
-				$total = 0;
-				$j=0;$index=0;
-				foreach($query->result() as $row)
-				{
-					$temp = $this->item->get_item(array('item_code'=>$row->item_code));
-					$item = $temp->row();
-					$jumlah = $item ->item_hj *(1 - $row->item_disc/100) * $row->quantity;
-					$jumlah_item += $row->quantity;
-					$total += $jumlah;
-					if(!isset($list_item[$index]))
-					{
-						$list_item[$index] = '';
-					}
-					$list_item[$index].= '<tr>
-						<td style="width: 20px;height:;text-align: center;">'.++$i.'</td>						
-						<td style="width: 70px;text-align:center">'.$item->item_code.'</td>
-                        <td style="width: 70px;height:;text-align: center;">'.$item->cat_code.'</td>
-						<td style="width: 50px;text-align: center;">'.$item->sup_code.'</td>
-						<td style="width: 110px;">'.strtoupper($item->item_name).'</td>
-                        <td style="width: 50px;text-align: center;">'.$row->item_disc.'</td>                        
-						<td style="width: 75px;text-align: right;">'.number_format($item->item_hj,'0',',','.').',-</td>
-                        <td style="width: 40px;text-align:right">'.$row->quantity.'</td>
-						<td style="width: 75px;text-align: right;">'.number_format($jumlah,'0',',','.').',-</td>
-					    </tr>';
-					$j++;
-					if($j==15)
-					{
-                        //yang ditutup table disini khusus yang
-                        if($item_jml%15 > 0)
-                        {                            
-                            $list_item[$index] .= '</table>';
+				$query = $this->item_distribution->get_item_for_pdf(array('dist_code'=>$kode_bon,'shop_code'=>$shop_code));
+                if($query->num_rows() > 0)
+                {
+                    $item_jml = $query->num_rows();
+                    //ambil mutasi
+                    $mutasi = $query->row();
+                    $temp = $this->shop->get_shop($mutasi->shop_code);
+                    $shop = $temp->row();
+                    $this->data['shop_code'] = $shop->shop_code;
+                    $head = '<div style="margin-top: 5px;">
+                            <h3 style="text-align: center;">BON MUTASI KELUAR GUDANG</h3>
+                            <table style="width: 700px;">
+                            <tr><td style="width: 80px;">Kode Bon</td><td style="width:260px;">: '.$kode_bon.'</td>
+                            <td style="width: 70px;text-align:right;">Tanggal</td><td style="width:100px;text-align:right">: '.date_to_string($mutasi->dist_out).'</td></tr>
+                            <tr><td style="width: 80px; ">Toko Tujuan</td><td>: '.strtoupper($shop->shop_name).'</td></tr>                                
+                            </table>
+                        </div><br />';
+                        
+                    $head .= '<table style="width: 600px;" border="1" cellpadding="3">
+                            <tr>
+                            <td style="width: 20px;text-align: center;">No</td>						
+                            <td style="width: 70px;text-align: center">Kode Barang</td>
+                            <td style="width: 70px;text-align: center;">Kelompok Brg</td>
+                            <td style="width: 50px;text-align: center;">Supplier</td>
+                            <td style="width: 110px;text-align: center;">Nama Barang</td>
+                            <td style="width: 50px;text-align: center;">Disc %</td> 
+                            <td style="width: 75px;text-align: center;">Harga Jual (Rp.)</td>
+                            <td style="width: 40px;text-align: center;">Qty Brg</td>
+                            <td style="width: 75px;text-align: center;">Jumlah (Rp.) </td>
+                            </tr>';
+                    $i = 0;
+                    $jumlah_item = 0;
+                    $total = 0;
+                    $j=0;$index=0;
+                    
+                    foreach($query->result() as $row)
+                    {
+                        $temp = $this->item->get_item(array('item_code'=>$row->item_code));
+                        $item = $temp->row();
+                        $jumlah = $item ->item_hj *(1 - $row->item_disc/100) * $row->quantity;
+                        $jumlah_item += $row->quantity;
+                        $total += $jumlah;
+                        if(!isset($list_item[$index]))
+                        {
+                            $list_item[$index] = '';
                         }
-                        else
-                        {                           
-                            if($index < ($item_jml/15)-1)
+                        $list_item[$index].= '<tr>
+                            <td style="width: 20px;height:;text-align: center;">'.++$i.'</td>						
+                            <td style="width: 70px;text-align:center">'.$item->item_code.'</td>
+                            <td style="width: 70px;height:;text-align: center;">'.$item->cat_code.'</td>
+                            <td style="width: 50px;text-align: center;">'.$item->sup_code.'</td>
+                            <td style="width: 110px;">'.strtoupper($item->item_name).'</td>
+                            <td style="width: 50px;text-align: center;">'.$row->item_disc.'</td>                        
+                            <td style="width: 75px;text-align: right;">'.number_format($item->item_hj,'0',',','.').',-</td>
+                            <td style="width: 40px;text-align:right">'.$row->quantity.'</td>
+                            <td style="width: 75px;text-align: right;">'.number_format($jumlah,'0',',','.').',-</td>
+                            </tr>';
+                        $j++;
+                        if($j==15)
+                        {
+                            //yang ditutup table disini khusus yang
+                            if($item_jml%15 > 0)
+                            {                            
                                 $list_item[$index] .= '</table>';
-                        }
-						$j=0;$index++;                        
-					}                 
-				}    
-                //Jika jenis item pas kelipatan 15, maka index diturunkan satu dan harus ditutup langsung
-                if($item_jml%15 == 0)
-                {               
-                    $list_item[--$index] .= '<tr>						
-                                                <td style="width: 445px;text-align:right" colspan="7"> T O T A L</td>
-                                                 <td style="width: 40px;text-align:right">'.$jumlah_item.'</td>
-                                                <td style="width: 75px;text-align: right;">'.number_format($total,'0',',','.').',-</td>
-                                                </tr>
-                                        </table>';                 
+                            }
+                            else
+                            {                           
+                                if($index < ($item_jml/15)-1)
+                                    $list_item[$index] .= '</table>';
+                            }
+                            $j=0;$index++;                        
+                        }                 
+                    }    
+                    //Jika jenis item pas kelipatan 15, maka index diturunkan satu dan harus ditutup langsung
+                    if($item_jml%15 == 0)
+                    {               
+                        $list_item[--$index] .= '<tr>						
+                                                    <td style="width: 445px;text-align:right" colspan="7"> T O T A L</td>
+                                                     <td style="width: 40px;text-align:right">'.$jumlah_item.'</td>
+                                                    <td style="width: 75px;text-align: right;">'.number_format($total,'0',',','.').',-</td>
+                                                    </tr>
+                                            </table>';                 
+                    }
+                    //yang bukan kelipatan  15, ya normal                
+                    else
+                    {
+                        $list_item[$index] .= '<tr>						
+                                                    <td style="width: 445px;text-align:right" colspan="7"> T O T A L</td>
+                                                     <td style="width: 40px;text-align:right">'.$jumlah_item.'</td>
+                                                    <td style="width: 75px;text-align: right;">'.number_format($total,'0',',','.').',-</td>
+                                                    </tr>
+                                            </table>';
+                    }
+                    $footer = '<br /><table style="text-align:center;">
+                                            <tr><td>Bagian Gudang</td><td>Bagian Transport</td><td>Bagian Toko</td><td>Bagian Komputer</td></tr>                            
+                                    </table>';
+                    //echo htmlentities($list_item[1]);exit;
+                    $this->cetak_pdf($head,$list_item,$footer);
                 }
-                //yang bukan kelipatan  15, ya normal                
                 else
                 {
-                    $list_item[$index] .= '<tr>						
-                                                <td style="width: 445px;text-align:right" colspan="7"> T O T A L</td>
-                                                 <td style="width: 40px;text-align:right">'.$jumlah_item.'</td>
-                                                <td style="width: 75px;text-align: right;">'.number_format($total,'0',',','.').',-</td>
-                                                </tr>
-                                        </table>';
+                    $this->data['err_msg'] = '<p><span style="color:red">Data tidak ditemukan</span></p>';
                 }
-				$footer = '<br /><table style="text-align:center;">
-					                    <tr><td>Bagian Gudang</td><td>Bagian Transport</td><td>Bagian Toko</td><td>Bagian Komputer</td></tr>                            
-					            </table>';
-                //echo htmlentities($list_item[1]);exit;
-				$this->cetak_pdf($head,$list_item,$footer);
 			}
             //rekap untuk cetak bon
             if($this->uri->segment(4) == 'rekap')
@@ -1222,7 +1230,7 @@ class Gudang extends Controller {
                                             <td>
                                             <!--'.form_open('gudang/cetak/bon').'-->
                                                 <input type="hidden" name="dist_code" value="'.$row->dist_code.'"/>
-                                                <a href="'.base_url().'gudang/cetak/bon/'.$row->dist_code.'" target="new"/><span class="button"><input class="button" type="submit" name="submit_cetak_bon" value="Cetak"></span></a>
+                                                <a href="'.base_url().'gudang/cetak/bon/'.$row->dist_code.'/'.$this->input->post('shop_code').'" target="new"/><span class="button"><input class="button" type="submit" name="submit_cetak_bon" value="Cetak"></span></a>
                                             <!--'.form_close().'-->
                                             </td>
                                         </tr>';
@@ -1348,7 +1356,7 @@ class Gudang extends Controller {
             if($this->input->post('submit_simpan_retur'))
             {
                 $data = array(
-                        'retur_code'=> time(),
+                        'retur_code'=> $this->input->post('retur_code'),
                         'retur_date'=> date('Y-m-d'),
                         'shop_code' => $this->input->post('shop_code'),
                         'op_code'=> $this->session->userdata('p_id')

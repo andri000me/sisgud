@@ -38,7 +38,7 @@
             </table>
             <!--<?php echo form_open('gudang/cetak/bon') ?>-->
             <p style="text-align:center"><input type="hidden" name="dist_code" value="<?php echo $dist_code ?>"/>
-            <a href="<?php echo base_url().'gudang/cetak/bon/'.$dist_code ?>" target="new">
+            <a href="<?php echo base_url().'gudang/cetak/bon/'.$dist_code.'/'.$shop->shop_code ?>" target="new">
                 <span class="button"><input class="button" type="submit" name="submit_cetak_bon" value="Cetak"></span>
             </a>
             </p>
