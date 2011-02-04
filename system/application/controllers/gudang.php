@@ -271,7 +271,8 @@ class Gudang extends Controller {
 				$this->data['sup'] = $query->row();
                 
                 //ambil data item mutasi
-                $query = $this->item_mutasi->get_item_mutasi(array('sup_code'=>$this->input->post('sup_code')));                
+                $query = $this->item_mutasi->get_item_mutasi(array('sup_code'=>$this->input->post('sup_code')));
+                
                 if($query->num_rows() > 0)
                 {
                     $row_data = '';

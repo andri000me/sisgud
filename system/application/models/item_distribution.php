@@ -100,7 +100,7 @@ class Item_distribution extends Model {
     function get_item_for_bon($shop_code)
     {
         $query = 'select ids.*,i.*,sum(ids.quantity) as quantity from item_distribution ids left join item i on ids.item_code = i.item_code 
-                where ids.shop_code = "'.$shop_code.'" and ids.dist_code=0 and ids.status=1 group by item_code order by item_code asc';
+                where ids.shop_code = "'.$shop_code.'" and ids.dist_code=0 and ids.status=1 group by ids.item_code';
         return $this->db->query($query);
     }
     /**
@@ -109,8 +109,7 @@ class Item_distribution extends Model {
     function get_item_for_pdf($param)
     {
         $this->db->select('item_distribution.*,sum(quantity) as quantity');
-        $this->db->group_by('item_code');
-        $this->db->order_by('item_code','asc');
+        $this->db->group_by('item_code');        
         return $this->db->get_where('item_distribution',$param);
     }
     /**
