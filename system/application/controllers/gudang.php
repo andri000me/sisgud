@@ -151,7 +151,7 @@ class Gudang extends Controller {
 			{
 				$query = $this->supplier->get_supplier($this->input->post('sup_code'));
 				$sup = $query->row();
-                $query = $this->item_mutasi->get_item_mutasi(array('sup_code'=>$this->input->post('sup_code'))); 
+                $query = $this->item_mutasi->get_item_mutasi(array('sup_code'=>$this->input->post('sup_code')));                
                 if($query->num_rows() > 0)
                 {
                     $data = $query->row();
@@ -272,7 +272,7 @@ class Gudang extends Controller {
                 
                 //ambil data item mutasi
                 $query = $this->item_mutasi->get_item_mutasi(array('sup_code'=>$this->input->post('sup_code')));
-                
+                //echo $this->db->last_query();exit;
                 if($query->num_rows() > 0)
                 {
                     $row_data = '';
@@ -283,7 +283,7 @@ class Gudang extends Controller {
                                         <td>'.++$i.'</td>
                                         <td>'.$row->item_code.'</td>
                                         <td>'.$row->item_name.'</td>
-                                        <td>'.$row->item_qty_stock.'</td>
+                                        <td>'.$row->qty.'</td>
                                         '.$row_shop.'
                                         <td></td>
                                     </tr>';

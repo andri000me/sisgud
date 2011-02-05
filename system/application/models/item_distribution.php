@@ -70,7 +70,7 @@ class Item_distribution extends Model {
         $query = 'select * from (select ids.dist_out,ids.shop_code,ids.quantity,i.* 
                     from item_distribution ids 
                     left join item i on ids.item_code=i.item_code where i.item_code = "'.$item_code.'" and ids.status=2) as cetak
-                left join shop on cetak.shop_code = shop.shop_code';
+                left join shop on cetak.shop_code = shop.shop_code order by i.item_code';
                     
         return $this->db->query($query);
     }
@@ -91,7 +91,7 @@ class Item_distribution extends Model {
     {
         $query = 'select ids.item_code, i.item_name, i.cat_code,i.item_hj, ids.item_disc, ids.quantity 
                     from item_distribution ids left join item i on ids.item_code=i.item_code 
-                    where ids.export="'.$param['export'].'"';
+                    where ids.export="'.$param['export'].'" order by ids.item_code';
         return $this->db->query($query);
     }
     /**

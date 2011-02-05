@@ -7,4 +7,7 @@ revisi 1.0
 - benerin ubah toko, sama tambah toko, ada opsi mode/modiest -ok
 - tambah autocomplete untuk kode supplier ketika tambah supplier -ok
 - rekap bon dibuat perhari, biar gampang searchingnya. -ok
-- bug fixing untuk cetak bon dengan jumlah yang pas kelipatan 15
+- bug fixing untuk cetak bon dengan jumlah yang pas kelipatan 15 -ok
+- bug fixing untuk handle cetak bon dengan kode bon sama dan toko yang berbeda -ok
+- bug fixing retur barang, kode barang jadi 10 digit dan ada input untuk kode retur -ok
+- bug fixing untuk cetak mutasi keluar dan cetak bon, tidak diurutkan berdasarkan item_code tapi dibiarkan saja -ok

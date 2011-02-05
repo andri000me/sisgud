@@ -26,11 +26,11 @@ class Item_mutasi extends Model {
     {
         if(isset($param['sup_code']))
         {
-            $query = 'select * from item_mutasi left join item on item_mutasi.item_code=item.item_code where item.sup_code = "'.$param['sup_code'].'" and item_mutasi.status_print_mutasi=0';
+            $query = 'select * from item_mutasi left join item on item_mutasi.item_code=item.item_code where item.sup_code = "'.$param['sup_code'].'" and item_mutasi.status_print_mutasi=0 order by id';
         }
         else if(isset($param['kode_mutasi']))
         {
-            $query = 'select * from item_mutasi left join supplier on item_mutasi.sup_code=supplier.sup_code where item_mutasi.kode_mutasi = "'.$param['kode_mutasi'].'"';
+            $query = 'select * from item_mutasi left join supplier on item_mutasi.sup_code=supplier.sup_code where item_mutasi.kode_mutasi = "'.$param['kode_mutasi'].'" order by id';
         }
         return $this->db->query($query);
     }
