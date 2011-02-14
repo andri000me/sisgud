@@ -290,6 +290,8 @@ class Gudang extends Controller {
                     }
                     $this->data['tgl_bon'] = $row->date_bon;
                     $this->data['row_data'] = $row_data;
+                    //kita gabung bon nya jadi satu bon
+                    $this->item_mutasi->create_mutasi_keluar(array('sup_code'=>$this->input->post('sup_code')));
                 }
             }
 			//ambil supplier yang ada di table item_mutasi dan status print mutasinya masih kosong
@@ -977,7 +979,7 @@ class Gudang extends Controller {
 		    {
                 //ambil data item
                 $this->load->model('item_distribution');
-                $query = $this->item_distribution->get_item_accumulated($this->input->post('sup_code'));  
+                $query = $this->item_distribution->get_item_accumulated($this->input->post('sup_code'));echo $this->db->last_query();exit;  
                 $items = $query->result();
                 if($query->num_rows() > 0)
                 {

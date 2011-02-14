@@ -40,7 +40,7 @@ class Item_distribution extends Model {
     function get_item_accumulated($sup_code)
     {        
         $this->db->select('item.item_code')->from('item_distribution')->join('item','item.item_code = item_distribution.item_code');
-        $this->db->where(array('dist_code'=>0,'status'=>2,'sup_code'=>$sup_code))->group_by('item_code');
+        $this->db->where(array('dist_code'=>0,'status'=>2,'sup_code'=>$sup_code))->group_by('item.item_code')->order_by('item_distribution.id');
         return $this->db->get();
     }
     /**
@@ -59,9 +59,12 @@ class Item_distribution extends Model {
         $query = 'select sum(ids.quantity) as qty,ids.status,i.* 
                     from item_distribution ids 
                     left join item i on ids.item_code=i.item_code where i.sup_code = "'.$sup_code.'" and ids.status != 1 
-                    group by ids.item_code';
+                    group by ids.item_code order by ids.id';
         return $this->db->query($query);
     }
+    /**
+    *
+    */
     /**
     * ambil data barang untuk dieksport ke file .txt yang akan dipake untuk print barcode
     */
@@ -70,7 +73,7 @@ class Item_distribution extends Model {
         $query = 'select * from (select ids.dist_out,ids.shop_code,ids.quantity,i.* 
                     from item_distribution ids 
                     left join item i on ids.item_code=i.item_code where i.item_code = "'.$item_code.'" and ids.status=2) as cetak
-                left join shop on cetak.shop_code = shop.shop_code order by i.item_code';
+                left join shop on cetak.shop_code = shop.shop_code';
                     
         return $this->db->query($query);
     }
@@ -81,7 +84,7 @@ class Item_distribution extends Model {
     {
         $query = 'select ids.item_code, i.item_name, i.cat_code,i.item_hj, ids.item_disc, ids.quantity 
                     from item_distribution ids left join item i on ids.item_code=i.item_code 
-                    where ids.shop_code = "'.$shop_code.'" and ids.export=0';
+                    where ids.shop_code = "'.$shop_code.'" and ids.export=0 order by ids.id';
         return $this->db->query($query);
     }
     /**
@@ -91,7 +94,7 @@ class Item_distribution extends Model {
     {
         $query = 'select ids.item_code, i.item_name, i.cat_code,i.item_hj, ids.item_disc, ids.quantity 
                     from item_distribution ids left join item i on ids.item_code=i.item_code 
-                    where ids.export="'.$param['export'].'" order by ids.item_code';
+                    where ids.export="'.$param['export'].'" order by ids.id';
         return $this->db->query($query);
     }
     /**
@@ -100,7 +103,7 @@ class Item_distribution extends Model {
     function get_item_for_bon($shop_code)
     {
         $query = 'select ids.*,i.*,sum(ids.quantity) as quantity from item_distribution ids left join item i on ids.item_code = i.item_code 
-                where ids.shop_code = "'.$shop_code.'" and ids.dist_code=0 and ids.status=1 group by ids.item_code';
+                where ids.shop_code = "'.$shop_code.'" and ids.dist_code=0 and ids.status=1 group by ids.id';
         return $this->db->query($query);
     }
     /**
@@ -109,7 +112,7 @@ class Item_distribution extends Model {
     function get_item_for_pdf($param)
     {
         $this->db->select('item_distribution.*,sum(quantity) as quantity');
-        $this->db->group_by('item_code');        
+        $this->db->group_by('item_code')->order_by('id','asc');        
         return $this->db->get_where('item_distribution',$param);
     }
     /**
