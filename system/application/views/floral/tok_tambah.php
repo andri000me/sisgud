@@ -22,7 +22,8 @@
                     <select name="shop_cat" style="width:155px;margin:2px;">
                         <option value="1">MODE</option>
                         <option value="2">MODIEST</option>
-                        <!--<option value="3">NANA</option>-->
+                        <option value="3">OBRAL</option>
+                        <option value="4">RUSAK</option>
                     </select>
                     <span class="note">*)</span></td>                                
                 </tr>

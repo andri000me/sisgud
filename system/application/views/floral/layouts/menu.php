@@ -22,6 +22,8 @@
             <?php } if($role == 'user') { ?>
             <ul class="sub">
                 <li><a href="<?php echo base_url() ?>gudang/mutasi/keluar">Mutasi Keluar</a></li>                             
+                <li><a href="<?php echo base_url() ?>gudang/mutasi/rusak">Mutasi Barang Rusak</a></li>                             
+                <li><a href="<?php echo base_url() ?>gudang/mutasi/obral">Mutasi Barang Obral</a></li>                             
                 <li><a href="<?php echo base_url() ?>gudang/export">Ekspor Data</a></li>                              
             </ul>
             <?php } ?>

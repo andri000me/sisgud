@@ -96,12 +96,18 @@ class Gudang extends Controller {
 			$this->data['page_title'] .= ' :. Mutasi Masuk';           		               
 			$this->load->view(config_item('template').'gud_mutasimasuk',$this->data);
 		}
-		else if($this->uri->segment(3)=='keluar')
+		else if($this->uri->segment(3)=='keluar' || $this->uri->segment(3)=='obral' || $this->uri->segment(3)=='rusak')
 		{
 			//loading model
+            $this->data['opsi'] = $this->uri->segment(3);
             $this->load->model('shop');            
             //get all the  shop
-            $query = $this->shop->get_shop();
+            if($this->uri->segment(3)=='keluar')
+                $query = $this->shop->get_shop();
+            else if($this->uri->segment(3)=='obral')
+                $query = $this->shop->get_shop_by_cat('OBRAL');
+            else if($this->uri->segment(3)=='rusak')
+                $query = $this->shop->get_shop_by_cat('RUSAK');
             if($query->num_rows() > 0)
             {
                 //setting the initial shop,
@@ -129,7 +135,7 @@ class Gudang extends Controller {
                 foreach($shop_initial as $row)
                 {
                     $qty[$row] = $this->input->post('qty_'.$row);
-                }
+                }               
                 //insert mutasi keluar
                 $this->insert_mutasi_keluar($item_code,$item_hj,$qty,$qty_stok,$item_disc);                
             }
@@ -289,9 +295,7 @@ class Gudang extends Controller {
                                     </tr>';
                     }
                     $this->data['tgl_bon'] = $row->date_bon;
-                    $this->data['row_data'] = $row_data;
-                    //kita gabung bon nya jadi satu bon
-                    $this->item_mutasi->create_mutasi_keluar(array('sup_code'=>$this->input->post('sup_code')));
+                    $this->data['row_data'] = $row_data;                   
                 }
             }
 			//ambil supplier yang ada di table item_mutasi dan status print mutasinya masih kosong
@@ -867,7 +871,7 @@ class Gudang extends Controller {
     function insert_mutasi_keluar($item_code,$item_hj,$qty,$qty_stok,$item_disc)
     {
         //ambil data semua toko
-        $query = $this->shop->get_shop();
+        $query = $this->shop->get_all_shop();        
         if($query->num_rows() > 0)
         {
             $shop = $query->result();
@@ -877,42 +881,46 @@ class Gudang extends Controller {
             $success = '';
             for($i=0;$i<count($item_code);$i++)//mulai dari baris ke satu sampai abis
             {
-                $shop_initial='';
-                for($j=0;$j<count($shop);$j++)//looping semua toko
+                if($item_hj[$i] > 0)
                 {
-                    $quantity = $qty[strtolower($shop[$j]->shop_initial)][$i];
-                    if(!empty($quantity) && $quantity > 0)
+                    $shop_initial='';
+                    for($j=0;$j<count($shop);$j++)//looping semua toko
                     {
-                        $data = array(
-                            'dist_code'=> 0,
-                            'item_code'=> $item_code[$i],
-                            'shop_code'=> $shop[$j]->shop_code,
-                            'dist_out'=> $now,
-                            'quantity'=> $quantity,
-                            'item_disc'=> $item_disc[$i],
-                            'status'=> 0
-                        );
-                        //insert data ke table item_distribution 
-                        if($this->item_distribution->insert_item_distribution($data))
+                        if(isset($qty[strtolower($shop[$j]->shop_initial)][$i]))
+                            $quantity = $qty[strtolower($shop[$j]->shop_initial)][$i];
+                        if(!empty($quantity) && $quantity > 0)
                         {
-                            $shop_initial.= $shop[$j]->shop_initial.', ';
+                            $data = array(
+                                'dist_code'=> 0,
+                                'item_code'=> $item_code[$i],
+                                'shop_code'=> $shop[$j]->shop_code,
+                                'dist_out'=> $now,
+                                'quantity'=> $quantity,
+                                'item_disc'=> $item_disc[$i],
+                                'status'=> 0
+                            );
+                            //insert data ke table item_distribution 
+                            if($this->item_distribution->insert_item_distribution($data))
+                            {
+                                $shop_initial.= $shop[$j]->shop_initial.', ';
+                            }
+                            $quantity = 0;
                         }
-                        $quantity = 0;
+                        
                     }
+                    //update qty_stok di tabel item
+                    $param = array('item_code'=>$item_code[$i],'item_qty_stok'=>$qty_stok[$i],'item_hj'=>$item_hj[$i]);
+                    $this->item->update_item($param);
                     
+                    if(!empty($shop_initial))//setting msg
+                    {
+                        $success .= 'kode <b>'.$item_code[$i].'</b> ke toko : <b>('.$shop_initial.')</b>, ';
+                    }
                 }
-                //update qty_stok di tabel item
-                $param = array('item_code'=>$item_code[$i],'item_qty_stok'=>$qty_stok[$i],'item_hj'=>$item_hj[$i]);
-                $this->item->update_item($param);
-                
-                if(!empty($shop_initial))//setting msg
-                {
-                    $success .= 'kode <b>'.$item_code[$i].'</b> ke toko : <b>('.$shop_initial.')</b>, ';
-                }
-            }
+            }            
             if(!empty($success))
             {
-                $success = 'Proses mutasi keluar untuk '.$success.' telah berhasil dilakukan';
+                $success = 'Proses mutasi '.$this->data['opsi'].' untuk '.$success.' telah berhasil dilakukan';
             }
             else
             {
@@ -930,7 +938,7 @@ class Gudang extends Controller {
             $form_notify .= '<span style="color:red">'.$failed.'</span>';
         }
         $this->session->set_userdata('form_notify',$form_notify);
-        redirect('/gudang/mutasi/keluar','refresh');
+        redirect('/gudang/mutasi/'.$this->data['opsi'],'refresh');
     }
     /**
 	*Method for printing label an bon
@@ -979,7 +987,7 @@ class Gudang extends Controller {
 		    {
                 //ambil data item
                 $this->load->model('item_distribution');
-                $query = $this->item_distribution->get_item_accumulated($this->input->post('sup_code'));echo $this->db->last_query();exit;  
+                $query = $this->item_distribution->get_item_accumulated($this->input->post('sup_code'));
                 $items = $query->result();
                 if($query->num_rows() > 0)
                 {
@@ -1032,7 +1040,7 @@ class Gudang extends Controller {
                         $this->session->set_userdata('link_download',base_url().'data/Mode_Fashion.doc');
                         $this->session->set_userdata('item_code',$item_code);
                         //simpan data 
-                        redirect('gudang/cetak/label','refresh');
+                        //redirect('gudang/cetak/label','refresh');
                     }
                     else
                     {
@@ -1724,15 +1732,23 @@ class Gudang extends Controller {
         }
         else if($option == 'bon')
         {
-            $query = $this->db->query('select * from shop where shop_code in (select shop_code from item_distribution where dist_code = 0 group by shop_code)');
+            $query = $this->db->query('select * from (select shop_code from item_distribution where dist_code = 0 group by shop_code) as dist left join shop on shop.shop_code=dist.shop_code where shop_cat != "OBRAL" and shop_cat != "RUSAK"');
+        }
+        else if($option == 'obral')
+        {
+            $query = $this->db->query('select * from (select shop_code from item_distribution where dist_code = 0 group by shop_code) as dist left join shop on shop.shop_code=dist.shop_code where shop_cat = "OBRAL"');
+        }
+        else if($option == 'rusak')
+        {
+            $query = $this->db->query('select * from (select shop_code from item_distribution where dist_code = 0 group by shop_code) as dist left join shop on shop.shop_code=dist.shop_code where shop_cat = "RUSAK"');
         }
         else if($option == 'pdf')
         {
-            $query = $this->db->query('select * from shop where shop_code in (select shop_code from item_distribution where dist_code != 0 group by shop_code)');
+            $query = $this->db->query('select * from (select shop_code from item_distribution where dist_code != 0 group by shop_code) as dist left join shop on shop.shop_code=dist.shop_code');
         }
         else if($option == 'export')
         {
-            $query = $this->db->query('select * from shop where shop_code in (select shop_code from item_distribution where dist_code != 0 and export=0 group by shop_code)');
+            $query = $this->db->query('select shop.* from (select shop_code from item_distribution where dist_code != 0 and export=0 group by shop_code) as dist left join shop on shop.shop_code=dist.shop_code');
         }
         //processing query result
             if($query->num_rows())

@@ -5,7 +5,7 @@
     <div class="templatemo_right_section">
         <div class="tempatemo_section_box_1">
             <h1>Gudang >> Mutasi Keluar</h1>
-            <?php echo form_open('gudang/mutasi/keluar') ?>            
+            <?php echo form_open('gudang/mutasi/'.$opsi) ?>            
             <p><?php
             if($this->session->userdata('form_notify'))
             {

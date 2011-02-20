@@ -79,12 +79,13 @@ class Item_distribution extends Model {
     }
     /**
     * fungsi ambil data item untuk preview sebelum export
+    * data yang dipreview untuk dieksport adalah yang udah di cetak bon nya
     */
     function get_item_for_shop($shop_code)
     {
         $query = 'select ids.item_code, i.item_name, i.cat_code,i.item_hj, ids.item_disc, ids.quantity 
                     from item_distribution ids left join item i on ids.item_code=i.item_code 
-                    where ids.shop_code = "'.$shop_code.'" and ids.export=0 order by ids.id';
+                    where ids.shop_code = "'.$shop_code.'" and ids.export=0 and dist_code != 0 order by ids.id';
         return $this->db->query($query);
     }
     /**

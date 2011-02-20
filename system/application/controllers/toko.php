@@ -68,7 +68,7 @@ class Toko extends Controller {
                 $this->data['shop_supervisor'] = $this->input->post('shop_supervisor');
                 //insert data ke database
                 if($this->insert_data())
-                {
+                {                    
                     //upload shop img
                     $config['upload_path'] = 'css/images/toko/';
                     $config['allowed_types'] = 'jpg';
@@ -100,6 +100,7 @@ class Toko extends Controller {
                     'shop_address'=>$this->data['shop_address'],
                     'shop_initial'=>$this->data['shop_initial'],
                     'shop_phone'=>$this->data['shop_phone'],
+                    'shop_cat'=>$this->data['shop_cat'],
                     'shop_supervisor'=>$this->data['shop_supervisor']
                 );
         //check dulu
@@ -248,7 +249,7 @@ class Toko extends Controller {
     function list_toko()
     {
         $this->load->model('shop');
-        $query = $this->shop->get_shop();            
+        $query = $this->shop->get_all_shop();            
         if($query->num_rows())
         {
             $this->data['list_toko'] ='<select name="shop_code">';

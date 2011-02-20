@@ -21,8 +21,9 @@
                     <td>Cabang</td><td>:
                     <select name="shop_cat" style="width:155px;margin:2px;">
                         <option value="1" <?php if($shop->shop_cat == 'MODE') echo 'selected="selected"'; ?> >MODE</option>
-                        <option value="2" <?php if($shop->shop_cat == 'MODIEST') echo 'selected="selected"'; ?> >MODIEST</option>
-                        <!--<option value="3">NANA</option>-->
+                        <option value="2" <?php if($shop->shop_cat == 'MODIEST') echo 'selected="selected"'; ?> >MODIEST</option>                        
+                        <option value="3" <?php if($shop->shop_cat == 'OBRAL') echo 'selected="selected"'; ?> >OBRAL</option>                        
+                        <option value="4" <?php if($shop->shop_cat == 'RUSAK') echo 'selected="selected"'; ?> >RUSAK</option>
                     </select>
                     <span class="note">*)</span></td>                                
                 </tr>

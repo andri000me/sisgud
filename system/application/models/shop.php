@@ -9,7 +9,9 @@ class Shop extends Model {
 		parent::Model();
 	}
 	/**
-	*retrieving data category item
+	*retrieving shop
+    * by shop_code
+    * all shop except obral and rusak
 	*/
 	function get_shop($shop_code='')
 	{
@@ -19,15 +21,31 @@ class Shop extends Model {
         }
         else
         {
+            $this->db->where('shop_cat !=','OBRAL');
+            $this->db->where('shop_cat !=','RUSAK');
             return $this->db->get_where('shop',array('flag_hapus'=>0));
         }
 	}
+    /**
+    * Ambil semua toko tak terkecuali
+    */
+    function get_all_shop()
+    {
+        return $this->db->get_where('shop',array('flag_hapus'=>0));
+    }
+    /**
+    * ambil data toko berdasarkan kategori toko
+    */
+    function get_shop_by_cat($shop_cat)
+    {
+        return $this->db->get_where('shop',array('flag_hapus'=>0,'shop_cat'=>$shop_cat));    
+    }
     /**
     *insert / tambah toko baru
     */
     function insert($data)
     {
-        return $this->db->insert('shop',$data);
+        return $this->db->insert('shop',$data);        
     }
     /**
     * function cari toko
