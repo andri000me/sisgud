@@ -4,7 +4,7 @@
 <div id="templatemo_content_area_bottom">   
     <div class="templatemo_right_section">
         <div class="tempatemo_section_box_1">
-            <h1>Gudang >> Mutasi Keluar</h1>
+            <h1>Gudang >> Mutasi <?php echo ucwords($opsi) ?></h1>
             <?php echo form_open('gudang/mutasi/'.$opsi) ?>            
             <p><?php
             if($this->session->userdata('form_notify'))
