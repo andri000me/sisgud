@@ -2168,7 +2168,7 @@ class Gudang extends Controller {
                                         <td>
                                         <!--'.form_open('gudang/cetak/bon').'-->
                                             <input type="hidden" name="dist_code" value="'.$row->dist_code.'"/>
-                                            <a href="'.base_url().'gudang/obral/'.$row->dist_code.'/'.$this->input->post('shop_code').'" target="new"/><span class="button"><input class="button" type="submit" name="submit_cetak_bon" value="Cetak"></span></a>
+                                            <a href="'.base_url().'gudang/rusak/'.$row->dist_code.'/'.$this->input->post('shop_code').'" target="new"/><span class="button"><input class="button" type="submit" name="submit_cetak_bon" value="Cetak"></span></a>
                                         <!--'.form_close().'-->
                                         </td>
                                     </tr>';
