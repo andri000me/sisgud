@@ -14,6 +14,7 @@
             }
             ?></p>
             <div class="table-container">
+            <?php if(isset($shop_count)) { ?>
             <table class="table-data">
                 <tr>
                     <td rowspan="2" class="header">No</td>
@@ -47,13 +48,17 @@
                     }
                 ?>                
             </table>            
-            </div>
+            
             <p>
                 <span class="button"><input type="submit" name="submit_mutasi_keluar" value="Simpan" class="button"/></span>
                 <span class="button"><input type="button" value="Lagi" class="button"/></span>
                 <span class="button"><input type="reset" value="Batal" class="button"/></span>
             </p>
             <?php echo form_close() ?>
+            <?php } else { ?>
+            <p><span style="color:red">Data tidak ditemukan, silahkan buat outlet terlebih dahulu</span></p>
+            <?php } ?>
+            </div>
             <script type="text/javascript"><!--// 
             function countStok(line) {
                 var shop = <?php echo json_encode($shop_initial) ?>;
