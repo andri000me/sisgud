@@ -1059,7 +1059,7 @@ class Gudang extends Controller {
 			$this->load->view(config_item('template').'gud_cetaklabel',$this->data);
 		}		
 		else if($this->uri->segment(3)=='bon')
-		{
+		{            
 			//print preview untuk bon toko tertentu
 			if($this->input->post('submit_preview_bon'))
 			{
@@ -1069,7 +1069,7 @@ class Gudang extends Controller {
                 $query = $this->shop->get_shop($this->input->post('shop_code'));
                 $this->data['shop'] = $query->row();
                 $this->data['tgl_bon'] = date('Y-m-d');
-                $this->data['dist_code'] = time();
+                $this->data['dist_code'] = $this->generate_bon($this->input->post('shop_code'));
                 $query = $this->item_distribution->get_item_for_bon($this->input->post('shop_code'));                
                 if($query->num_rows() > 0)
                 {
@@ -1101,12 +1101,13 @@ class Gudang extends Controller {
                     $this->data['err_msg'] = '<span style="color:red">Tidak dapat mencetak bon. Anda belum mencetak label atau bon sudah pernah dicetak</span>';
                 }
                 //buat bon untuk toko yang sedang ditampilkan
-                $this->item_distribution->create_bon(array('shop_code'=>$this->input->post('shop_code'),'dist_code'=>$this->data['dist_code']));
+                $this->item_distribution->create_bon(array('shop_code'=>$this->input->post('shop_code'),'dist_code'=>$this->data['dist_code']));                
 			}			
 			//cetak bon setelah preview
             $kode_bon = $this->uri->segment(4);$shop_code = $this->uri->segment(5);
-            if($this->input->post('submit_cetak_bon') || (!empty($kode_bon) && is_numeric($kode_bon)))
-			{
+            if($this->input->post('submit_cetak_bon') || (!empty($kode_bon) && !empty($shop_code)))
+			{    
+               
                 //ambil barang untuk dicetak bonnya
                 if(empty($kode_bon))
                 {
@@ -1115,7 +1116,7 @@ class Gudang extends Controller {
                 $this->load->model('item_distribution');
                 $this->load->model('shop');
                 $this->load->model('item');
-				$query = $this->item_distribution->get_item_for_pdf(array('dist_code'=>$kode_bon,'shop_code'=>$shop_code));
+				$query = $this->item_distribution->get_item_for_pdf(array('dist_code'=>$kode_bon,'shop_code'=>$shop_code));                 
                 if($query->num_rows() > 0)
                 {
                     $item_jml = $query->num_rows();
@@ -1218,10 +1219,10 @@ class Gudang extends Controller {
                 {
                     $this->data['err_msg'] = '<p><span style="color:red">Data tidak ditemukan</span></p>';
                 }
-			}
+			}            
             //rekap untuk cetak bon
             if($this->uri->segment(4) == 'rekap')
-            {   
+            {       
                 if($this->input->post('submit_rekap_bon'))
                 {
                     $this->load->model('item_distribution');
@@ -1251,7 +1252,7 @@ class Gudang extends Controller {
                         $this->data['row_data'] = $row_data;
                     }
                     else
-                    {
+                    {                       
                         $this->data['err_msg'] = '<p><span style="color:red">Data tidak ditemukan.</span></p>';
                     }
                     //ambil data toko
@@ -1260,16 +1261,61 @@ class Gudang extends Controller {
                     $this->data['shop'] = $query->row();
                 }
                 $this->data['list_toko_pdf'] = $this->list_toko('pdf');
+                
                 $this->load->view(config_item('template').'gud_rekapbon',$this->data);
             }
             else
             {
-			    $this->data['list_toko_bon'] = $this->list_toko('bon');	
+			    $this->data['list_toko_bon'] = $this->list_toko('bon');               
 			    $this->data['page_title'] .= ' :. Mencetak Label';            
 			    $this->load->view(config_item('template').'gud_cetakbon',$this->data);
             }
 		}
 	}
+    /**
+    *Fungsi untuk generate kode bon toko
+    */
+    function generate_bon($shop_code)
+    {
+        //retrieve shop data
+        $this->load->model('shop');
+        $this->load->model('item_distribution');
+        $query = $this->shop->get_shop($shop_code);
+        if($query->num_rows() > 0)
+        {
+            $shop = $query->row();
+        
+            //retrieve last dist code for shop
+            $query = $this->item_distribution->get_last_dist_code($shop_code);
+            //klo ada tinggal nerusin aja
+            if($query->num_rows() >0)
+            {
+                $last_code = $query->row()->dist_code;
+                //kode lama numeric time, jadi mesti buat kode baru
+                if(is_numeric($last_code))
+                {
+                    $dist_code = strtoupper($shop->shop_initial).date('y').'-0001';
+                }
+                else
+                {
+                    $arr = explode('-',$last_code);
+                    $num = ++$arr[1];
+                    $dist_code = strtoupper($shop->shop_initial).date('y').'-';
+                    for($i=strlen($num);$i<4;$i++)
+                    {
+                        $dist_code .= '0';
+                    }
+                    $dist_code .= $num;
+                }
+            }
+            //klo belum ada bikin baru
+            else
+            {
+                $dist_code = strtoupper($shop->shop_initial).date('y').'-0001';
+            }            
+            return $dist_code;
+        }        
+    }
     /**
     * Fungsi untuk akumulasi cetak label
     */
@@ -1734,31 +1780,31 @@ class Gudang extends Controller {
         }
         else if($option == 'bon')
         {
-            $query = $this->db->query('select * from (select shop_code from item_distribution where dist_code = 0 group by shop_code) as dist left join shop on shop.shop_code=dist.shop_code where shop_cat != "OBRAL" and shop_cat != "RUSAK"');
+            $query = $this->db->query('select * from (select shop_code from item_distribution where dist_code = "0" group by shop_code) as dist left join shop on shop.shop_code=dist.shop_code where shop_cat != "OBRAL" and shop_cat != "RUSAK"');
         }
         else if($option == 'obral')
         {
-            $query = $this->db->query('select * from (select shop_code from item_distribution where dist_code = 0 group by shop_code) as dist left join shop on shop.shop_code=dist.shop_code where shop_cat = "OBRAL"');
+            $query = $this->db->query('select * from (select shop_code from item_distribution where dist_code = "0" group by shop_code) as dist left join shop on shop.shop_code=dist.shop_code where shop_cat = "OBRAL"');
         }
         else if($option == 'obral_pdf')
         {
-            $query = $this->db->query('select * from (select shop_code from item_distribution where dist_code != 0 group by shop_code) as dist left join shop on shop.shop_code=dist.shop_code where shop_cat = "OBRAL"');
+            $query = $this->db->query('select * from (select shop_code from item_distribution where dist_code != "0" group by shop_code) as dist left join shop on shop.shop_code=dist.shop_code where shop_cat = "OBRAL"');
         }
         else if($option == 'rusak')
         {
-            $query = $this->db->query('select * from (select shop_code from item_distribution where dist_code = 0 group by shop_code) as dist left join shop on shop.shop_code=dist.shop_code where shop_cat = "RUSAK"');
+            $query = $this->db->query('select * from (select shop_code from item_distribution where dist_code = "0" group by shop_code) as dist left join shop on shop.shop_code=dist.shop_code where shop_cat = "RUSAK"');
         }
         else if($option == 'rusak_pdf')
         {
-            $query = $this->db->query('select * from (select shop_code from item_distribution where dist_code != 0 group by shop_code) as dist left join shop on shop.shop_code=dist.shop_code where shop_cat = "RUSAK"');
+            $query = $this->db->query('select * from (select shop_code from item_distribution where dist_code != "0" group by shop_code) as dist left join shop on shop.shop_code=dist.shop_code where shop_cat = "RUSAK"');
         }
         else if($option == 'pdf')
         {
-            $query = $this->db->query('select * from (select shop_code from item_distribution where dist_code != 0 group by shop_code) as dist left join shop on shop.shop_code=dist.shop_code');
+            $query = $this->db->query('select * from (select shop_code from item_distribution where dist_code != "0" group by shop_code) as dist left join shop on shop.shop_code=dist.shop_code');
         }
         else if($option == 'export')
         {
-            $query = $this->db->query('select shop.* from (select shop_code from item_distribution where dist_code != 0 and export=0 group by shop_code) as dist left join shop on shop.shop_code=dist.shop_code where shop_cat != "OBRAL" and shop_cat != "RUSAK"');
+            $query = $this->db->query('select shop.* from (select shop_code from item_distribution where dist_code != "0" and export=0 group by shop_code) as dist left join shop on shop.shop_code=dist.shop_code where shop_cat != "OBRAL" and shop_cat != "RUSAK"');
         }
         //processing query result
         if($query->num_rows())
@@ -2020,7 +2066,7 @@ class Gudang extends Controller {
             $this->item_distribution->create_bon(array('shop_code'=>$this->input->post('shop_code'),'dist_code'=>$this->data['dist_code']));
         }
         //cetak barang rusak ke pdf
-        if($this->input->post('submit_cetak_rusak') || ($this->uri->segment(3) && is_numeric($this->uri->segment(3))))
+        if($this->input->post('submit_cetak_rusak') || ($this->uri->segment(3) && $this->uri->segment(4)))
         {
             //ambil barang untuk dicetak bonnya
             $kode_bon = $this->uri->segment(3);
@@ -2242,7 +2288,7 @@ class Gudang extends Controller {
             $this->item_distribution->create_bon(array('shop_code'=>$this->input->post('shop_code'),'dist_code'=>$this->data['dist_code']));
         }
         //cetak bon obral ke pdf
-        if($this->input->post('submit_cetak_obral') || ($this->uri->segment(3) && is_numeric($this->uri->segment(3))) )
+        if($this->input->post('submit_cetak_obral') || ($this->uri->segment(3) && $this->uri->segment(4)))
         {
             //ambil barang untuk dicetak bonnya
             $kode_bon = $this->uri->segment(3);
