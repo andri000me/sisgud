@@ -870,7 +870,7 @@ class Gudang extends Controller {
     **/
     function insert_mutasi_keluar($item_code,$item_hj,$qty,$qty_stok,$item_disc)
     {
-        //ambil data semua toko
+        //ambil data semua toko        
         $query = $this->shop->get_all_shop();        
         if($query->num_rows() > 0)
         {
@@ -881,7 +881,8 @@ class Gudang extends Controller {
             $success = '';
             for($i=0;$i<count($item_code);$i++)//mulai dari baris ke satu sampai abis
             {
-                if($item_hj[$i] > 0)
+                $tmp_cat = substr($item_code[$i],0,3);
+                if($tmp_cat == config_item('hadiah') || $item_hj[$i] > 0)
                 {
                     $shop_initial='';
                     for($j=0;$j<count($shop);$j++)//looping semua toko
@@ -991,7 +992,7 @@ class Gudang extends Controller {
                 $items = $query->result();
                 if($query->num_rows() > 0)
                 {
-                    $data_txt = 'Cabang:'.chr(9).'Nama Barang :'.chr(9).'Kode Brg/Barcode :'.chr(9).'Input Harga :'.chr(9).'Supplier :'.chr(9).'Tanggal :'.chr(9).'Kode Toko :'.chr(10);
+                    $data_txt = 'Cabang:'.chr(9).'Nama Barang :'.chr(9).'Kode Brg/Barcode :'.chr(9).'Input Harga :'.chr(9).'Harga Modal :'.chr(9).'Supplier :'.chr(9).'Tanggal :'.chr(9).'Kode Toko :'.chr(10);
                     foreach($items as $row)
                     {
                         //ambil data barang yang akan dibuat label                
@@ -1015,7 +1016,11 @@ class Gudang extends Controller {
                                     {
                                         $shop_cat = $row->shop_cat;
                                     }
-                                    $data_txt .= strtoupper($shop_cat).chr(9).strtoupper($row->item_name).chr(9).$row->item_code.chr(9).number_format($row->item_hj,0,',','.').',-'.chr(9).
+                                    //pengkodean harga modal
+                                    $tmp = substr($row->item_hm,0,3);
+                                    $kode = config_item('kode_hm');                                    
+                                    $kode_hm = $kode[$tmp[0]].$kode[$tmp[1]].$kode[$tmp[2]];                                   
+                                    $data_txt .= strtoupper($shop_cat).chr(9).strtoupper($row->item_name).chr(9).$row->item_code.chr(9).number_format($row->item_hj,0,',','.').',-'.chr(9).$kode_hm.chr(9).
                                                 strtoupper($row->sup_code).chr(9).date("dmy").chr(9).$row->shop_code .chr(10);
                                                   
                                 }                        
@@ -1892,9 +1897,14 @@ class Gudang extends Controller {
                     }
                     //hanya supervisor yang boleh lihat harga modal
                     $hm = '';
-                    if($this->session->userdata('p_role') == 'supervisor')
+                    if($this->session->userdata('p_role') == 'supervisor' || $this->session->userdata('p_role') == 'operator_retur')
                     {
                         $hm = '<td style="text-align:right"> '.number_format($row->item_hp,0,',','.').',-'.'&nbsp;</td>';
+                    }
+                    $hj = '<td style="text-align:right"> '.$item_hj.'&nbsp;</td>';
+                    if($this->session->userdata('p_role') == 'operator_retur')
+                    {
+                        $hj = '';
                     }
                     //yang boleh hapus hanya supervisor
                     $button_del = '';
@@ -1917,7 +1927,7 @@ class Gudang extends Controller {
                                                     <td class="left">'.ucwords($row->cat_name).'</td>                                                    
                                                     <td class="left">'.ucwords($row->sup_name).'</td>                                                 
                                                     '.$hm.'
-                                                    <td style="text-align:right"> '.$item_hj.'&nbsp;</td>
+                                                    '.$hj.'
                                                     <td>'.$row->item_qty_stock.'</td>                                                    
                                                     '.$button_ubah.'                                                    
                                                 </tr>';

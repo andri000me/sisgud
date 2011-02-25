@@ -11,7 +11,7 @@
         </div>
         </li>
         </ul>
-        <?php } if($role == 'operator' || $role == 'user') { ?>
+        <?php } if($role == 'operator' || $role == 'user' || $role=='operator_retur') { ?>
         <ul class="select"><li><a href="#"><b>Gudang</b></a>
         <div class="select_sub">
             <?php if($role == 'operator') { ?>
@@ -21,10 +21,16 @@
             </ul>
             <?php } if($role == 'user') { ?>
             <ul class="sub">
-                <li><a href="<?php echo base_url() ?>gudang/mutasi/keluar">Mutasi Keluar</a></li>                             
-                <li><a href="<?php echo base_url() ?>gudang/mutasi/rusak">Mutasi Barang Rusak</a></li>                             
-                <li><a href="<?php echo base_url() ?>gudang/mutasi/obral">Mutasi Barang Obral</a></li>                             
+                <li><a href="<?php echo base_url() ?>gudang/mutasi/keluar">Mutasi Keluar</a></li>                                 
                 <li><a href="<?php echo base_url() ?>gudang/export">Ekspor Data</a></li>                              
+            </ul>
+            <?php } if($role == 'operator_retur') { ?>
+            <ul class="sub">
+                <li><a href="<?php echo base_url() ?>gudang/mutasi/masuk/hadiah">Mutasi Masuk Hadiah</a></li>                             
+                <li><a href="<?php echo base_url() ?>gudang/retur/tambah">Retur Barang</a></li>            
+                <li><a href="<?php echo base_url() ?>gudang/mutasi/keluar/hadiah">Mutasi Keluar Hadiah</a></li>                             
+                <li><a href="<?php echo base_url() ?>gudang/mutasi/rusak">Mutasi Barang Rusak</a></li>                             
+                <li><a href="<?php echo base_url() ?>gudang/mutasi/obral">Mutasi Barang Obral</a></li>                                  
             </ul>
             <?php } ?>
         </div>
@@ -40,7 +46,7 @@
         </div>
         </li>
         </ul>
-        <?php } if($role == 'operator') { ?>
+        <?php } if($role == 'operator' || $role == 'operator_retur') { ?>
         <ul class="select"><li><a href="#"><b>Supplier</b></a>
         <div class="select_sub">
             <ul class="sub">
@@ -60,13 +66,18 @@
             <?php } if($role=='user') { ?>
             <ul class="sub">
                 <li><a href="<?php echo base_url() ?>gudang/cetak/label">Cetak Label</a></li>
-                <li><a href="<?php echo base_url() ?>gudang/cetak/bon">Cetak Bon</a></li>
-                <li><a href="<?php echo base_url() ?>gudang/obral">Cetak Bon Obral</a></li>                
-                <li><a href="<?php echo base_url() ?>gudang/rusak">Cetak Bon Rusak</a></li>       
+                <li><a href="<?php echo base_url() ?>gudang/cetak/bon">Cetak Bon</a></li>                      
             </ul>
             <?php } if($role=='supervisor') { ?>
             <ul class="sub">          
                 <li><a href="<?php echo base_url() ?>gudang/sisa">Cetak Mutasi Sisa</a></li>
+            </ul>
+            <?php } if($role =='operator_retur') { ?>
+            <ul class="sub">
+                <li><a href="<?php echo base_url() ?>gudang/cetak/label">Cetak Label</a></li>
+                 <li><a href="<?php echo base_url() ?>gudang/cetak/bon">Cetak Bon</a></li>                
+                <li><a href="<?php echo base_url() ?>gudang/obral">Cetak Bon Obral</a></li>                
+                <li><a href="<?php echo base_url() ?>gudang/rusak">Cetak Bon Rusak</a></li>       
             </ul>
             <?php } ?>
         </div>
@@ -91,11 +102,15 @@
             <ul class="sub">                              
                 <li><a href="<?php echo base_url() ?>gudang/stok">Stok Gudang</a></li>                
             </ul>
+            <?php } if($role=='operator_retur') { ?>
+            <ul class="sub">                              
+                <li><a href="<?php echo base_url() ?>gudang/stok">Stok Gudang</a></li>                
+            </ul>
             <?php } ?>
         </div>
         </li>
         </ul>
-        <?php } if($role != 'admin') { ?>
+        <?php } if($role != 'admin' && $role != 'operator_retur') { ?>
         <ul class="select"><li><a href="#"><b>Toko</b></a>
         <div class="select_sub">
             <?php if($role == 'operator' || $role == 'user') { ?>
