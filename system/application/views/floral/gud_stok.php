@@ -25,10 +25,12 @@
                     <td class="header">Nama Barang</td>
                     <td class="header">Kelompok <br /> Barang</td>
                     <td class="header">Supplier</td>
-                    <?php if($this->session->userdata('p_role') == 'supervisor') { ?>
+                    <?php if($this->session->userdata('p_role') == 'supervisor' || $this->session->userdata('p_role') == 'operator_retur') { ?>
                     <td class="header">Harga Modal (Rp)</td>
                     <?php } ?>
+                    <?php if($this->session->userdata('p_role') != 'operator_retur') { ?>
                     <td class="header">Harga Jual (Rp)</td>
+                    <?php } ?>
                     <td class="header">Stok (item)</td>
                     <?php if($this->session->userdata('p_role') == 'supervisor' || $this->session->userdata('p_role') == 'operator') { ?>
                     <td class="header">Action</td>

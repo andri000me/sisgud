@@ -352,9 +352,10 @@ class Toko extends Controller {
                         $row->total = 0;
                     }
                     $stok = $row->total - $retur;
+                    $i++;
                     if($this->session->userdata('p_role') == 'supervisor')
                     {
-                        $line  = ++$i%10;
+                        $line  = $i%10;
                         $hapus = '<span class="button"><input type="submit" name="submit_ubah" class="button" value="Hapus" onclick="hapusToko(\''.$row->shop_code.'\','.$line.',\''.$row->shop_name.'\')"/></span>';
                     }
                     else

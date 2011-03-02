@@ -35,6 +35,20 @@ class Autocomplete extends Controller {
 		}
 	}
     /*
+    * auto complete item for mutasi hadiah
+    */
+	function autocomplete_hadiah($key="")
+	{
+        if($key == config_item('hadiah'))
+        {
+            $query = $this->autocomplete->get_item_for_mutasi_keluar($key);		
+            foreach($query->result() as $row)
+            {
+                echo ucwords($row->item_code).'|'.$row->item_name.'|'.$row->item_qty_stock.'|'.ucwords($row->sup_name).'|'.number_format($row->item_hj,0,',','.').',-'.'|'.$row->item_hp.'|'.$row->item_hj.chr(10);
+            }
+        }
+	}
+    /*
     * auto complete item for retur
     */
 	function autocomplete_retur($key="")

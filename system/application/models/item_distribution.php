@@ -26,11 +26,11 @@ class Item_distribution extends Model {
     {
         if($status == 2)
         {
-            $this->db->where(array('status'=>0,'dist_code'=>0,'item_code'=>$item_code));
+            $this->db->where(array('status'=>0,'dist_code'=>'0','item_code'=>$item_code));
         }
         else if($status == 0)
         {
-            $this->db->where(array('status'=>2,'dist_code'=>0,'item_code'=>$item_code));
+            $this->db->where(array('status'=>2,'dist_code'=>'0','item_code'=>$item_code));
         }
         return $this->db->update('item_distribution',array('status'=>$status));
     }
@@ -40,7 +40,7 @@ class Item_distribution extends Model {
     function get_item_accumulated($sup_code)
     {        
         $this->db->select('item.item_code')->from('item_distribution')->join('item','item.item_code = item_distribution.item_code');
-        $this->db->where(array('dist_code'=>0,'status'=>2,'sup_code'=>$sup_code))->group_by('item.item_code')->order_by('item_distribution.id');
+        $this->db->where(array('dist_code'=>'0','status'=>2,'sup_code'=>$sup_code))->group_by('item.item_code')->order_by('item_distribution.id');
         return $this->db->get();
     }
     /**
@@ -85,7 +85,7 @@ class Item_distribution extends Model {
     {
         $query = 'select ids.item_code, i.item_name, i.cat_code,i.item_hj, ids.item_disc, ids.quantity 
                     from item_distribution ids left join item i on ids.item_code=i.item_code 
-                    where ids.shop_code = "'.$shop_code.'" and ids.export=0 and dist_code != 0 order by ids.id';
+                    where ids.shop_code = "'.$shop_code.'" and ids.export=0 and dist_code != "0" order by ids.id';
         return $this->db->query($query);
     }
     /**
@@ -104,7 +104,7 @@ class Item_distribution extends Model {
     function get_item_for_bon($shop_code)
     {
         $query = 'select ids.*,i.*,sum(ids.quantity) as quantity from item_distribution ids left join item i on ids.item_code = i.item_code 
-                where ids.shop_code = "'.$shop_code.'" and ids.dist_code=0 and ids.status=1 group by ids.id';
+                where ids.shop_code = "'.$shop_code.'" and ids.dist_code="0" and ids.status=1 group by ids.id';
         return $this->db->query($query);
     }
     /**
@@ -138,7 +138,7 @@ class Item_distribution extends Model {
     */
     function create_bon($param)
     {
-        $query = 'update item_distribution ids set ids.dist_code="'.$param['dist_code'].'" where ids.status=1 and ids.dist_code= 0 and ids.shop_code="'.$param['shop_code'].'"';
+        $query = 'update item_distribution ids set ids.dist_code="'.$param['dist_code'].'" where ids.status=1 and ids.dist_code= "0" and ids.shop_code="'.$param['shop_code'].'"';
         return $this->db->query($query);
     }
     /**
@@ -152,8 +152,16 @@ class Item_distribution extends Model {
             $tgl = '';
         $query = 'select shop.shop_name,shop.shop_address, dist_code,dist_out, count(item_code) as jenis_brg,sum(quantity) as jumlah_brg 
                 from item_distribution ids left join shop on ids.shop_code = shop.shop_code 
-                where ids.shop_code ="'.$shop_code.'" '.$tgl.' and ids.dist_code != 0
+                where ids.shop_code ="'.$shop_code.'" '.$tgl.' and ids.dist_code != "0"
                 group by dist_code order by dist_out desc';
         return $this->db->query($query);
+    }
+    /**
+    *Ambil kode bon yang terakhir
+    */
+    function get_last_dist_code($shop_code)
+    {
+        $this->db->select('dist_code')->group_by('dist_code')->order_by('dist_code','desc')->limit(1);
+        return $this->db->get_where('item_distribution',array('shop_code'=>$shop_code));
     }
 }

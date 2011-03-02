@@ -14,6 +14,7 @@
             }
             ?></p>
             <div class="table-container">
+            <?php if(isset($shop_count)) { ?>
             <table class="table-data">
                 <tr>
                     <td rowspan="2" class="header">No</td>
@@ -29,31 +30,54 @@
                     <?php echo $shop_name ?>
                 </tr>
                 <?php 
+                    if($this->uri->segment(4) == 'hadiah')
+                    {
+                        $class_input = 'class="item_hadiah ac_input"';
+                        $readonly = 'readonly="readonly"';                        
+                    }
+                    else
+                    {
+                        $class_input = 'class="item_code ac_input"';
+                        $readonly = '';
+                    }
                     for($i=0;$i<15;) 
                     { 
+                        $i++;
+                        if($this->uri->segment(4) == 'hadiah')
+                        {
+                            $harga = '<td><input type="hidden" id="item_hp_'.$i.'"/><input type="text" name="item_hj[]" id="hj_'.$i.'" style="width:80px" onkeyup="setFocus('.$i.')" readonly="readonly" value="0"/></td>';
+                        }
+                        else
+                        {
+                            $harga = '<td><input type="hidden" id="item_hp_'.$i.'"/><input type="text" name="item_hj[]" id="hj_'.$i.'" style="width:80px" onblur="checkItemHj('.$i.')" onkeyup="setFocus('.$i.')" /></td>';
+                        }
                         echo '<tr class="row-data">
-                                <td>'.++$i.'</td>
+                                <td>'.$i.'</td>
                                 <td>
-                                    <input type="text" class="item_code ac_input" name="item_code[]" maxlength="10" style="width:80px" onkeyup="setFocus('.$i.')"/>
+                                    <input type="text" '.$class_input.' name="item_code[]" maxlength="10" style="width:80px" onkeyup="setFocus('.$i.')"/>
                                     <span id="item_code_'.$i.'" style="display:none"></span>
                                 </td>
                                 <td><input type="text" id="item_name_'.$i.'" style="width:130px" readonly="readonly"/></td>
                                 <td><input type="text" id="qty_first_'.$i.'" style="width: 25px;" readonly="readonly"/></td>                                
                                 '.str_replace('#',$i,$row_qty).'
                                 <td><input type="text" name="qty_stok[]" id="qty_stok_'.$i.'" style="width: 25px;" readonly="yes"/></td>
-                                <td><input type="hidden" id="item_hp_'.$i.'"/><input type="text" name="item_hj[]" id="hj_'.$i.'" style="width:80px" onblur="checkItemHj('.$i.')" onkeyup="setFocus('.$i.')"/></td>
+                                '.$harga.'
                                 <td><input type="text" name="item_disc[]" id="disc_'.$i.'" style="width:80px"/></td>
                             </tr>';
                     }
                 ?>                
             </table>            
-            </div>
+            
             <p>
                 <span class="button"><input type="submit" name="submit_mutasi_keluar" value="Simpan" class="button"/></span>
                 <span class="button"><input type="button" value="Lagi" class="button"/></span>
                 <span class="button"><input type="reset" value="Batal" class="button"/></span>
             </p>
             <?php echo form_close() ?>
+            <?php } else { ?>
+            <p><span style="color:red">Data tidak ditemukan, silahkan buat outlet terlebih dahulu</span></p>
+            <?php } ?>
+            </div>
             <script type="text/javascript"><!--// 
             function countStok(line) {
                 var shop = <?php echo json_encode($shop_initial) ?>;
