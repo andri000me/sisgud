@@ -32,6 +32,7 @@
                             <option value="2">Supervisor</option>
                             <option value="3">Operator</option>
                             <option value="4">User</option>
+                            <option value="5">Operator Retur</option>
                         </p>
                         <span class="note">*) </span>
                     </td>                                

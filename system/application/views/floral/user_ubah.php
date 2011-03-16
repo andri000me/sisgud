@@ -33,6 +33,7 @@
                             <option value="2" <?php if($pengguna->p_role == 'supervisor') echo 'selected="selected"' ?> >Supervisor</option>
                             <option value="3" <?php if($pengguna->p_role == 'operator') echo 'selected="selected"' ?> >Operator</option>
                             <option value="4" <?php if($pengguna->p_role == 'user') echo 'selected="selected"' ?> >User</option>
+                            <option value="5" <?php if($pengguna->p_role == 'operator_retur') echo 'selected="selected"' ?> >Operator Retur</option>
                         </p>
                         <span class="note">*) </span>
                     </td>                                
