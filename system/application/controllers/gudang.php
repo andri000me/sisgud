@@ -1251,6 +1251,11 @@ class Gudang extends Controller {
                                                 <input type="hidden" name="dist_code" value="'.$row->dist_code.'"/>
                                                 <a href="'.base_url().'gudang/cetak/bon/'.$row->dist_code.'/'.$this->input->post('shop_code').'" target="new"/><span class="button"><input class="button" type="submit" name="submit_cetak_bon" value="Cetak"></span></a>
                                             <!--'.form_close().'-->
+                                            '.form_open('gudang/export').'
+                                                <input type="hidden" value="'.$row->dist_code.'" name="dist_code" />
+                                                <input type="hidden" value="'.$this->input->post('shop_code').'" name="shop_code" />
+                                                <span class="button"><input class="button" type="submit" value="Export" name="submit_export"/></span>
+                                            '.form_close().'
                                             </td>
                                         </tr>';
                         }
@@ -2515,7 +2520,14 @@ class Gudang extends Controller {
             $temp = $this->shop->get_shop($this->input->post('shop_code'));
             $shop = $temp->row();
             //ambil data untuk dieksport
-            $query = $this->item_distribution->get_item_export(array('export'=>$this->input->post('export')));
+            if($this->input->post('export')) 
+            {
+                $query = $this->item_distribution->get_item_export(array('export'=>$this->input->post('export')));
+            }
+            else if($this->input->post('dist_code'))
+            {
+                $query = $this->item_distribution->get_item_export(array('dist_code'=>$this->input->post('dist_code'),'shop_code'=>$this->input->post('shop_code')));
+            }
             if($query->num_rows() > 0)
             {                                  
                 echo query_to_csv($query,TRUE,$shop->shop_initial.'.csv');                               

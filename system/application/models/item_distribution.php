@@ -93,9 +93,18 @@ class Item_distribution extends Model {
     */
     function get_item_export($param)
     {
-        $query = 'select ids.item_code, i.item_name, i.cat_code,i.item_hj, ids.item_disc, ids.quantity 
-                    from item_distribution ids left join item i on ids.item_code=i.item_code 
-                    where ids.export="'.$param['export'].'" order by ids.id';
+        if(isset($param['export']))
+        {
+            $query = 'select ids.item_code, i.item_name, i.cat_code,i.item_hj, ids.item_disc, ids.quantity 
+                        from item_distribution ids left join item i on ids.item_code=i.item_code 
+                        where ids.export="'.$param['export'].'" order by ids.id';
+        }
+        else if(isset($param['dist_code']) && isset($param['shop_code']))
+        {
+            $query = 'select ids.item_code, i.item_name, i.cat_code,i.item_hj, ids.item_disc, ids.quantity 
+                        from item_distribution ids left join item i on ids.item_code=i.item_code 
+                        where ids.dist_code="'.$param['dist_code'].'" and ids.shop_code="'.$param['shop_code'].'" order by ids.id';
+        }
         return $this->db->query($query);
     }
     /**
