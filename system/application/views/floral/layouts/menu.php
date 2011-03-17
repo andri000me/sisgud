@@ -67,8 +67,6 @@
             <ul class="sub">
                 <li><a href="<?php echo base_url() ?>gudang/cetak/label">Cetak Label</a></li>
                 <li><a href="<?php echo base_url() ?>gudang/cetak/bon">Cetak Bon</a></li>                      
-                <li><a href="<?php echo base_url() ?>gudang/obral">Cetak Bon Obral</a></li>                
-                <li><a href="<?php echo base_url() ?>gudang/rusak">Cetak Bon Rusak</a></li>       
             </ul>
             <?php } if($role=='supervisor') { ?>
             <ul class="sub">          
@@ -78,6 +76,8 @@
             <ul class="sub">
                 <li><a href="<?php echo base_url() ?>gudang/cetak/label">Cetak Label</a></li>
                  <li><a href="<?php echo base_url() ?>gudang/cetak/bon">Cetak Bon</a></li>                
+                <li><a href="<?php echo base_url() ?>gudang/obral">Cetak Bon Obral</a></li>                
+                <li><a href="<?php echo base_url() ?>gudang/rusak">Cetak Bon Rusak</a></li>       
             </ul>
             <?php } ?>
         </div>
