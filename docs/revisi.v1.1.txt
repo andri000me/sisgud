@@ -8,9 +8,10 @@ Revisi sisgud 1.1
   + untuk mencatat barang2 yang diretur
   + pada saat cetak pdf untuk barang yang diretur, ditambahkan 3 kolom yaitu barang, potong bon atau uang
 - ditambahkan field kategori toko untuk memfasilitasi 2 hal di atas. Kategori toko virtual -ok,
-- tambahin fungsi untuk cetak stok toko, baik toko biasa maupun toko obral/rusak 
-- tambahin fungsi untuk cetak stok gudang
-- kode bon untuk bon toko dibuat formatnya INISIAL-TH-No-urut, cth: NB-11-555 -ok untuk kodebon toko, obral dan barang rusak belum diubah
-- buat satu role sendiri untuk retur, role name= operator_retur
+- kode bon untuk bon toko dibuat formatnya INISIAL-TH-No-urut, cth: NB-11-555 -ok untuk kodebon toko, obral dan barang rusak belum diubah -ok
+- buat satu role sendiri untuk retur, role name= operator_retur -ok
+- cetak label dibedain per user yang login, file label nya -ok
+- rekap ekspor data -ok
+- rekap mutasi sisa 
   
   

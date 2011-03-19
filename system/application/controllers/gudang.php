@@ -1044,7 +1044,7 @@ class Gudang extends Controller {
                             $this->item_distribution->update_status(array('item_code'=>$row->item_code));
                             $item_code .= $row->item_code.', ';
                         }                        
-                        $this->session->set_userdata('link_download',base_url().'data/Mode_Fashion.doc');
+                        $this->session->set_userdata('link_download',base_url().'data/label-'.$this->session->userdata('p_id').'.doc');
                         $this->session->set_userdata('item_code',$item_code);
                         //simpan data 
                         //redirect('gudang/cetak/label','refresh');
@@ -1834,7 +1834,14 @@ class Gudang extends Controller {
     function export_file_txt($data_txt)
     {
         //print per toko
-        $filename = "data/Mode_Fashion.doc";
+        $filename = "data/label-".$this->session->userdata('p_id').".doc";        
+        //initialize the file
+        if(!file_exists($filename))
+        {
+            $file = fopen($filename,"w");  
+            $cek = fwrite($file,'-');
+            fclose($file);
+        }        
         if(is_writable($filename))
         {
             $file = fopen($filename,"w");  

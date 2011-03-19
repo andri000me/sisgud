@@ -1,0 +1,5 @@
+rencana sisgud versi 1.2
+- tambahin fungsi untuk cetak stok toko, baik toko biasa maupun toko obral/rusak 
+- tambahin fungsi untuk cetak stok gudang 
+- bisa akses langsung ke printer dengan lebih baik dari sikasir
+- bisa cetak reporting pdf dengan kemampuan lebih baik
