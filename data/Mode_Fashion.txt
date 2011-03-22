@@ -1,5 +1,0 @@
-Nama Barang :	Kode Brg/Barcode :	Input Harga :	Supplier :	Tanggal :	Kode Toko :
-CELANA BATIK	0912301001	123.456,-	136	271010	11
-CELANA BATIK	0912301001	123.456,-	136	271010	11
-CELANA BATIK	0912301001	123.456,-	136	271010	11
-=====	=====	=====	=====	=====	=====
