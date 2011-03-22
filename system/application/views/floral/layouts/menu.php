@@ -101,6 +101,7 @@
             <?php } if($role=='supervisor') { ?>
             <ul class="sub">                              
                 <li><a href="<?php echo base_url() ?>gudang/stok">Stok Gudang</a></li>                
+                <li><a href="<?php echo base_url() ?>gudang/sisa/rekap">Rekap Mutasi Sisa</a></li>                
             <?php } if($role=='operator_retur') { ?>
             <ul class="sub">                              
                 <li><a href="<?php echo base_url() ?>gudang/stok">Stok Gudang</a></li>                
@@ -128,8 +129,13 @@
         </li>
         </ul>
         <?php } ?>
-        <ul class="select"><li><a href="#"><b>Help</b></a></li></ul>
-        
+        <ul class="select"><li><a href="#"><b>Help</b></a>
+        <div class="select_sub">
+            <ul class="sub">
+                <li><a href="<?php echo base_url() ?>help/about">About Sisgud</a></li>                                                
+            </ul>
+        </div>
+        </li></ul>        
         </div>
         </div>			
     <div class="cleaner"></div>

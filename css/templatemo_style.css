@@ -318,6 +318,15 @@ input[type=button],input[type=submit],input[type=reset] { font-family: "Trebuche
 	text-align: justify;
 	margin: 5px 20px;
 }
+.tempatemo_section_box_1 ul li {
+	
+}
+.tempatemo_section_box_1 ul li {	
+	color: #5a5a5a;
+}
+.tempatemo_section_box_1 table {
+	color: #5a5a5a;
+}
 
 .tempatemo_section_box_2 h1 {
 	font-size: 16px;
