@@ -13,6 +13,12 @@ Revisi sisgud 1.1
 - cetak label dibedain per user yang login, file label nya -ok
 - rekap ekspor data -ok
 - rekap mutasi sisa - sedang dikerjakan
-- tambah halaman help/about
-  
+- tambah halaman help/about -ok
+- ketika retur, mutasi obral, mutasi rusak bisa scan trus langsung muncul barangnya, gak usah ketik manual.
+- Mecetak mutasi keluar berdasar supplier, kelompokkan berdasar kode bon dan harinya
+  input : pilih suplier, hasil:
+  No | Tgl | Kode Bon | Jumlah Barang | Total Barang | Operasi
+  -------------------------------------------------------------
+  1  | xxx | axxxxxxx | 12            | 24           | Cetak  
+  di hasil cetaknya sama kaya bon order yang di mutasi masuk, cuma ada tambahan kolom HM,HJ dan Toko  
   
