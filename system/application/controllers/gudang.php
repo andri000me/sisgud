@@ -463,6 +463,7 @@ class Gudang extends Controller {
     */
     function sisa($param='')
     {
+        
         $this->load->model('item');
         $this->load->model('sisa_mutasi');
         //cetak ke pdf
@@ -471,101 +472,106 @@ class Gudang extends Controller {
             $this->load->model('shop');
             $this->load->model('supplier');
             //ambil data untuk cetak sisa mutasi ke pdf
-           
+            $kode_mutasi = $this->uri->segment(4);
+            if($this->uri->segment(4) && is_numeric($kode_mutasi))
+            {                
+                $query = $this->sisa_mutasi->get_sisa_mutasi_by_kode($kode_mutasi);                 
+            }
+            else
+            {
+                $kode_mutasi = time();
                 $query = $this->sisa_mutasi->get_sisa_mutasi(); 
-                if($query->num_rows() > 0)
+            }
+            if($query->num_rows() > 0)
+            {                
+                $data = $query->row();
+                $head = '<div style="margin-top: 5px;">
+                            <h3 style="text-align: center;">BON ORDER BARANG (SISA)</h3>
+                            <table style="width: 700px;">
+                            <tr><td style="width: 50px;">SUPPLIER</td><td style="width:300px;">: CAMPUR-CAMPUR</td></tr>							                              
+                            <tr><td style="width: 50px;">TANGGAL</td><td style="width:300px;">: '.date_to_string($data->date_entry).'</td></tr>							                              
+                            </table>
+                        </div><br />';
+                
+                //retrieve data toko
+                $qry = $this->shop->get_shop();
+                $jumlah_toko = $qry->num_rows();
+                $this->data['shop_count'] = $qry->num_rows();
+                $width = $jumlah_toko * 25;				
+                $head .= '<table style="width: 600px;" border="1" cellpadding="3">
+                        <tr>
+                        <td style="width: 20px;text-align: center;" rowspan="2">No</td>
+                        <td style="width: 60px;text-align: center; vertical-align: middle;" rowspan="2">Kode Label</td>
+                        <td style="width: 100px;text-align: center;" rowspan="2">Nama</td>
+                        <td style="width: 25px;text-align: center;" rowspan="2">Qty</td>
+                        <td style="width: '.$width.'px;text-align: center;" colspan="'.$jumlah_toko.'">Distribusi</td>
+                        <td style="width: 50px;text-align: center;" rowspan="2">HM</td>
+                        <td style="width: 60px;text-align: center;" rowspan="2">Harga Jual</td>						
+                        </tr>
+                        <tr>';
+                $row_shop = '';
+                foreach($qry->result() as $row)
                 {
-                    $data = $query->row();
-                    $head = '<div style="margin-top: 5px;">
-                                <h3 style="text-align: center;">BON ORDER BARANG (SISA)</h3>
-                                <table style="width: 700px;">
-                                <tr><td style="width: 50px;">SUPPLIER</td><td style="width:300px;">: CAMPUR-CAMPUR</td></tr>							                              
-                                <tr><td style="width: 50px;">TANGGAL</td><td style="width:300px;">: '.date_to_string($data->date_entry).'</td></tr>							                              
-                                </table>
-                            </div><br />';
+                    $head .= '<td style="width: 25px;text-align: center; font-size: 17px;">'.strtoupper($row->shop_initial).'</td>';
+                    $row_shop .= '<td style="width: 25x;text-align: center; font-size: 17px;"></td>';
+                }
+                $head.='</tr>';
                     
-                    //retrieve data toko
-                    $query = $this->shop->get_shop();
-                    $jumlah_toko = $query->num_rows();
-                    $this->data['shop_count'] = $query->num_rows();
-                    $width = $jumlah_toko * 25;				
-                    $head .= '<table style="width: 600px;" border="1" cellpadding="3">
-                            <tr>
-                            <td style="width: 20px;text-align: center;" rowspan="2">No</td>
-                            <td style="width: 60px;text-align: center; vertical-align: middle;" rowspan="2">Kode Label</td>
-                            <td style="width: 100px;text-align: center;" rowspan="2">Nama</td>
-                            <td style="width: 25px;text-align: center;" rowspan="2">Qty</td>
-                            <td style="width: '.$width.'px;text-align: center;" colspan="15">Distribusi</td>
-                            <td style="width: 50px;text-align: center;" rowspan="2">HM</td>
-                            <td style="width: 60px;text-align: center;" rowspan="2">Harga Jual</td>						
-                            </tr>
-                            <tr>';
-                    $row_shop = '';
-                    foreach($query->result() as $row)
+                //retrieving data item untuk diprint				
+                //$query = $this->sisa_mutasi->get_sisa_mutasi();                
+                $data='';               
+                $j = 0;
+                foreach($query->result() as $row)
+                {
+                    $temp = $this->item->get_item(array('item_code'=>$row->item_code));
+                    $item = $temp->row();                        
+                    $data .='<tr>
+                            <td style="width: 20px;text-align: center;">'.++$j.'</td>
+                            <td style="width: 60px;text-align: center;">'.$row->item_code.'</td>
+                            <td style="width: 100px;text-align: center;">'.$item->item_name.'</td>
+                            <td style="width: 25px;text-align: center">'.$row->qty.'</td>
+                            '.$row_shop;
+                    
+                    //check barang medan atau luar kota
+                    if(!$this->check_if_medan($row->sup_code))
                     {
-                        $head .= '<td style="width: 25px;text-align: center; font-size: 17px;">'.strtoupper($row->shop_initial).'</td>';
-                        $row_shop .= '<td style="width: 25x;text-align: center; font-size: 17px;"></td>';
+                        $hp = floor($item->item_hp + 0.15*$item->item_hp);
                     }
-                    $head.='</tr>';
-                        
-                    //retrieving data item untuk diprint				
-                    $query = $this->sisa_mutasi->get_sisa_mutasi();                
-                    $data='';
-                    if($query->num_rows() > 0)
+                     else
                     {
-                        $kode_mutasi = time();
-                        $j = 0;
-                        foreach($query->result() as $row)
-                        {
-                            $temp = $this->item->get_item(array('item_code'=>$row->item_code));
-                            $item = $temp->row();                        
-                            $data .='<tr>
-                                    <td style="width: 20px;text-align: center;">'.++$j.'</td>
-                                    <td style="width: 60px;text-align: center;">'.$row->item_code.'</td>
-                                    <td style="width: 100px;text-align: center;">'.$item->item_name.'</td>
-                                    <td style="width: 25px;text-align: center">'.$row->qty.'</td>
-                                    '.$row_shop;
-                            
-                            //check barang medan atau luar kota
-                            if(!$this->check_if_medan($row->sup_code))
-                            {
-                                $hp = floor($item->item_hp + 0.15*$item->item_hp);
-                            }
-                             else
-                            {
-                                $hp = $item->item_hp;
-                            }
-                            $data .= '	<td style="width: 50px;text-align: right;">'.number_format($hp,'0',',','.').',-</td>
-                                    <td style="width: 60px;text-align: right;">'.number_format($item->item_hj,'0',',','.').',-</td>		
-                                    </tr>';
-                            $this->sisa_mutasi->update_status(array('kode_mutasi'=>$kode_mutasi,'item_code'=>$row->item_code));
-                            //atur paging
-                            if($jumlah_toko <= 10 && $j%15 == 0)
-                            {
-                                $list_data[] = $data;
-                                $data = '';
-                            }
-                            else if($jumlah_toko > 10 && $j%25 == 0)
-                            {
-                                $list_data[] = $data;
-                                $data = '';
-                            }
-                        }
-                        //klo data tak kosong, tambahkan
-                        if(!empty($data))
-                        {
-                            $list_data[] = $data;
-                        }
-                        $footer = '</table><br /><table style="text-align:center;">
-                                <tr><td>(Bagian Mutasi Masuk)</td><td>(Bagian Distribusi)</td></tr>                            
-                            </table>';
-                        if(count($list_data) > 0)
-                        {
-                            $this->cetak_mutasi_pdf($head, $list_data, $footer); 
-                        }
+                        $hp = $item->item_hp;
+                    }
+                    $data .= '	<td style="width: 50px;text-align: right;">'.number_format($hp,'0',',','.').',-</td>
+                            <td style="width: 60px;text-align: right;">'.number_format($item->item_hj,'0',',','.').',-</td>		
+                            </tr>';
+                    $this->sisa_mutasi->update_status(array('kode_mutasi'=>$kode_mutasi,'item_code'=>$row->item_code));
+                    //atur paging
+                    if($jumlah_toko <= 10 && $j%15 == 0)
+                    {
+                        $list_data[] = $data;
+                        $data = '';
+                    }
+                    else if($jumlah_toko > 10 && $j%25 == 0)
+                    {
+                        $list_data[] = $data;
+                        $data = '';
                     }
                 }
+                //klo data tak kosong, tambahkan
+                if(!empty($data))
+                {
+                    $list_data[] = $data;
+                }
+                $footer = '</table><br /><table style="text-align:center;">
+                        <tr><td>(Bagian Mutasi Masuk)</td><td>(Bagian Distribusi)</td></tr>                            
+                    </table>';
+                if(count($list_data) > 0)
+                {
+                    $this->cetak_mutasi_pdf($head, $list_data, $footer);                     
+                }                
+            }
         }
+        
         //preview sebelum cetak mutasi sisa
         if($this->input->post('submit_preview_sisa'))
         {            
@@ -615,6 +621,7 @@ class Gudang extends Controller {
             $this->load->view(config_item('template').'gud_printsisa',$this->data);
             
         }
+        
         //insert atw delete dari table
         if($this->input->post('opsi'))
         {
@@ -654,6 +661,7 @@ class Gudang extends Controller {
             }
                
         }
+        
         //search dari form
         if($this->input->post('submit_cari_sisa'))
         {
@@ -663,66 +671,113 @@ class Gudang extends Controller {
         }
         else
         {
+            
             //search dari session, untuk lihat page
             $keywords = $this->session->userdata('keywords');
             if(isset($keywords))
             {
                 $query = $this->item->get_sisa($keywords);
             }            
-        }
-        //tampilin data untuk ke browser
-        if(isset($query) && $query->num_rows() > 0)
-        {
-            $this->data['total_item'] = $query->num_rows(); 
-            //setting up pagination
-            $this->load->library('pagination');
-            $config['base_url'] = base_url().'gudang/sisa/';
-            $config['total_rows'] = $this->data['total_item'];
-            $config['per_page'] = 20;
-            $this->pagination->initialize($config);
-            $this->data['page'] = $this->pagination->create_links();
-            //applying pagination on displaying result            
-            if(isset($param) && intval($param) > 0)
-            {
-                $page_min = $param;
-                $page_max = $page_min + $config['per_page'];
-            }
-            else
-            {
-                $page_min = 0;
-                $page_max = $config['per_page'];
-            }
-            $i = 0;
-            $this->data['row_data'] = '';            
-            foreach($query->result() as $row)
-            {                         
-                if($i>=$page_min && $i <$page_max)
-                {
-                    $checkbox = '<input type="checkbox" name="opsi_'.++$i.'" value="'.$row->item_code.'" onchange="addRemoveMutasi('.$i.')"/>';
-                    if($row->kode_mutasi == '0')
-                    {
-                        $checkbox = '<input type="checkbox" name="opsi_'.$i.'" value="'.$row->item_code.'" onchange="addRemoveMutasi('.$i.')" checked="checked"/>';
-                    }
-                    $this->data['row_data'] .= '<tr>
-                                                    <td>'.$i.'</td>
-                                                    <td>'.$row->item_code.'</td>
-                                                    <td>'.$row->item_name.'</td>
-                                                    <td>'.$row->cat_code.'</td>
-                                                    <td>'.$row->sup_code.'</td>
-                                                    <td>'.number_format($row->item_hp,0,',','.').'</td>
-                                                    <td>'.$row->item_qty_stock.'</td>
-                                                    <td>'.$checkbox.'</td>
-                                                </tr>';
-                }
-                else
-                {
-                    $i++;
-                }
-            }            
-        }
+        }        
         if(!isset($_POST['submit_preview_sisa']))        
         {
-            $this->load->view(config_item('template').'gud_sisa',$this->data);
+            //urusan rekap mutasi sisa
+            if($param=='rekap')
+            {                
+                if($this->input->post('submit_rekap_mutasi_sisa'))
+                {                    
+                    //ambil data dari form
+                    $this->data['tgl_mutasi'] = $this->input->post('tgl_mutasi');
+                    //$this->data['tgl_bon'] = $this->input->post('tgl_bon');
+                    $this->data['sup_code'] = $this->input->post('sup_code');
+                    $opsi = $this->input->post('opsi');
+                    
+                    //ambilin data
+                    $this->load->model('item_mutasi');
+                    if($this->input->post('tgl_mutasi'))
+                    {
+                        $query = $this->sisa_mutasi->get_sisa_mutasi_by_date(array('tgl_mutasi'=>$this->data['tgl_mutasi']));
+                        $this->data['title'] = 'TANGGAL MUTASI : '.date_to_string($this->input->post('tgl_mutasi'));
+                    }                    
+                    if(isset($query) && $query->num_rows() > 0)
+                    {
+                        $i=0;
+                        $row_data='';
+                        foreach($query->result() as $row)
+                        {                            
+                            $row_data .='<tr>
+                                            <td>'.++$i.'</td>
+                                            <td>'.$row->kode_mutasi.'</td>
+                                            <td>'.ucwords($row->sup_name).' ('.$row->sup_code.')</td>
+                                            <td>'.$row->jml_barang.' macam</td>
+                                            <td>'.date_to_string($row->date_entry).'</td>
+                                            <td><a href="'.base_url().'gudang/sisa/cetak/'.$row->kode_mutasi.'" target="_new"><span class="button"><input type="button" class="button" value="Cetak" /></span></a></td>
+                                        </tr>';
+                        }                        
+                        $this->data['row_data'] = $row_data;
+                    }
+                    else
+                    {
+                        $this->data['err_msg'] = '<span style="color:red">Data tidak ditemukan, silahkan ulangi lagi.</span>';
+                    } 
+                }    
+                $this->load->view(config_item('template').'gud_rekapsisa',$this->data);                    
+            }
+            //list data barang untuk dicetak mutasi sisa
+            else
+            {
+                //tampilin data untuk ke browser
+                if(isset($query) && $query->num_rows() > 0)
+                {
+                    $this->data['total_item'] = $query->num_rows(); 
+                    //setting up pagination
+                    $this->load->library('pagination');
+                    $config['base_url'] = base_url().'gudang/sisa/';
+                    $config['total_rows'] = $this->data['total_item'];
+                    $config['per_page'] = 20;
+                    $this->pagination->initialize($config);
+                    $this->data['page'] = $this->pagination->create_links();
+                    //applying pagination on displaying result            
+                    if(isset($param) && intval($param) > 0)
+                    {
+                        $page_min = $param;
+                        $page_max = $page_min + $config['per_page'];
+                    }
+                    else
+                    {
+                        $page_min = 0;
+                        $page_max = $config['per_page'];
+                    }
+                    $i = 0;
+                    $this->data['row_data'] = '';            
+                    foreach($query->result() as $row)
+                    {                         
+                        if($i>=$page_min && $i <$page_max)
+                        {
+                            $checkbox = '<input type="checkbox" name="opsi_'.++$i.'" value="'.$row->item_code.'" onchange="addRemoveMutasi('.($i%$config['per_page']).')"/>';
+                            if($row->kode_mutasi == '0')
+                            {
+                                $checkbox = '<input type="checkbox" name="opsi_'.$i.'" value="'.$row->item_code.'" onchange="addRemoveMutasi('.($i%$config['per_page']).')" checked="checked"/>';
+                            }
+                            $this->data['row_data'] .= '<tr>
+                                                            <td>'.$i.'</td>
+                                                            <td>'.$row->item_code.'</td>
+                                                            <td>'.$row->item_name.'</td>
+                                                            <td>'.$row->cat_code.'</td>
+                                                            <td>'.$row->sup_code.'</td>
+                                                            <td>'.number_format($row->item_hp,0,',','.').'</td>
+                                                            <td>'.$row->item_qty_stock.'</td>
+                                                            <td>'.$checkbox.'</td>
+                                                        </tr>';
+                        }
+                        else
+                        {
+                            $i++;
+                        }
+                    }            
+                }
+                $this->load->view(config_item('template').'gud_sisa',$this->data);
+            }
         }
     }
     function check_if_medan($sup_code)

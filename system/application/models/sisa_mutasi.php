@@ -35,11 +35,35 @@ class Sisa_mutasi extends Model {
         return $this->db->get_where('sisa_mutasi', array('status_print_mutasi'=>0));
     }
     /**
+    * ambil data untuk dicetak berdasar kode mutasi
+    */
+    function get_sisa_mutasi_by_kode($kode)
+    {
+        $this->db->order_by('item_code','asc');
+        return $this->db->get_where('sisa_mutasi', array('kode_mutasi'=>$kode));
+    }
+    /**
     *update status print jadi 1
     */
     function update_status($param)
     {
         $query = 'update sisa_mutasi set status_print_mutasi = 1, kode_mutasi="'.$param['kode_mutasi'].'" where item_code="'.$param['item_code'].'"';
+        return $this->db->query($query);
+    }
+    /**
+    *Ambil data mutasi masuk pada tanggal tertentu, kelompokkan berdasarkan kode mutasi
+    */
+    function get_sisa_mutasi_by_date($param)
+    {
+        $query = 'select sisa_mutasi.*, count(item_code) as jml_barang, supplier.* from sisa_mutasi left join supplier on sisa_mutasi.sup_code = supplier.sup_code where sisa_mutasi.date_entry = "'.$param['tgl_mutasi'].'" group by kode_mutasi';
+        return $this->db->query($query);
+    }
+    /**
+    * Ambil data mutasi berdasarkan supplier, kelompokkan berdasarkan bon
+    */
+    function get_sisa_mutasi_by_supplier($sup_code)
+    {
+        $query = 'select sisa_mutasi.*, count(item_code) as jml_barang, supplier.* from sisa_mutasi left join supplier on sisa_mutasi.sup_code = supplier.sup_code where sisa_mutasi.sup_code = "'.$sup_code.'" group by kode_mutasi';
         return $this->db->query($query);
     }
 }
