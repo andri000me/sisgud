@@ -28,11 +28,38 @@ class Autocomplete extends Controller {
     */
 	function autocomplete_item($key="")
 	{
-		$query = $this->autocomplete->get_item_for_mutasi_keluar($key);		
-		foreach($query->result() as $row)
-		{
-			echo ucwords($row->item_code).'|'.$row->item_name.'|'.$row->item_qty_stock.'|'.ucwords($row->sup_name).'|'.number_format($row->item_hj,0,',','.').',-'.'|'.$row->item_hp.'|'.$row->item_hj.chr(10);
-		}
+        //ketik manual
+        if(!empty($key))
+        {
+            $query = $this->autocomplete->get_item_for_mutasi_keluar($key);		
+            foreach($query->result() as $row)
+            {
+                echo ucwords($row->item_code).'|'.$row->item_name.'|'.$row->item_qty_stock.'|'.ucwords($row->sup_name).'|'.number_format($row->item_hj,0,',','.').',-'.'|'.$row->item_hp.'|'.$row->item_hj.chr(10);
+            }
+        }
+        //scan
+        else 
+        {
+            $item_code = $this->input->post('item_code');
+            $query = $this->autocomplete->get_item_for_mutasi_keluar($item_code);
+            if($query->num_rows() == 1)
+            {
+                $row = $query->row();
+                $data = array(
+                    'item_code'=>$row->item_code,
+                    'item_name'=>$row->item_name,
+                    'item_qty_stock'=>$row->item_qty_stock,
+                    'sup_name'=>ucwords($row->sup_name),
+                    'item_hj'=>$row->item_hj,
+                    'item_hp'=>number_format($row->item_hp,0,',','.').',-'
+                );
+                echo json_encode($data);
+            }
+            else
+            {
+                echo 0;
+            }
+        }
 	}
     /*
     * auto complete item for mutasi hadiah
@@ -53,11 +80,37 @@ class Autocomplete extends Controller {
     */
 	function autocomplete_retur($key="")
 	{
-		$query = $this->autocomplete->get_item_for_retur($key);		
-		foreach($query->result() as $row)
-		{
-			echo ucwords($row->item_code).'|'.$row->item_name.'|'.$row->item_qty_stock.'|'.ucwords($row->sup_name).'|'.number_format($row->item_hj,0,',','.').',-'.chr(10);
-		}
+        //ketik manual
+        if(!empty($key)) 
+        {
+            $query = $this->autocomplete->get_item_for_retur($key);		
+            foreach($query->result() as $row)
+            {
+                echo ucwords($row->item_code).'|'.$row->item_name.'|'.$row->item_qty_stock.'|'.ucwords($row->sup_name).'|'.number_format($row->item_hj,0,',','.').',-'.chr(10);
+            }
+        }
+        //scan
+        else 
+        {
+            $item_code = $this->input->post('item_code');
+            $query = $this->autocomplete->get_item_for_retur($item_code);
+            if($query->num_rows() == 1)
+            {
+                $row = $query->row();
+                $data = array(
+                    'item_code'=>$row->item_code,
+                    'item_name'=>$row->item_name,
+                    'item_qty_stock'=>$row->item_qty_stock,
+                    'sup_name'=>ucwords($row->sup_name),
+                    'item_hj'=>number_format($row->item_hj,0,',','.').',-'
+                );
+                echo json_encode($data);
+            }
+            else 
+            {
+                echo 0;
+            }
+        }
 	}
     /**
     *autocomplete shop

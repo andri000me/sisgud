@@ -53,6 +53,9 @@
                 <span class="button"><input type="reset" value="Batal" class="button"/></span>
             </p>
             <?php echo form_close() ?>
+            <div id="dialog_msg" title="Peringatan" style="display:none">
+            <span id="warning_msg"></span>
+            </div>
       </div>                
         <div class="tempatemo_right_bottom">
         </div>

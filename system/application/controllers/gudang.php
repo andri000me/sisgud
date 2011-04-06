@@ -118,7 +118,7 @@ class Gudang extends Controller {
                 foreach($query->result() as $row)
                 {
                     $shop .= '<td class="header">'.strtoupper($row->shop_initial).'</td>';
-                    $row_qty .= '<td><input type="text" name="qty_'.strtolower($row->shop_initial).'[]" id="qty_'.strtolower($row->shop_initial).'_#" style="width: 25px;" onkeyup="countStok(#)"/></td>';
+                    $row_qty .= '<td><input type="text" name="qty_'.strtolower($row->shop_initial).'[]" id="qty_'.strtolower($row->shop_initial).'_#" style="width: 25px;" onkeyup="countStok(#)" onkeypress="checkForEnter(event)"/></td>';
                     $shop_initial[$i++] = strtolower($row->shop_initial);
                 }
                 $this->data['shop_name'] = $shop;
@@ -1479,63 +1479,71 @@ class Gudang extends Controller {
         {
             if($this->input->post('submit_simpan_retur'))
             {
-                $data = array(
-                        'retur_code'=> $this->input->post('retur_code'),
-                        'retur_date'=> date('Y-m-d'),
-                        'shop_code' => $this->input->post('shop_code'),
-                        'op_code'=> $this->session->userdata('p_id')
-                    );				
-                //retrieving data from form
-                $item_code = $this->input->post('item_code');						
-                $qty_retur = $this->input->post('qty_retur');
-                $shop_code = $this->input->post('shop_code');
-                $tgl_retur = $this->input->post('tgl_retur');
-                $retur_code = time();
-                //processing retur
-                $this->load->model('item_retur');
-                $this->load->model('item');
-                $success = '';
-                $failed = '';
-                for($i=0;$i<count($item_code);$i++)
+                if($this->input->post('shop_code') && $this->input->post('retur_code') && $this->input->post('tgl_retur'))
                 {
-                    if(!empty($item_code[$i]) && $qty_retur[$i] > 0)
+                    $data = array(
+                            'retur_code'=> $this->input->post('retur_code'),
+                            'retur_date'=> date('Y-m-d'),
+                            'shop_code' => $this->input->post('shop_code'),
+                            'op_code'=> $this->session->userdata('p_id')
+                        );				
+                    //retrieving data from form
+                    $item_code = $this->input->post('item_code');						
+                    $qty_retur = $this->input->post('qty_retur');
+                    $shop_code = $this->input->post('shop_code');
+                    $tgl_retur = $this->input->post('tgl_retur');
+                    $retur_code = time();
+                    //processing retur
+                    $this->load->model('item_retur');
+                    $this->load->model('item');
+                    $success = '';
+                    $failed = '';
+                    for($i=0;$i<count($item_code);$i++)
                     {
-                        $data = array(
-                            'retur_code'=>$retur_code,
-                            'retur_date'=>$tgl_retur,
-                            'item_code'=>$item_code[$i],
-                            'quantity'=>$qty_retur[$i],
-                            'shop_code'=>$shop_code,
-                            'op_code'=>$this->session->userdata('p_id')
-                        );
-                        if($this->item_retur->insert_item_retur($data))
+                        if(!empty($item_code[$i]) && $qty_retur[$i] > 0)
                         {
-                            //tambahin stok yang ada di gudang
-                            if($this->item->update_after_retur($data))
+                            $data = array(
+                                'retur_code'=>$retur_code,
+                                'retur_date'=>$tgl_retur,
+                                'item_code'=>$item_code[$i],
+                                'quantity'=>$qty_retur[$i],
+                                'shop_code'=>$shop_code,
+                                'op_code'=>$this->session->userdata('p_id')
+                            );
+                            if($this->item_retur->insert_item_retur($data))
                             {
-                                $success .= $item_code[$i].', ';
+                                //tambahin stok yang ada di gudang
+                                if($this->item->update_after_retur($data))
+                                {
+                                    $success .= $item_code[$i].', ';
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if(!empty($item_code[$i]))
+                            {
+                                $failed .= $item_code[$i].', ';
                             }
                         }
                     }
-                    else
+                    $msg = '';
+                    if(!empty($success))
                     {
-                        if(!empty($item_code[$i]))
-                        {
-                            $failed .= $item_code[$i].', ';
-                        }
+                        $msg .= '<span style="color:green">Kode barang <b>'.$success.'</b> berhasil diretur</span><br />';
                     }
+                    if(!empty($failed))
+                    {
+                        $msg .= '<span style="color:red">Kode barang <b>'.$success.'</b> gagal diretur</span><br />';
+                    }
+                    $this->session->set_userdata('form_notify',$msg);
+                    redirect('/gudang/retur/tambah/','refresh');
                 }
-                $msg = '';
-                if(!empty($success))
+                else 
                 {
-                    $msg .= '<span style="color:green">Kode barang <b>'.$success.'</b> berhasil diretur</span><br />';
+                    $msg = '<span style="color:red">Terjadi kesalahan, periksa kembali tanggal retur, kode retur, dan kode toko</span>';
+                    $this->session->set_userdata('form_notify',$msg);
                 }
-                if(!empty($failed))
-                {
-                    $msg .= '<span style="color:red">Kode barang <b>'.$success.'</b> gagal diretur</span><br />';
-                }
-                $this->session->set_userdata('form_notify',$msg);
-                redirect('/gudang/retur/tambah/','refresh');
             }
             
             $this->load->view(config_item('template').'gud_retur',$this->data);

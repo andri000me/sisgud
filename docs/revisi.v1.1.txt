@@ -12,9 +12,9 @@ Revisi sisgud 1.1
 - buat satu role sendiri untuk retur, role name= operator_retur -ok
 - cetak label dibedain per user yang login, file label nya -ok
 - rekap ekspor data -ok
-- rekap mutasi sisa - sedang dikerjakan
+- rekap mutasi sisa - ok
 - tambah halaman help/about -ok
-- ketika retur, mutasi obral, mutasi rusak bisa scan trus langsung muncul barangnya, gak usah ketik manual.
+- ketika retur, mutasi obral, mutasi rusak bisa scan trus langsung muncul barangnya, gak usah ketik manual.-ok
 - Mecetak mutasi keluar berdasar supplier, kelompokkan berdasar kode bon dan harinya
   input : pilih suplier, hasil:
   No | Tgl | Kode Bon | Jumlah Barang | Total Barang | Operasi

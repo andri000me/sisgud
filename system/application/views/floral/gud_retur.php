@@ -13,7 +13,7 @@
                 </tr>                
                 <tr>
                     <td>Nama Toko</td><td>: <input class="ac_input text_field" type="text" id="shop_name"   value="" /></td>
-                    <td>Kode Retur</td><td>: <input type="text" name="retur_code" value="" /></td>
+                    <td>Kode Retur</td><td>: <input type="text" name="retur_code" value="" id="retur_code"/></td>
                 </tr>                      
             </table>
             <p><?php
@@ -38,19 +38,19 @@
                         echo '<tr>
                                 <td>'.++$i.'</td>
                                 <td>
-                                    <input type="text" class="item_code_retur ac_input" name="item_code[]" maxlength="10" style="width:80px" onkeyup="setFocus('.$i.')"/>
+                                    <input type="text" class="item_code_retur ac_input" name="item_code[]" maxlength="10" style="width:80px" onkeyup="setFocus('.$i.')" onfocus="setFocus('.$i.')"/>
                                     <span id="item_code_'.$i.'" style="display:none"></span>
                                 </td>
                                 <td><span id="item_name_'.$i.'" style="width:130px"></span></td>
                                 <td><span id="sup_name_'.$i.'"></span></td>
                                 <td><span id="item_hj_'.$i.'"></span></td>
-                                <td><input type="text" name="qty_retur[]" size="5"/></td>
+                                <td><input type="text" name="qty_retur[]" size="5" id="qty_retur_'.$i.'" onkeypress="check(event)" onfocus="setFocus('.$i.')"/></td>
                             </tr>';
                     } 
                 ?>                
             </table>
             <p>
-                <span class="button"><input type="submit" name="submit_simpan_retur" value="Simpan" class="button"/></span>
+                <span class="button"><input type="submit" name="submit_simpan_retur" value="Simpan" class="button" onclick="validateFormRetur()"/></span>
                 <span class="button"><input type="button" value="Lagi" class="button"/></span>
                 <span class="button"><input type="reset" value="Batal" class="button"/></span>
             </p>

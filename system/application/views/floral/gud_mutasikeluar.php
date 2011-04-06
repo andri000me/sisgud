@@ -54,7 +54,7 @@
                         echo '<tr class="row-data">
                                 <td>'.$i.'</td>
                                 <td>
-                                    <input type="text" '.$class_input.' name="item_code[]" maxlength="10" style="width:80px" onkeyup="setFocus('.$i.')"/>
+                                    <input type="text" '.$class_input.' name="item_code[]" maxlength="10" style="width:80px" onfocus="setFocus('.$i.')" onkeypress="checkForEnter(event)"/>
                                     <span id="item_code_'.$i.'" style="display:none"></span>
                                 </td>
                                 <td><input type="text" id="item_name_'.$i.'" style="width:130px" readonly="readonly"/></td>
