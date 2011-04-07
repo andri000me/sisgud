@@ -15,9 +15,9 @@ Revisi sisgud 1.1
 - rekap mutasi sisa - ok
 - tambah halaman help/about -ok
 - ketika retur, mutasi obral, mutasi rusak bisa scan trus langsung muncul barangnya, gak usah ketik manual.-ok
-- Mecetak mutasi keluar berdasar supplier, kelompokkan berdasar kode bon dan harinya
+- Mecetak mutasi keluar berdasar supplier, kelompokkan berdasar kode bon dan harinya -ok
   input : pilih suplier, hasil:
-  No | Tgl | Kode Bon | Jumlah Barang | Total Barang | Operasi
+  No | Kode | Kode Bon | Jumlah Barang | Total Barang | Operasi
   -------------------------------------------------------------
   1  | xxx | axxxxxxx | 12            | 24           | Cetak  
   di hasil cetaknya sama kaya bon order yang di mutasi masuk, cuma ada tambahan kolom HM,HJ dan Toko  
