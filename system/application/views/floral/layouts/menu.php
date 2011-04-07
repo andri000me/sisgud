@@ -101,7 +101,8 @@
             <?php } if($role=='supervisor') { ?>
             <ul class="sub">                              
                 <li><a href="<?php echo base_url() ?>gudang/stok">Stok Gudang</a></li>                
-                <li><a href="<?php echo base_url() ?>gudang/sisa/rekap">Rekap Mutasi Sisa</a></li>                
+                <li><a href="<?php echo base_url() ?>gudang/sisa/rekap">Rekap Mutasi Sisa</a></li>
+                <li><a href="<?php echo base_url() ?>gudang/mutasi/rekap">Rekap Mutasi Keluar</a></li>
             <?php } if($role=='operator_retur') { ?>
             <ul class="sub">                              
                 <li><a href="<?php echo base_url() ?>gudang/stok">Stok Gudang</a></li>                

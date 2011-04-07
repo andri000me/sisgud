@@ -35,6 +35,14 @@ class Item_distribution extends Model {
         return $this->db->update('item_distribution',array('status'=>$status));
     }
     /**
+    * Ambil data distribusi barang ke toko-toko
+    */
+    function get_item_distribution($item_code) 
+    {
+        $query = 'select item_code,shop_code,sum(quantity) as total from item_distribution  where item_code = "'.$item_code.'" group by shop_code';
+        return $this->db->query($query);
+    }
+    /**
     * Ambil semua item yang dalam status terakumulasi
     */
     function get_item_accumulated($sup_code)
