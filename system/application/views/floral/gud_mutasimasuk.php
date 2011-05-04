@@ -29,20 +29,20 @@
                 <?php
                     if($this->uri->segment(4) == 'hadiah')
                     {
-                        $cat_code = '<input type="text" name="cat_code[]" size="12" maxlength="3" value="'.config_item('hadiah').'" readonly="readonly"/>';
+                        $cat_code = '<input type="text" name="cat_code[]" size="12" maxlength="3" value="'.config_item('hadiah').'" readonly="readonly" onkeypress="destroyEnter(event)"/>';
                     }
                     else
                     {
-                        $cat_code = '<input type="text" name="cat_code[]" size="12" maxlength="3" />';
+                        $cat_code = '<input type="text" name="cat_code[]" size="12" maxlength="3" onkeypress="checkForEnter(0,event,this)"/>';
                     }
                     for($i=0;$i<15;) 
                     { 
                         echo '<tr>
                                 <td>'.++$i.'</td>
                                 <td>'.$cat_code.'</td>
-                                <td><input type="text" name="item_name[]" size="50" maxlength="25"/></td>
-                                <td><input type="text" name="item_hp[]" size="20"/></td>
-                                <td><input type="text" name="item_qty[]" size="5"/></td>
+                                <td><input type="text" name="item_name[]" size="50" maxlength="25" onkeypress="checkForEnter(0,event,this)"/></td>
+                                <td><input type="text" name="item_hp[]" size="20" onkeypress="checkForEnter(0,event,this)"/></td>
+                                <td><input type="text" name="item_qty[]" size="5" onkeypress="checkForEnter(0,event,this)"/></td>
                             </tr>';
                     } 
                 ?>                

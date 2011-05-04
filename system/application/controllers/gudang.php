@@ -118,7 +118,7 @@ class Gudang extends Controller {
                 foreach($query->result() as $row)
                 {
                     $shop .= '<td class="header">'.strtoupper($row->shop_initial).'</td>';
-                    $row_qty .= '<td><input type="text" name="qty_'.strtolower($row->shop_initial).'[]" id="qty_'.strtolower($row->shop_initial).'_#" style="width: 25px;" onkeyup="countStok(#)" onkeypress="checkForEnter(event)"/></td>';
+                    $row_qty .= '<td><input type="text" name="qty_'.strtolower($row->shop_initial).'[]" id="qty_'.strtolower($row->shop_initial).'_#" style="width: 25px;" onkeyup="countStok(#)" onkeypress="checkForEnter(1,event,this)"/></td>';
                     $shop_initial[$i++] = strtolower($row->shop_initial);
                 }
                 $this->data['shop_name'] = $shop;
@@ -164,8 +164,9 @@ class Gudang extends Controller {
                     $head = '<div style="margin-top: 5px;">
                                 <h3 style="text-align: center;">BON ORDER BARANG</h3>
                                 <table style="width: 700px;">
-                                <tr><td style="width: 50px;">SUPPLIER</td><td style="width:300px;">: '.strtoupper($sup->sup_name).'</td></tr>							                              
-                                <tr><td style="width: 50px;">TANGGAL</td><td style="width:300px;">: '.date_to_string($data->date_entry).'</td></tr>							                              
+                                <tr><td style="width: 100px;">SUPPLIER</td><td style="width:250px;">: '.strtoupper($sup->sup_name).'</td></tr>							                              
+                                <tr><td style="width: 100px;">TANGGAL BON</td><td style="width:250px;">: '.date_to_string($data->date_bon).'</td></tr>							                              
+                                <tr><td style="width: 100px;">TANGGAL MUTASI</td><td style="width:250px;">: '.date_to_string($data->date_entry).'</td></tr>							                              
                                 </table>
                             </div>';
                     
@@ -376,10 +377,11 @@ class Gudang extends Controller {
                     $query = $this->item_mutasi->get_item_mutasi(array('kode_mutasi'=>$kode_mutasi));
                     $data = $query->row();
                     $head = '<div style="margin-top: 5px;">
-                                <h3 style="text-align: center;">LAPORAN DISTRIBUSI BARANG</h3>
+                                <h3 style="text-align: center;">REKAP DISTRIBUSI BARANG</h3>
                                 <table style="width: 700px;">
-                                <tr><td style="width: 50px;">SUPPLIER</td><td style="width:300px;">: '.strtoupper($data->sup_name).'</td></tr>							                              
-                                <tr><td style="width: 50px;">TANGGAL</td><td style="width:300px;">: '.date_to_string($data->date_entry).'</td></tr>							                              
+				<tr><td style="width: 100px;">SUPPLIER</td><td style="width:250px;">: '.strtoupper($data->sup_name).'</td></tr>							                              
+                                <tr><td style="width: 100px;">TANGGAL BON</td><td style="width:250px;">: '.date_to_string($data->date_bon).'</td></tr>							                              
+                                <tr><td style="width: 100px;">TANGGAL MUTASI</td><td style="width:250px;">: '.date_to_string($data->date_entry).'</td></tr>	
                                 </table>
                             </div><br />';
                     //retrieve data toko
@@ -489,8 +491,9 @@ class Gudang extends Controller {
                     $head = '<div style="margin-top: 5px;">
                                 <h3 style="text-align: center;">BON ORDER BARANG</h3>
                                 <table style="width: 700px;">
-                                <tr><td style="width: 50px;">SUPPLIER</td><td style="width:300px;">: '.strtoupper($data->sup_name).'</td></tr>							                              
-                                <tr><td style="width: 50px;">TANGGAL</td><td style="width:300px;">: '.date_to_string($data->date_entry).'</td></tr>							                              
+				<tr><td style="width: 100px;">SUPPLIER</td><td style="width:250px;">: '.strtoupper($data->sup_name).'</td></tr>							                              
+                                <tr><td style="width: 100px;">TANGGAL BON</td><td style="width:250px;">: '.date_to_string($data->date_bon).'</td></tr>							                              
+                                <tr><td style="width: 100px;">TANGGAL MUTASI</td><td style="width:250px;">: '.date_to_string($data->date_entry).'</td></tr>							                              
                                 </table>
                             </div><br />';
                     //retrieve data toko
@@ -1202,7 +1205,14 @@ class Gudang extends Controller {
                                         $shop_cat = $row->shop_cat;
                                     }
                                     //pengkodean harga modal
-                                    $tmp = substr($row->item_hp,0,3);
+				    if($row->item_hp == 0) 
+				    {
+					$tmp = array(0,0,0);
+				    }
+				    else
+				    {
+					$tmp = substr($row->item_hp,0,3);
+				    }                                    
                                     $kode = config_item('kode_hm');                                    
                                     $kode_hm = $kode[$tmp[0]].$kode[$tmp[1]].$kode[$tmp[2]];                                   
                                     $data_txt .= strtoupper($shop_cat).chr(9).strtoupper($row->item_name).chr(9).$row->item_code.chr(9).number_format($row->item_hj,0,',','.').',-'.chr(9).$kode_hm.chr(9).
@@ -2056,11 +2066,19 @@ class Gudang extends Controller {
         //jika search berdasarkan keyword
 		if($this->input->post('submit_search_stock'))
         {
+	    $this->session->set_userdata('keywords',$this->input->post('keywords'));
             $keywords = $this->input->post('keywords');
         }
         else
         {
-            $keywords = '';
+	    if($this->session->userdata('keywords'))
+	    {
+		$keywords = $this->session->userdata('keywords');
+	    }
+	    else 
+	    {
+            	$keywords = '';
+	    }
         }        
         //tampilkan datanya
         $this->load->model('item');

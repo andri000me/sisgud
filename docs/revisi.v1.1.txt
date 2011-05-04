@@ -21,4 +21,8 @@ Revisi sisgud 1.1
   -------------------------------------------------------------
   1  | xxx | axxxxxxx | 12            | 24           | Cetak  
   di hasil cetaknya sama kaya bon order yang di mutasi masuk, cuma ada tambahan kolom HM,HJ dan Toko  
+
+- Bikin fasilitas supaya bisa mengeluarkan barang dari Toko Retur / Rusak. Supaya barangbisa diolah lagi
+
+
   
