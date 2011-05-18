@@ -97,6 +97,15 @@ class Item_distribution extends Model {
         return $this->db->query($query);
     }
     /**
+    * hitung jumlah bon yang akan diekport datanya
+    */
+    function count_bon_export($shop_code)
+    {
+        $query = 'select ids.dist_code, ids.shop_code, count(ids.item_code) as jml_item, sum(quantity) as total_item from item_distribution ids 
+                    where ids.shop_code = "'.$shop_code.'" and ids.export=0 and dist_code != "0" group by ids.dist_code';
+        return $this->db->query($query);
+    }
+    /**
     * ambil export berdasarkan kode exportnya
     */
     function get_item_export($param)

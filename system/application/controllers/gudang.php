@@ -2696,37 +2696,68 @@ class Gudang extends Controller {
         {
             $this->load->model('item_distribution');        
             $this->load->model('shop');  
-            //tampilkan data yang mau diexport
-            $query = $this->item_distribution->get_item_for_shop($this->input->post('shop_code'));
-            if($query->num_rows() > 0)
+            //check, apakah data yang dieksport ada dalam 1 bon atau lebih
+            $qry = $this->item_distribution->count_bon_export($this->input->post('shop_code'));
+            $this->data['num_of_bon'] = $qry->num_rows();
+            if($qry->num_rows() > 1 ) //jika lebih dari satu bon
             {
-                $this->data['total_item'] = $query->num_rows();
-                $this->data['total'] = 0;
-                $this->data['row_data'] = '';
                 $i = 0;
-                foreach($query->result() as $row)
+                $this->data['row_data'] = '';
+                foreach($qry->result() as $row)
                 {
                     $this->data['row_data'] .= '<tr>
                                                     <td>'.++$i.'</td>
-                                                    <td>'.$row->item_code.'</td>
-                                                    <td>'.$row->item_name.'</td>
-                                                    <td>'.number_format($row->item_hj,0,',',',').',-</td>
-                                                    <td>'.$row->item_disc.'</td>
-                                                    <td>'.$row->quantity.'</td>
-                                                </tr>';
-                    $this->data['total'] += $row->quantity;
-                } 
+                                                    <td>'.$row->dist_code.'</td>
+                                                    <td>'.$row->jml_item.'</td>
+                                                    <td>'.$row->total_item.'</td>
+                                                    <td>
+                                                        '.form_open('gudang/export').'
+                                                        <input type="hidden" name="dist_code" value="'.$row->dist_code.'" />
+                                                        <input type="hidden" name="shop_code" value="'.$row->shop_code.'" />
+                                                        <span class="button"><input class="button" type="submit" name="submit_export" value="Export" /></span>
+                                                        '.form_close().'
+                                                    </td>
+                                                    </tr>';
+                }
                 //update status exportnya, isi time aja
                 $this->data['export'] = time();                
                 $this->item_distribution->update_status_export(array('shop_code'=>$this->input->post('shop_code'),'export'=>$this->data['export']));
             }
+            //jika tidak lebih dari satu bon, diproses biasa aja
             else
-            {
-                $this->data['err_msg'] = '<span style="color:red">Tidak ada data export untuk toko ini</span>'; 
+            {            
+                //tampilkan data yang mau diexport
+                $query = $this->item_distribution->get_item_for_shop($this->input->post('shop_code'));
+                if($query->num_rows() > 0)
+                {
+                    $this->data['total_item'] = $query->num_rows();
+                    $this->data['total'] = 0;
+                    $this->data['row_data'] = '';
+                    $i = 0;
+                    foreach($query->result() as $row)
+                    {
+                        $this->data['row_data'] .= '<tr>
+                                                        <td>'.++$i.'</td>
+                                                        <td>'.$row->item_code.'</td>
+                                                        <td>'.$row->item_name.'</td>
+                                                        <td>'.number_format($row->item_hj,0,',',',').',-</td>
+                                                        <td>'.$row->item_disc.'</td>
+                                                        <td>'.$row->quantity.'</td>
+                                                    </tr>';
+                        $this->data['total'] += $row->quantity;
+                    } 
+                    //update status exportnya, isi time aja
+                    $this->data['export'] = time();                
+                    $this->item_distribution->update_status_export(array('shop_code'=>$this->input->post('shop_code'),'export'=>$this->data['export']));
+                }
+                else
+                {
+                    $this->data['err_msg'] = '<span style="color:red">Tidak ada data export untuk toko ini</span>'; 
+                }
+                //tampilkan data toko            
+                $temp = $this->shop->get_shop($this->input->post('shop_code'));
+                $this->data['shop'] = $temp->row(); 
             }
-            //tampilkan data toko            
-            $temp = $this->shop->get_shop($this->input->post('shop_code'));
-            $this->data['shop'] = $temp->row();            
         }
         //export to csv
         if($this->input->post('submit_export'))
@@ -2743,8 +2774,8 @@ class Gudang extends Controller {
                 $query = $this->item_distribution->get_item_export(array('export'=>$this->input->post('export')));
             }
             else if($this->input->post('dist_code'))
-            {
-                $query = $this->item_distribution->get_item_export(array('dist_code'=>$this->input->post('dist_code'),'shop_code'=>$this->input->post('shop_code')));
+            {                
+                $query = $this->item_distribution->get_item_export(array('dist_code'=>$this->input->post('dist_code'),'shop_code'=>$this->input->post('shop_code')));                
             }
             if($query->num_rows() > 0)
             {                                  

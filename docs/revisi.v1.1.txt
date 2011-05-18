@@ -20,9 +20,10 @@ Revisi sisgud 1.1
   No | Kode | Kode Bon | Jumlah Barang | Total Barang | Operasi
   -------------------------------------------------------------
   1  | xxx | axxxxxxx | 12            | 24           | Cetak  
-  di hasil cetaknya sama kaya bon order yang di mutasi masuk, cuma ada tambahan kolom HM,HJ dan Toko  
+  di hasil cetaknya sama kaya bon order yang di mutasi masuk, cuma ada tambahan kolom HM,HJ dan Toko -ok
 
 - Bikin fasilitas supaya bisa mengeluarkan barang dari Toko Retur / Rusak. Supaya barangbisa diolah lagi
+- Export data untuk toko dibuat per bon, kaya rekap bon untuk yang sekali export lebih dari satu bon. Soalnya yang dibandingin itu bonnnya. -ok
 
 
   

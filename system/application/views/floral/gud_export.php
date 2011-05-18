@@ -15,7 +15,7 @@
             <p><?php if(isset($err_msg)) echo $err_msg ?></p>
             <?php echo form_close() ?>
             
-            <?php if(isset($row_data)) { ?>
+            <?php if(isset($row_data) && $num_of_bon == 1) { ?>
             <p style="text-align:center;color:#000;"><b>PREVIEW EXPORT DATA</b></p>
             <table class="table-form">
                 <tr><td>Toko Tujuan</td><td>: <?php echo $shop->shop_name ?></td></tr>
@@ -39,8 +39,19 @@
             <input type="hidden" value="<?php echo $shop->shop_code ?>" name="shop_code" />
             <p style="text-align:center"><span class="button"><input class="button" type="submit" value="Export" name="submit_export"/></span></p>
             <?php echo form_close() ?>
-            <?php } ?>
-           
+            <?php } else if(isset($row_data) && $num_of_bon > 1) { ?>
+            <p style="text-align:center;color:#000;"><b>DAFTAR EXPORT DATA</b></p>
+            <table class="table-data">
+                <tr>
+                    <td class="header">No</td>
+                    <td class="header">Kode BON</td>
+                    <td class="header">Jenis Barang</td>
+                    <td class="header">Total Barang</td>
+                    <td class="header">Action</td>                                    
+                </tr>
+                <?php echo $row_data ?>
+            </table>
+            <?php } ?>           
       </div>                
         <div class="tempatemo_right_bottom">
         </div>
