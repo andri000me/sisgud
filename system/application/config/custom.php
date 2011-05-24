@@ -10,7 +10,7 @@ $config['template'] = 'floral/';
 * 1 => konfigurasi lama, masih belum nampilin nama modiest dan mode
 * 2 => konfigurasi baru
 */
-$config['label'] = 1;
+$config['label'] = 2;
 
 /**
 * Kode kelompok barang untuk hadiah
