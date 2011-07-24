@@ -22,8 +22,18 @@ Revisi sisgud 1.1
   1  | xxx | axxxxxxx | 12            | 24           | Cetak  
   di hasil cetaknya sama kaya bon order yang di mutasi masuk, cuma ada tambahan kolom HM,HJ dan Toko -ok
 
-- Bikin fasilitas supaya bisa mengeluarkan barang dari Toko Retur / Rusak. Supaya barangbisa diolah lagi
 - Export data untuk toko dibuat per bon, kaya rekap bon untuk yang sekali export lebih dari satu bon. Soalnya yang dibandingin itu bonnnya. -ok
-
-
-  
+- Pada menu mutasi masuk tambahkan:
+  + Ada kode untuk barang luar kota dan dalam kota
+  + Ada total harga modal yang tanpa ditambah 15%
+  + Pas cetak mutasi, kolom nama dibuat rata kiri
+  + Tampilkan kode bon pada hasil cetaknya
+- Rekap mutasi, kode supplier bisa diinput langsung
+- Hapus barang dipindahkan dari supervisor ke admin
+- Bikin fungsi rekap rekomendasi, untuk rekomendasi harga jual kepada supervisor.
+  Kode Label | Nama | HM | HM +15% | HJ Rekomendasi | Qty | Total Rupiah
+- Rekap distribusi barang, per kelompok barang dengan rentang waktu tertentu, default per bulan. Ini untuk mengetahui efektifitas penjualan toko.
+          | Barang Masuk Toko | Barang Terjual Toko | Selisih    |
+  Kel Brg |=======================================================
+          |   Qty   | Rupiah  |   Qty   | Rupiah    | Qty| Rupiah|
+  =================================================================
