@@ -22,3 +22,8 @@ $config['hadiah'] = 888;
 */
 $config['kode_hm'] = array('E','F','A','S','H','I','O','N','M','O','D');
 //end of file custom.php
+
+/**
+ * Default timezone
+ */
+$config['timezone'] = 'Asia/Jakarta';

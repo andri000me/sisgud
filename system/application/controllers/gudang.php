@@ -54,6 +54,9 @@ class Gudang extends Controller {
         $this->load->helper('sisgud');
         $this->data['now_date'] = get_date();
         $this->data['userinfo'] = get_userinfo($this);
+        
+        //set time zone
+        ini_set('date_default_timezone', config_item('timezone'));
 	}
 	/**
 	*Default function index. First call by class
@@ -158,6 +161,7 @@ class Gudang extends Controller {
 				$query = $this->supplier->get_supplier($this->input->post('sup_code'));
 				$sup = $query->row();
                 $query = $this->item_mutasi->get_item_mutasi(array('sup_code'=>$this->input->post('sup_code')));                
+                
                 if($query->num_rows() > 0)
                 {
                     $data = $query->row();
@@ -187,6 +191,7 @@ class Gudang extends Controller {
                             </tr>
                             <tr>';
                     $row_shop = '';
+                    
                     foreach($query->result() as $row)
                     {
                         $head .= '<td style="width: 25px;text-align: center; font-size: 17px;">'.strtoupper($row->shop_initial).'</td>';
@@ -200,6 +205,7 @@ class Gudang extends Controller {
                     {
                         $j=0;
                         $data='';
+                        $total=0;
                         foreach($query->result() as $row)
                         {
                             $data .='<tr>
@@ -209,13 +215,16 @@ class Gudang extends Controller {
                                     <td style="width: 25px;text-align: center">'.$row->qty.'</td>
                                     '.$row_shop;	
                             //check barang medan atau luar kota
+                            $total += ($row->item_hp*$row->qty);
                             if(!$this->check_if_medan($row->sup_code))
                             {
                                 $hp = floor($row->item_hp + 0.15*$row->item_hp);
+                                $this->data['sup_region']='LMD';
                             }
                              else
                             {
                                 $hp = $row->item_hp;
+                                $this->data['sup_region']='MDN';
                             }
                             $data .= '	<td style="width: 50px;text-align: right;">'.number_format($hp,'0',',','.').',-</td>
                                     <td style="width: 60px;text-align: center;"></td>		
@@ -237,7 +246,12 @@ class Gudang extends Controller {
                         {
                             $list_data[] =$data;
                         }
-                        $footer = '</table><br /><table style="text-align:center;">
+                        $footer = '<tr>
+                        				<td rowspan="4" style="text-align:right;width:205px;">T O T A L</td>
+                        				<td rowspan="'.($jumlah_toko+1).'" style="text-align:right;width:'.($jumlah_toko*25+50).'px">'.number_format($total,'0',',','.').',-</td>
+                        				<td style="width:60px;"></td>
+                        			</tr>
+                        			</table><br /><table style="text-align:center;">
                                 <tr><td>(Bagian Mutasi Masuk)</td><td>(Bagian Distribusi)</td></tr>                            
                             </table>';
                         //update status item yang udh pernah diprint mutasi jadi 1
@@ -449,10 +463,12 @@ class Gudang extends Controller {
                             if(!$this->check_if_medan($row->sup_code))
                             {
                                 $hp = floor($row->item_hp + 0.15*$row->item_hp);
+                                $this->data['sup_region'] = 'LMD';
                             }
                             else
                             {
                                 $hp = $row->item_hp;
+                                $this->data['sup_region'] = 'MDN';
                             }
                             $data .= '	<td style="width: 50px;text-align: right;">'.number_format($hp,'0',',','.').',-</td>
                                     <td style="width: 60px;text-align: center;">'.number_format($row->item_hj,'0',',','.').',-</td>		
@@ -527,6 +543,7 @@ class Gudang extends Controller {
                     {
                         $row_data = '';
                         $j = 0;
+                        $total=0;
                         foreach($query->result() as $row)
                         {
                             $data .='<tr>
@@ -536,13 +553,16 @@ class Gudang extends Controller {
                                     <td style="width: 25px;text-align: center">'.$row->qty.'</td>
                                     '.$row_shop;
                             
+                            $total += ($row->item_hp*$row->qty);
                             if(!$this->check_if_medan($row->sup_code))
                             {
                                 $hp = floor($row->item_hp + 0.15*$row->item_hp);
+                                $this->data['sup_region']='LMD';
                             }
                             else
                             {
                                 $hp = $row->item_hp;
+                                $this->data['sup_region']='MDN';
                             }
                             $data .= '	<td style="width: 50px;text-align: right;">'.number_format($hp,'0',',','.').',-</td>
                                     <td style="width: 60px;text-align: center;"></td>		
@@ -563,7 +583,12 @@ class Gudang extends Controller {
                         {
                             $list_data[] =$data;
                         }
-                        $footer = '</table><br /><table style="text-align:center;">
+                        $footer = '<tr>
+                        				<td rowspan="4" style="text-align:right;width:205px;">T O T A L</td>
+                        				<td rowspan="'.($jumlah_toko+1).'" style="text-align:right;width:'.($jumlah_toko*25+50).'px">'.number_format($total,'0',',','.').',-</td>
+                        				<td style="width:60px;"></td>
+                        			</tr>
+                        			</table><br /><table style="text-align:center;">
                                 <tr><td>(Bagian Mutasi Masuk)</td><td>(Bagian Distribusi)</td></tr>                            
                             </table>';                  
                         $this->cetak_mutasi_pdf($head, $list_data, $footer);
@@ -1301,19 +1326,20 @@ class Gudang extends Controller {
                     $this->data['err_msg'] = '<span style="color:red">Tidak dapat mencetak bon. Anda belum mencetak label atau bon sudah pernah dicetak</span>';
                 }
                 //buat bon untuk toko yang sedang ditampilkan
-                $this->item_distribution->create_bon(array('shop_code'=>$this->input->post('shop_code'),'dist_code'=>$this->data['dist_code']));                
+                //$this->item_distribution->create_bon(array('shop_code'=>$this->input->post('shop_code'),'dist_code'=>$this->data['dist_code']));                
 			}			
 			//cetak bon setelah preview
             $kode_bon = $this->uri->segment(4);$shop_code = $this->uri->segment(5);
             if($this->input->post('submit_cetak_bon') || (!empty($kode_bon) && !empty($shop_code)))
 			{    
-               
+				$this->load->model('item_distribution');
+				$this->item_distribution->create_bon(array('shop_code'=>$shop_code,'dist_code'=>$kode_bon));
                 //ambil barang untuk dicetak bonnya
                 if(empty($kode_bon))
                 {
                     $kode_bon = $this->input->post('dist_code');
                 }                
-                $this->load->model('item_distribution');
+                
                 $this->load->model('shop');
                 $this->load->model('item');
 				$query = $this->item_distribution->get_item_for_pdf(array('dist_code'=>$kode_bon,'shop_code'=>$shop_code));                 
@@ -1602,6 +1628,13 @@ class Gudang extends Controller {
         {
             $pdf->AddPage();            
             $pdf->writeHTML($head.$data.$footer, true, 0, true, 0);
+            if($jumlah_toko<=10)
+            	$pdf->writeHTMLCell(30,15,188,5,'<span style="font-size:30pt">'.$this->data['sup_region'].'</span>','right');
+            else
+            	$pdf->writeHTMLCell(30,15,210,5,
+            		'<span style="font-size:30pt;">'.$this->data['sup_region'].'</span>',            		
+            		'right');
+            
         }
         
 		//-------------------------------------------------------------------------------------
