@@ -1293,47 +1293,62 @@ class Gudang extends Controller {
                 //ambil dan tentukan tanggal serta kode bon, toko tujuan
                 $query = $this->shop->get_shop($this->input->post('shop_code'));
                 $this->data['shop'] = $query->row();
-                $this->data['tgl_bon'] = date('Y-m-d');
-                $this->data['dist_code'] = $this->generate_bon($this->input->post('shop_code'));
-                $query = $this->item_distribution->get_item_for_bon($this->input->post('shop_code'));                
-                if($query->num_rows() > 0)
+                
+                $bon = $this->generate_bon($this->input->post('shop_code'));
+                $this->data['tgl_bon'] = $bon['dist_out'];
+                $this->data['dist_code'] = $bon['dist_code'];
+                if(count($bon['dist_code']) > 1)
                 {
-                    $i=0;
-                    $row_data='';
-                    $total_rupiah = 0;
-                    $total_qty = 0;
-                    foreach($query->result() as $row)
-                    {
-                        $jumlah = $row->item_hj *(1 - $row->item_disc/100) * $row->quantity;
-                        $row_data .= '<tr>
-                                        <td>'.++$i.'</td>
-                                        <td>'.$row->sup_code.'</td>
-                                        <td>'.$row->item_code.'</td>
-                                        <td class="left">'.$row->item_name.'</td>
-                                        <td class="left">'.$row->item_disc.'</td>
-                                        <td class="right">'.number_format($row->item_hj,0,',','.').',-</td>
-                                        <td>'.$row->quantity.' item</td>
-                                        <td class="right">'.number_format($jumlah,0,',','.').',-</td>
-                                    </tr>';
-                        $total_rupiah += $jumlah;
-                        $total_qty += $row->quantity;                        
-                    }
-                    $row_data .= '<tr><td colspan="6">T O T A L</td><td>'.$total_qty.' item</td><td class="right">'.number_format($total_rupiah,0,',','.').',-</td></tr>';
-                    $this->data['row_data'] = $row_data;
+                	
                 }
-                else
+                $rows = array();
+                $k=0;
+                foreach($bon['dist_out'] as $dist_out)
                 {
-                    $this->data['err_msg'] = '<span style="color:red">Tidak dapat mencetak bon. Anda belum mencetak label atau bon sudah pernah dicetak</span>';
+                	$query = $this->item_distribution->get_item_for_bon($this->input->post('shop_code'),$dist_out);
+                	if($query->num_rows() > 0)
+                	{
+                		$i=0;
+                		$row_data='';
+                		$total_rupiah = 0;
+                		$total_qty = 0;
+                		foreach($query->result() as $row)
+                		{
+                			$jumlah = $row->item_hj *(1 - $row->item_disc/100) * $row->quantity;
+                			$row_data .= '<tr>
+                	                                        <td>'.++$i.'</td>
+                	                                        <td>'.$row->sup_code.'</td>
+                	                                        <td>'.$row->item_code.'</td>
+                	                                        <td class="left">'.$row->item_name.'</td>
+                	                                        <td class="left">'.$row->item_disc.'</td>
+                	                                        <td class="right">'.number_format($row->item_hj,0,',','.').',-</td>
+                	                                        <td>'.$row->quantity.' item</td>
+                	                                        <td class="right">'.number_format($jumlah,0,',','.').',-</td>
+                	                                    </tr>';
+                			$total_rupiah += $jumlah;
+                			$total_qty += $row->quantity;
+                		}
+                		$row_data .= '<tr><td colspan="6">T O T A L</td><td>'.$total_qty.' item</td><td class="right">'.number_format($total_rupiah,0,',','.').',-</td></tr>';
+                		$rows[$k++] = $row_data;
+                	}
+                	else
+                	{
+                		$this->data['err_msg'] = '<span style="color:red">Tidak dapat mencetak bon. Anda belum mencetak label atau bon sudah pernah dicetak</span>';
+                	}
                 }
+                $this->data['row'] = $rows;
+                
                 //buat bon untuk toko yang sedang ditampilkan
                 //$this->item_distribution->create_bon(array('shop_code'=>$this->input->post('shop_code'),'dist_code'=>$this->data['dist_code']));                
 			}			
 			//cetak bon setelah preview
-            $kode_bon = $this->uri->segment(4);$shop_code = $this->uri->segment(5);
+            $kode_bon = $this->uri->segment(4);
+            $shop_code = $this->uri->segment(5);
+            $tgl_bon=$this->uri->segment(6);
             if($this->input->post('submit_cetak_bon') || (!empty($kode_bon) && !empty($shop_code)))
 			{    
 				$this->load->model('item_distribution');
-				$this->item_distribution->create_bon(array('shop_code'=>$shop_code,'dist_code'=>$kode_bon));
+				$this->item_distribution->create_bon(array('shop_code'=>$shop_code,'dist_code'=>$kode_bon,'dist_out'=>$tgl_bon));
                 //ambil barang untuk dicetak bonnya
                 if(empty($kode_bon))
                 {
@@ -1515,7 +1530,11 @@ class Gudang extends Controller {
         if($query->num_rows() > 0)
         {
             $shop = $query->row();
-        
+
+            //how many bon do we have to create
+            $qry = $this->item_distribution->count_bon($shop_code);   
+            //var_dump($qry->result());exit;         
+            
             //retrieve last dist code for shop
             $query = $this->item_distribution->get_last_dist_code($shop_code);
             //klo ada tinggal nerusin aja
@@ -1525,26 +1544,38 @@ class Gudang extends Controller {
                 //kode lama numeric time, jadi mesti buat kode baru
                 if(is_numeric($last_code))
                 {
-                    $dist_code = strtoupper($shop->shop_initial).date('y').'-0001';
+                    $dist_code[0] = strtoupper($shop->shop_initial).date('y').'-0001';
                 }
                 else
                 {
                     $arr = explode('-',$last_code);
                     $num = ++$arr[1];
-                    $dist_code = strtoupper($shop->shop_initial).date('y').'-';
-                    for($i=strlen($num);$i<4;$i++)
-                    {
-                        $dist_code .= '0';
-                    }
-                    $dist_code .= $num;
+                    $dist_code[0] = strtoupper($shop->shop_initial).date('y').'-'.str_pad($num, 4, '0',STR_PAD_LEFT);             
                 }
             }
             //klo belum ada bikin baru
             else
             {
-                $dist_code = strtoupper($shop->shop_initial).date('y').'-0001';
-            }            
-            return $dist_code;
+                $dist_code[0] = strtoupper($shop->shop_initial).date('y').'-0001';
+            } 
+                     
+            if($qry->num_rows()>0)
+            {
+            	$i=0;
+            	foreach($qry->result() as $row)
+            	{
+            		if($i>0)
+            		{
+            			$dist_code[$i] = strtoupper($shop->shop_initial).date('y').'-'.str_pad(++$num, 4, '0',STR_PAD_LEFT);
+            		}
+            		$dist_out[$i] = $row->dist_out;
+            		$i++;
+            	}
+            }
+            return array(
+            	'dist_out'=>$dist_out,
+            	'dist_code'=>$dist_code
+            );
         }        
     }
     /**
@@ -2805,14 +2836,16 @@ class Gudang extends Controller {
             if($this->input->post('export')) 
             {
                 $query = $this->item_distribution->get_item_export(array('export'=>$this->input->post('export')));
+                $filename = $shop->shop_initial;
             }
             else if($this->input->post('dist_code'))
             {                
-                $query = $this->item_distribution->get_item_export(array('dist_code'=>$this->input->post('dist_code'),'shop_code'=>$this->input->post('shop_code')));                
+                $query = $this->item_distribution->get_item_export(array('dist_code'=>$this->input->post('dist_code'),'shop_code'=>$this->input->post('shop_code')));
+                $filename=$this->input->post('dist_code');                
             }
             if($query->num_rows() > 0)
             {                                  
-                echo query_to_csv($query,TRUE,$shop->shop_initial.'.csv');                               
+                echo query_to_csv($query,TRUE,$filename.'.csv');                               
             }               
         }
         else

@@ -128,10 +128,10 @@ class Item_distribution extends Model {
     /**
     *getting item for bon
     */
-    function get_item_for_bon($shop_code)
+    function get_item_for_bon($shop_code,$dist_out)
     {
         $query = 'select ids.*,i.*,sum(ids.quantity) as quantity from item_distribution ids left join item i on ids.item_code = i.item_code 
-                where ids.shop_code = "'.$shop_code.'" and ids.dist_code="0" and ids.status=1 group by ids.id';
+                where ids.shop_code = "'.$shop_code.'" and ids.dist_code="0" and ids.status=1 and dist_out="'.$dist_out.'" group by ids.id';
         return $this->db->query($query);
     }
     /**
@@ -169,7 +169,9 @@ class Item_distribution extends Model {
     	$count = $this->db->query($sql);
     	if($count->num_rows() == 0)
     	{
-        	$query = 'update item_distribution ids set ids.dist_code="'.$param['dist_code'].'" where ids.status=1 and ids.dist_code= "0" and ids.shop_code="'.$param['shop_code'].'"';
+        	$query = 'update item_distribution ids set ids.dist_code="'.$param['dist_code'].'" 
+        			where ids.status=1 and ids.dist_code= "0" and ids.shop_code="'.$param['shop_code'].'"
+        			and ids.dist_out="'.$param['dist_out'].'"';
         	return $this->db->query($query);
     	}
     }
@@ -195,5 +197,21 @@ class Item_distribution extends Model {
     {
         $this->db->select('dist_code')->group_by('dist_code')->order_by('dist_code','desc')->limit(1);
         return $this->db->get_where('item_distribution',array('shop_code'=>$shop_code));
+    }
+    
+    /**
+     * hitung jumlah bon yang harus dibuat, beda hari dibedakan bonnya.
+     * Cetak bon di lakukan berdasarkan urutan tanggal. 
+     * Ex: salah satu toko belum cetrak bon selama 2 hari dan ketika hari ketiga
+     * ingin cetak bon maka bon tersebut di kelompokkan berdasarkan tanggal. 
+     * Begitu juga untuk isi dari import data barang. 
+     * Sehingga memfasilitasi untuk pencetakan bon sebanyak 2 kali bon yang berbeda dalam satu hari yang sama 
+     * dan di bedakan dari nomor bon saja
+     */
+    function count_bon($shop_code)
+    {
+    	$sql = 'select dist_out from item_distribution where shop_code = "'.$shop_code.'" and dist_code="0" group by dist_out order by dist_out';
+    	//echo $sql;
+    	return $this->db->query($sql);
     }
 }
