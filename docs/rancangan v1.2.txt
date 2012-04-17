@@ -4,3 +4,4 @@ rencana sisgud versi 1.2
 - bisa akses langsung ke printer dengan lebih baik dari sikasir
 - bisa cetak reporting pdf dengan kemampuan lebih baik
 - checking stok barang untuk gudang
+- Bikin fasilitas supaya bisa mengeluarkan barang dari Toko Retur / Rusak. Supaya barangbisa diolah lagi
