@@ -22,5 +22,5 @@ function clearText(field)
         	<div id="templatemo_logo">
                 <img src="<?php echo base_url() ?>css/images/logo_mode.png" id="templatemo_logo_img" />
             	<h1 class="mode-fashion">&nbsp;<br />&nbsp;</h1>
-                <p id="logo_text">Jln. Nibung Baru 61-63<br /> Telp. (061) 227 654</p>
+                <p id="logo_text">Jln. Laksana No 68 ABC<br /> Telp. (061) 227 654</p>
             </div>

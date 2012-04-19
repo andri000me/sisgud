@@ -214,4 +214,50 @@ class Item_distribution extends Model {
     	//echo $sql;
     	return $this->db->query($sql);
     }
+    
+    /**
+     * Ambil item untuk dicetak ulang label
+     */
+    function get_cetak_ulang_label($dist_out)
+    {
+    	$sql = 'select dist.*,s.sup_name from (
+    				select i.sup_code, count(i.item_code) as jenis, sum(ids.quantity) as jumlah 
+    				from item_distribution ids left join item i on ids.item_code = i.item_code 
+    				where ids.dist_out="'.$dist_out.'" and ids.status=1 group by i.sup_code ) dist 
+    			left join supplier s on dist.sup_code = s.sup_code';
+    	return $this->db->query($sql);
+    }
+    
+    /**
+     * Update status label kembali ke nol untuk cetak ulang
+     */
+    function reset_status_label($sup_code, $dist_out)
+    {
+    	$sql = 'update item_distribution set status=0 where item_code in(
+    				select item_code from item where sup_code = "'.$sup_code.'"
+    			) and dist_out = "'.$dist_out.'"';
+    	return $this->db->query($sql);
+    }
+    
+    /**
+     * 
+     * Recapitulation of item distribution
+     * @param Array $param
+     */
+    function recap_distribution($param)
+    {
+    	if(!empty($param['item_code']))
+    		$where = 'where item.item_code = "'.$param['item_code'].'"';
+    	else if(!empty($param['sup_code']))
+    		$where = 'where item.sup_code = "'.$param['sup_code'].'"';
+    	else if(!empty($param['cat_code']))
+    		$where = 'where item.cat_code = "'.$param['cat_code'].'"';	
+    	else $where = '';
+    	
+    	$sql = 'select item.* from (select item_code from item_distribution where dist_out >= "'.$param['tgl_awal'].'" 
+    			and dist_out <= "'.$param['tgl_akhir'].'" group by item_code) dist left join item on 
+    			dist.item_code = item.item_code '.$where.' order by item_code';
+    	//echo $sql;
+    	return $this->db->query($sql);
+    }
 }

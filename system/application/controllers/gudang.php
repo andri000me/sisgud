@@ -168,6 +168,7 @@ class Gudang extends Controller {
                     $head = '<div style="margin-top: 5px;">
                                 <h3 style="text-align: center;">BON ORDER BARANG</h3>
                                 <table style="width: 700px;">
+                                <tr><td style="width: 100px;">KODE MUTASI</td><td style="width:250px;">: '.strtoupper($data->kode_mutasi).'</td></tr>	
                                 <tr><td style="width: 100px;">SUPPLIER</td><td style="width:250px;">: '.strtoupper($sup->sup_name).'</td></tr>							                              
                                 <tr><td style="width: 100px;">TANGGAL BON</td><td style="width:250px;">: '.date_to_string($data->date_bon).'</td></tr>							                              
                                 <tr><td style="width: 100px;">TANGGAL MUTASI</td><td style="width:250px;">: '.date_to_string($data->date_entry).'</td></tr>							                              
@@ -393,7 +394,8 @@ class Gudang extends Controller {
                     $head = '<div style="margin-top: 5px;">
                                 <h3 style="text-align: center;">REKAP DISTRIBUSI BARANG</h3>
                                 <table style="width: 700px;">
-				<tr><td style="width: 100px;">SUPPLIER</td><td style="width:250px;">: '.strtoupper($data->sup_name).'</td></tr>							                              
+								<tr><td style="width: 100px;">KODE MUTASI</td><td style="width:250px;">: '.strtoupper($data->kode_mutasi).'</td></tr>		
+								<tr><td style="width: 100px;">SUPPLIER</td><td style="width:250px;">: '.strtoupper($data->sup_name).'</td></tr>						                              
                                 <tr><td style="width: 100px;">TANGGAL BON</td><td style="width:250px;">: '.date_to_string($data->date_bon).'</td></tr>							                              
                                 <tr><td style="width: 100px;">TANGGAL MUTASI</td><td style="width:250px;">: '.date_to_string($data->date_entry).'</td></tr>	
                                 </table>
@@ -507,7 +509,8 @@ class Gudang extends Controller {
                     $head = '<div style="margin-top: 5px;">
                                 <h3 style="text-align: center;">BON ORDER BARANG</h3>
                                 <table style="width: 700px;">
-				<tr><td style="width: 100px;">SUPPLIER</td><td style="width:250px;">: '.strtoupper($data->sup_name).'</td></tr>							                              
+								<tr><td style="width: 100px;">KODE MUTASI</td><td style="width:250px;">: '.strtoupper($data->kode_mutasi).'</td></tr>	
+								<tr><td style="width: 100px;">SUPPLIER</td><td style="width:250px;">: '.strtoupper($data->sup_name).'</td></tr>						                              
                                 <tr><td style="width: 100px;">TANGGAL BON</td><td style="width:250px;">: '.date_to_string($data->date_bon).'</td></tr>							                              
                                 <tr><td style="width: 100px;">TANGGAL MUTASI</td><td style="width:250px;">: '.date_to_string($data->date_entry).'</td></tr>							                              
                                 </table>
@@ -602,7 +605,7 @@ class Gudang extends Controller {
         
 	}
     /**
-    * Susun item, masukkin ke row shop
+    * Susun item, masukkin ke row shop untuk PDF
     */
     function build_row_shop($row_shop,$shop,$shop_count,$item)
     {
@@ -615,6 +618,21 @@ class Gudang extends Controller {
             }
         }
         return $row_shop;
+    }
+    /**
+    * Susun item, masukkin ke row shop untuk view
+    */
+    function build_row_data_shop($row_shop,$shop,$shop_count,$item)
+    {
+    	for($i=0;$i<$shop_count;$i++)
+    	{
+    		//cocokkin urutannya
+    		if($shop[$i]==$item->shop_code)
+    		{
+    			$row_shop[$i] = '<td>'.$item->total.'</td>';
+            }
+        }
+    	return $row_shop;
     }
     /**
     *Fungsi untuk cetak barang yang sisa sisa, mutasi sisa
@@ -2866,6 +2884,169 @@ class Gudang extends Controller {
         echo '<pre>';        
         print_r($temp);       
         echo '</pre>';
+    }
+    
+    /**
+     * Fungsi untuk mengubah status label kembali ke nol untuk cetak ulang
+     * Dikelompokkan berdasarkan supplier
+     */
+    function label()
+    {
+    	$dist_out = $this->session->userdata('dist_out');
+    	if($this->input->post('submit_cari_sup'))
+    	{
+    		$this->session->set_userdata('dist_out', $this->input->post('dist_out'));
+    		$dist_out = $this->input->post('dist_out');
+    	}
+    	    	
+    	if($this->input->post('submit_ubah_status'))
+    	{
+    		$sup_code = $this->input->post('sup_code');
+    		$dist_out = $this->input->post('dist_out');
+    		$this->load->model('item_distribution');
+    		foreach($sup_code as $row)
+    		{
+    			$this->item_distribution->reset_status_label($row,$dist_out);
+    		}
+    		echo 1;  
+    		exit(0); 		
+    	}
+    	
+    	$this->load->model('item_distribution');
+    	if(!empty($dist_out))
+    	{
+    		//$dist_out = $this->input->post('dist_out');
+    		$query = $this->item_distribution->get_cetak_ulang_label($dist_out);
+    		if($query->num_rows())
+    		{
+    			$i=0;
+    			$row_data = '';
+    			foreach($query->result() as $row)
+    			{
+    				$row_data .= '<tr>
+    	    									<td>'.++$i.'</td>
+    	    									<td>'.$row->sup_code.'</td>
+    	    									<td>'.strtoupper($row->sup_name).'</td>
+    	    									<td>'.$row->jenis.' jenis</td>
+    	    									<td>'.$row->jumlah.' item</td>
+    	    									<td>
+    	    										<input type="checkbox" name="sup_code" value="'.$row->sup_code.'" class="checkbox_status"/>
+    	    									</td>
+    	    								</tr>';
+    			}
+    			$this->data['row_data'] = $row_data;
+    			$this->data['dist_out'] = $dist_out;
+    		}
+    		else
+    		{
+    			$this->data['err_msg'] = '<span style="color:red">Data tidak ditemukan</span>';
+    		}
+    	}
+    	else
+    	{
+    		$this->data['err_msg'] = '<span style="color:red">Tanggal tidak boleh dikosongkan</span>';
+    	}
+    	$this->load->view(config_item('template').'gud_label', $this->data);
+    }
+    
+    function rekapmasuk()
+    {
+    	if($this->input->post('submit_cari_mutasi'))
+    	{
+    		if($this->input->post('date_entry'))
+    		{
+    			$date_entry = $this->input->post('date_entry');
+    		}
+    		else
+    		{
+    			$this->data['err_msg'] = '<span style="color:red">Tanggal tidak boleh dikosongkan</span>';
+    		}
+    	}
+    	$this->load->view(config_item('template').'gud_rekapmasuk', $this->data);
+    }
+    
+    function distribusi()
+    {
+    	if($this->input->post('submit_rekap_distribusi'))
+    	{
+    		//siapin data shop untuk header
+    		$this->load->model('shop');
+    		$query = $this->shop->get_shop();
+    		$jumlah_toko = $query->num_rows();
+    		$this->data['jumlah_toko'] = $jumlah_toko;
+    		$shop = array();
+    		$header = '<tr>';
+            foreach($query->result() as $row)
+            {
+            	$shop[] = $row->shop_code;
+            	$header .= '<td class="header">'.strtoupper($row->shop_initial).'</td>';
+            }
+            $this->data['header'] = $header.'</tr>';
+    		//filter data sesuai parameter
+    		$this->data['opsi'] = $this->input->post('opsi');
+    		$this->data['tgl_awal'] = $this->input->post('tgl_awal');
+    		$this->data['tgl_akhir'] = $this->input->post('tgl_akhir');
+    		$this->data['title'] = 'PERIODE : '.date_to_string($this->data['tgl_awal']).' s.d. '.date_to_string($this->data['tgl_akhir']);
+    		$this->load->model('item_distribution');
+    		$param = array('tgl_awal'=>$this->data['tgl_awal'],'tgl_akhir'=>$this->data['tgl_akhir']);
+    		if($this->data['opsi'] == 1)
+    			$param['item_code'] = $this->input->post('item_code');
+    		else if($this->data['opsi'] == 2)
+    			$param['cat_code'] = $this->input->post('cate_code');
+    		else if($this->data['opsi'] == 3)
+    			$param['sup_code'] = $this->input->post('sup_code');
+    		$query = $this->item_distribution->recap_distribution($param);
+    		//var_dump($query);exit;
+    		if($query->num_rows())
+    		{
+    			//olah data untuk ditampilkan dalam tabel distribusi barang, per baris mewakili satu kode label
+    			$row_data='';
+    			$j=0;
+    			foreach($query->result() as $item)
+    			{
+    				$qry = $this->item_distribution->get_item_distribution($item->item_code);
+    				$row_shop = array();
+    				foreach($qry->result() as $item_dist)
+    				{
+    					$row_shop = $this->build_row_data_shop($row_shop,$shop,$jumlah_toko,$item_dist);
+    				}
+    				$row_shop_data = '';
+    				for($i=0;$i<$jumlah_toko;$i++)
+    				{
+	    				if(isset($row_shop[$i]))
+	    				{
+	    					$row_shop_data .= $row_shop[$i];
+	    				}
+	    				else
+	    				{
+	    					$row_shop_data .=  '<td></td>';
+	    				}
+    				}
+    				$this->load->model('supplier');
+    				if(!$this->check_if_medan($item->sup_code))
+    				{
+    					$hp = floor($item->item_hp + 0.15*$item->item_hp);
+    					//$this->data['sup_region'] = 'LMD';
+    				}
+    				else
+    				{
+    					$hp = $item->item_hp;
+    					//$this->data['sup_region'] = 'MDN';
+    				}
+    				$row_data .= '<tr>
+    								<td>'.++$j.'</td>
+    								<td>'.$item->item_code.'</td>
+    								<td>'.$item->item_qty_total.'</td>
+    								'.$row_shop_data.'
+    								<td>'.$item->item_qty_stock.'</td>
+    								<td>'.number_format($hp,0,',','.').'</td>
+    								<td>'.number_format($item->item_hj,0,',','.').'</td>
+    							';	
+    			}
+    			$this->data['row_data'] = $row_data;
+    		}
+    	}
+    	$this->load->view(config_item('template').'gud_rekapdistribusi', $this->data);
     }
 }
 /* End of file gudang.php */

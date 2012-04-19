@@ -66,6 +66,7 @@
             <?php } if($role=='user') { ?>
             <ul class="sub">
                 <li><a href="<?php echo base_url() ?>gudang/cetak/label">Cetak Label</a></li>
+                <li><a href="<?php echo base_url() ?>gudang/label">Cetak Ulang Label</a></li>
                 <li><a href="<?php echo base_url() ?>gudang/cetak/bon">Cetak Bon</a></li>                      
             </ul>
             <?php } if($role=='supervisor') { ?>
@@ -87,7 +88,8 @@
         <div class="select_sub">
             <?php if($role=='operator') { ?>
             <ul class="sub">                
-                <li><a href="<?php echo base_url() ?>gudang/mutasi/rekap">Rekap Mutasi Keluar</a></li>                
+                <!-- <li><a href="<?php echo base_url() ?>gudang/rekapmasuk">Rekap Mutasi Masuk</a></li> -->  
+                <li><a href="<?php echo base_url() ?>gudang/mutasi/rekap">Rekap Mutasi</a></li>              
                 <li><a href="<?php echo base_url() ?>gudang/retur/rekap">Rekap Retur</a></li>                
                 <li><a href="<?php echo base_url() ?>gudang/stok">Stok Gudang</a></li>
             </ul>
@@ -100,7 +102,8 @@
             </ul>
             <?php } if($role=='supervisor') { ?>
             <ul class="sub">                              
-                <li><a href="<?php echo base_url() ?>gudang/stok">Stok Gudang</a></li>                
+                <li><a href="<?php echo base_url() ?>gudang/stok">Stok Gudang</a></li> 
+                <li><a href="<?php echo base_url() ?>gudang/distribusi">Rekap Distribusi Barang</a></li>                
                 <li><a href="<?php echo base_url() ?>gudang/sisa/rekap">Rekap Mutasi Sisa</a></li>
                 <li><a href="<?php echo base_url() ?>gudang/mutasi/rekap">Rekap Mutasi Keluar</a></li>
             <?php } if($role=='operator_retur') { ?>

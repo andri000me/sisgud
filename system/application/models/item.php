@@ -113,6 +113,13 @@ class Item extends Model {
     */
     function hapus($item_code)
     {
+    	//hapus di table item_distribusi
+    	$sql = 'delete from item_distribution where item_code = "'.$item_code.'"';
+    	$this->db->query($sql);
+    	//hapus di table item_mutasi
+    	$sql = 'delete from item_mutasi where item_code="'.$item_code.'"';
+    	$this->db->query($sql);
+    	//hapus di table item
         $this->db->where('item_code',$item_code);
         return $this->db->delete('item');
     }    
