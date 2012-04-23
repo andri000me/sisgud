@@ -2858,7 +2858,8 @@ class Gudang extends Controller {
             }
             else if($this->input->post('dist_code'))
             {                
-                $query = $this->item_distribution->get_item_export(array('dist_code'=>$this->input->post('dist_code'),'shop_code'=>$this->input->post('shop_code')));
+                //echo 'bolo';exit;
+            	$query = $this->item_distribution->get_item_export(array('dist_code'=>$this->input->post('dist_code'),'shop_code'=>$this->input->post('shop_code')));
                 $filename=$this->input->post('dist_code');                
             }
             if($query->num_rows() > 0)

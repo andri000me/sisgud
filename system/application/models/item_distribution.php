@@ -121,7 +121,7 @@ class Item_distribution extends Model {
         {
             $query = 'select ids.item_code, i.item_name, i.cat_code,i.item_hj, ids.item_disc, sum(ids.quantity) as quantity 
                         from item_distribution ids left join item i on ids.item_code=i.item_code 
-                        where ids.dist_code="'.$param['dist_code'].'" and ids.shop_code="'.$param['shop_code'].'" order by ids.item_code';
+                        where ids.dist_code="'.$param['dist_code'].'" and ids.shop_code="'.$param['shop_code'].'" group by ids.item_code order by ids.item_code';
         }
         return $this->db->query($query);
     }
