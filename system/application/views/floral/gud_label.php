@@ -17,7 +17,9 @@
             
             <?php if(isset($row_data)) { ?>            
             <p style="text-align:center;font-weight:bold;color:#000;">DAFTAR CETAK ULANG LABEL</p>
-            <p>Tentukan supplier yang akan dicetak ulang labelnya.</p>
+            <p>
+            <?php echo 'Pilih Toko : '.$list_toko;?>
+            </p>
             <p><?php if(!empty($page)) echo 'Page : '.$page ?></p>
             <table class="table-data">
                 <tr>

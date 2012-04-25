@@ -1221,6 +1221,7 @@ class Gudang extends Controller {
                 $this->load->model('item_distribution');
                 $query = $this->item_distribution->get_item_accumulated($this->input->post('sup_code'));
                 $items = $query->result();
+                
                 if($query->num_rows() > 0)
                 {
                     $data_txt = 'Cabang:'.chr(9).'Nama Barang :'.chr(9).'Kode Brg/Barcode :'.chr(9).'Input Harga :'.chr(9).'Harga Modal :'.chr(9).'Supplier :'.chr(9).'Tanggal :'.chr(9).'Kode Toko :'.chr(10);
@@ -2101,6 +2102,10 @@ class Gudang extends Controller {
         {
             $query = $this->db->query('select shop.* from (select shop_code from item_distribution where dist_code != "0" and export=0 group by shop_code) as dist left join shop on shop.shop_code=dist.shop_code where shop_cat != "OBRAL" and shop_cat != "RUSAK"');
         }
+        else if($option == 'label')
+        {
+        	$query = $this->db->query('select * from shop where shop_cat != "OBRAL" and shop_cat != "RUSAK"');
+        }
         //processing query result
         if($query->num_rows())
         {
@@ -2902,12 +2907,13 @@ class Gudang extends Controller {
     	    	
     	if($this->input->post('submit_ubah_status'))
     	{
+    		$shop_code = $this->input->post('shop_code');
     		$sup_code = $this->input->post('sup_code');
     		$dist_out = $this->input->post('dist_out');
     		$this->load->model('item_distribution');
     		foreach($sup_code as $row)
     		{
-    			$this->item_distribution->reset_status_label($row,$dist_out);
+    			$this->item_distribution->reset_status_label($row,$dist_out,$shop_code);
     		}
     		echo 1;  
     		exit(0); 		
@@ -2947,6 +2953,7 @@ class Gudang extends Controller {
     	{
     		$this->data['err_msg'] = '<span style="color:red">Tanggal tidak boleh dikosongkan</span>';
     	}
+    	$this->data['list_toko'] = $this->list_toko('label');
     	$this->load->view(config_item('template').'gud_label', $this->data);
     }
     

@@ -26,11 +26,13 @@ class Item_distribution extends Model {
     {
         if($status == 2)
         {
-            $this->db->where(array('status'=>0,'dist_code'=>'0','item_code'=>$item_code));
+            //$this->db->where(array('status'=>0,'dist_code'=>'0','item_code'=>$item_code));
+            $this->db->where(array('status'=>0,'item_code'=>$item_code));
         }
         else if($status == 0)
         {
-            $this->db->where(array('status'=>2,'dist_code'=>'0','item_code'=>$item_code));
+            //$this->db->where(array('status'=>2,'dist_code'=>'0','item_code'=>$item_code));
+            $this->db->where(array('status'=>2,'item_code'=>$item_code));
         }
         return $this->db->update('item_distribution',array('status'=>$status));
     }
@@ -48,7 +50,8 @@ class Item_distribution extends Model {
     function get_item_accumulated($sup_code)
     {        
         $this->db->select('item.item_code')->from('item_distribution')->join('item','item.item_code = item_distribution.item_code');
-        $this->db->where(array('dist_code'=>'0','status'=>2,'sup_code'=>$sup_code))->group_by('item.item_code')->order_by('item_distribution.id');
+        //$this->db->where(array('dist_code'=>'0','status'=>2,'sup_code'=>$sup_code))->group_by('item.item_code')->order_by('item_distribution.id');
+        $this->db->where(array('status'=>2,'sup_code'=>$sup_code))->group_by('item.item_code')->order_by('item_distribution.id');
         return $this->db->get();
     }
     /**
@@ -231,11 +234,11 @@ class Item_distribution extends Model {
     /**
      * Update status label kembali ke nol untuk cetak ulang
      */
-    function reset_status_label($sup_code, $dist_out)
+    function reset_status_label($sup_code, $dist_out, $shop_code)
     {
     	$sql = 'update item_distribution set status=0 where item_code in(
     				select item_code from item where sup_code = "'.$sup_code.'"
-    			) and dist_out = "'.$dist_out.'"';
+    			) and dist_out = "'.$dist_out.'" and shop_code="'.$shop_code.'"';
     	return $this->db->query($sql);
     }
     
