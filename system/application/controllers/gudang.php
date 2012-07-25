@@ -196,7 +196,7 @@ class Gudang extends Controller {
                     foreach($query->result() as $row)
                     {
                         $head .= '<td style="width: 25px;text-align: center; font-size: 17px;">'.strtoupper($row->shop_initial).'</td>';
-                        $row_shop .= '<td style="width: 25px;text-align: center; font-size: 17px;"></td>';
+                        $row_shop .= '<td style="width: 25px;text-align: center; font-size: 17px; color: #bbb;">'.strtoupper($row->shop_initial).'</td>';
                     }
                     $head.='</tr>';
                         
