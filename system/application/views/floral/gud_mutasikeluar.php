@@ -79,13 +79,21 @@
             <?php } ?>
             </div>
             <script type="text/javascript"><!--// 
+            $(document).ready(function(){
+                var shop = <?php echo json_encode($shop_initial) ?>;
+                for(var i=0;i<shop.length;i++) {                    
+	            	$('input[name*="'+shop[i]+'"]').each(function() {
+	            		  $(this).watermark('watermark', shop[i].toUpperCase());
+	            	});
+                }
+            });
             function countStok(line) {
                 var shop = <?php echo json_encode($shop_initial) ?>;
                 var total = 0;
                 for(i=0;i<shop.length;i++) {
                     selector = '#qty_'+shop[i]+'_'+line;
                     temp = $(selector).val();                    
-                    if(temp == "") {
+                    if(temp == "" || isNaN(temp)) {
                         temp = 0;
                     }
                     else {

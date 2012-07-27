@@ -43,7 +43,8 @@ class Gudang extends Controller {
 		$this->data['pages']='gudang';
         $this->data['lib_js'] = '	<script src="'.base_url().'lib/jquery-1.4.4.min.js"></script>
                         <script src="'.base_url().'lib/jquery-ui-1.8.7.custom.min.js"></script>
-						<script src="'.base_url().'lib/jquery.autocomplete.js"></script>						
+						<script src="'.base_url().'lib/jquery.autocomplete.js"></script>
+						<script src="'.base_url().'lib/jquery.tinywatermark-2.1.0.min.js"></script>						
 						<script src="'.base_url().'lib/config.js"></script>						
 						<script src="'.base_url().'lib/functions.js"></script>						
 					';
@@ -121,12 +122,14 @@ class Gudang extends Controller {
                 foreach($query->result() as $row)
                 {
                     $shop .= '<td class="header">'.strtoupper($row->shop_initial).'</td>';
-                    $row_qty .= '<td><input type="text" name="qty_'.strtolower($row->shop_initial).'[]" id="qty_'.strtolower($row->shop_initial).'_#" style="width: 25px;" onkeyup="countStok(#)" onkeypress="checkForEnter(1,event,this)"/></td>';
-                    $shop_initial[$i++] = strtolower($row->shop_initial);
+                    $row_qty .= '<td><input type="text" class="'.strtolower($row->shop_initial).'_marked" name="qty_'.strtolower($row->shop_initial).'[]" id="qty_'.strtolower($row->shop_initial).'_#" style="width: 25px;" onkeyup="countStok(#)" onkeypress="checkForEnter(1,event,this)"/></td>';
+                    $shop_mark[$i] = strtoupper($row->shop_initial);
+                    $shop_initial[$i++] = strtolower($row->shop_initial);                    
                 }
                 $this->data['shop_name'] = $shop;
                 $this->data['row_qty'] = $row_qty;
                 $this->data['shop_initial'] = $shop_initial;
+                $this->data['shop_mark']=$shop_mark;
             }
             //processing data untuk mutasi keluar
             if($this->input->post('submit_mutasi_keluar')) 
@@ -138,7 +141,7 @@ class Gudang extends Controller {
                 foreach($shop_initial as $row)
                 {
                     $qty[$row] = $this->input->post('qty_'.$row);
-                }               
+                }                             
                 //insert mutasi keluar
                 $this->insert_mutasi_keluar($item_code,$item_hj,$qty,$qty_stok,$item_disc);                
             }
