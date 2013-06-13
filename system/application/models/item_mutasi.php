@@ -74,4 +74,30 @@ class Item_mutasi extends Model {
         $query = 'select * from item_mutasi left join item on item_mutasi.item_code=item.item_code where item_mutasi.kode_mutasi = "'.$param['kode_mutasi'].'"';
         return $this->db->query($query);
     }
+    /**
+     * Statistik barang masuk per supplier, disajikan per tanggal per kelompok barang
+     */
+    function stat_item_mutasi_sup($param)
+    {
+        $sql = 'select im.date_entry, i.cat_code, sum(im.qty) as masuk, sum(i.item_hm) as rupiah from item_mutasi im
+        left join item i on im.item_code=i.item_code
+        where date_entry >= "'.$param['from'].'" and date_entry <= "'.$param['to'].'" and im.sup_code= "'.$param['sup_code'].'"
+        group by im.date_entry, i.cat_code order by im.date_entry, i.cat_code';
+
+        return $this->db->query($sql);
+    }
+
+    /**
+     * Statistik barang masuk per kelompok barang
+     * @param $param
+     */
+    function stat_item_mutasi_cat($param)
+    {
+        $sql = 'select i.cat_code, sum(i.item_qty_stock) as stok_gudang, sum(im.qty) as masuk, sum(i.item_hm) as rupiah
+        from item_mutasi im left join item i on im.item_code=i.item_code
+        where date_entry >= "'.$param['from'].'" and date_entry <= "'.$param['to'].'" group by i.cat_code order by i.cat_code';
+
+        return $this->db->query($sql);
+    }
+
 }

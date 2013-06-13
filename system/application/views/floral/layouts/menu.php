@@ -56,7 +56,7 @@
         </div>
         </li>
         </ul>
-        <?php } if($role != 'admin') { ?>
+        <?php } if($role != 'admin' ) { ?>
         <ul class="select"><li><a href="#"><b>Pencetakan</b></a>
         <div class="select_sub">
             <?php if($role=='operator') { ?>
@@ -106,6 +106,10 @@
                 <li><a href="<?php echo base_url() ?>gudang/distribusi">Rekap Distribusi Barang</a></li>                
                 <li><a href="<?php echo base_url() ?>gudang/sisa/rekap">Rekap Mutasi Sisa</a></li>
                 <li><a href="<?php echo base_url() ?>gudang/mutasi/rekap">Rekap Mutasi Keluar</a></li>
+            <?php } if($role=='operator_rekap') { ?>
+            <ul class="sub">
+                <li><a href="<?php echo base_url() ?>laporan/masuk">Laporan Barang Masuk</a></li>
+                <li><a href="<?php echo base_url() ?>laporan/distribusi">Laporan Distribusi Barang</a></li>
             <?php } if($role=='operator_retur') { ?>
             <ul class="sub">                              
                 <li><a href="<?php echo base_url() ?>gudang/stok">Stok Gudang</a></li>                

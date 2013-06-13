@@ -263,4 +263,28 @@ class Item_distribution extends Model {
     	//echo $sql;
     	return $this->db->query($sql);
     }
+
+    /**
+     * Statistik distribusi barang berdasarkan supplier per toko
+     */
+    function stat_item_dist_sup($param)
+    {
+        $sql = 'select i.sup_code, sum(id.quantity) as qty, sum(id.quantity*i.item_hj) as rupiah
+        from item_distribution id left join item i on id.item_code = i.item_code
+        where id.shop_code = "'.$param['shop_code'].'" and id.dist_out >="'.$param['from'].'" and id.dist_out <= "'.$param['to'].'"
+        group by i.sup_code order by rupiah desc';
+        return $this->db->query($sql);
+    }
+
+    /**
+     * Statistik distribusi barang berdasarkan kelompok barang per toko
+     */
+    function stat_item_dist_cat($param)
+    {
+        $sql = 'select i.cat_code, sum(id.quantity) as qty, sum(id.quantity*i.item_hj) as rupiah
+        from item_distribution id left join item i on id.item_code = i.item_code
+        where id.shop_code = "'.$param['shop_code'].'" and id.dist_out >="'.$param['from'].'" and id.dist_out <= "'.$param['to'].'"
+        group by i.cat_code order by rupiah desc';
+        return $this->db->query($sql);
+    }
 }

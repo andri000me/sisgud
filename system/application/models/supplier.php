@@ -18,6 +18,17 @@ class Supplier extends Model {
     {
         return $this->db->get_where('supplier',array('sup_code'=>$sup_code));
     }
+
+    /**
+     * get supplier record direct
+     */
+    function get_sup_data($sup_code)
+    {
+        $query =  $this->db->get_where('supplier',array('sup_code'=>$sup_code));
+        if($query->num_rows())
+            return $query->row();
+        else return null;
+    }
     /**
     *Get supplier this day
     */

@@ -33,6 +33,7 @@
                             <option value="3">Operator</option>
                             <option value="4">User</option>
                             <option value="5">Operator Retur</option>
+                            <option value="6">Operator Rekap</option>
                         </p>
                         <span class="note">*) </span>
                     </td>                                
