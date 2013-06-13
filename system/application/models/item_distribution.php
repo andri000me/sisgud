@@ -281,10 +281,10 @@ class Item_distribution extends Model {
      */
     function stat_item_dist_cat($param)
     {
-        $sql = 'select i.cat_code, sum(id.quantity) as qty, sum(id.quantity*i.item_hj) as rupiah
+        $sql = 'select tbl1.*,c.cat_name from (select i.cat_code, sum(id.quantity) as qty, sum(id.quantity*i.item_hj) as rupiah
         from item_distribution id left join item i on id.item_code = i.item_code
         where id.shop_code = "'.$param['shop_code'].'" and id.dist_out >="'.$param['from'].'" and id.dist_out <= "'.$param['to'].'"
-        group by i.cat_code order by rupiah desc';
+        group by i.cat_code order by rupiah desc) tbl1 left join category c on tbl1.cat_code = c.cat_code';
         return $this->db->query($sql);
     }
 }

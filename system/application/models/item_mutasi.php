@@ -93,9 +93,10 @@ class Item_mutasi extends Model {
      */
     function stat_item_mutasi_cat($param)
     {
-        $sql = 'select i.cat_code, sum(i.item_qty_stock) as stok_gudang, sum(im.qty) as masuk, sum(i.item_hm) as rupiah
+        $sql = 'select tbl1.*, c.cat_name from (select i.cat_code, sum(i.item_qty_stock) as stok_gudang, sum(im.qty) as masuk, sum(i.item_hm) as rupiah
         from item_mutasi im left join item i on im.item_code=i.item_code
-        where date_entry >= "'.$param['from'].'" and date_entry <= "'.$param['to'].'" group by i.cat_code order by i.cat_code';
+        where date_entry >= "'.$param['from'].'" and date_entry <= "'.$param['to'].'"
+        group by i.cat_code order by rupiah desc) tbl1 left join category c on tbl1.cat_code=c.cat_code';
 
         return $this->db->query($sql);
     }

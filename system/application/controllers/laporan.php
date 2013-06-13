@@ -145,10 +145,10 @@ class Laporan extends Controller {
                         <table class="table-data" style="width: 500px;border: 1px solid;text-align: center;margin: 0px auto;" cellpadding="2" cellspacing="0">
                             <tr>
                                 <td class="header" style="font-weight: bold; width: 50px; background-color: #dedede; text-align:center; border: 1px solid;">No</td>
-                                <td class="header" style="font-weight: bold; width: 110px; background-color: #dedede; text-align:center; border: 1px solid;">Kelompok Barang</td>
-                                <td class="header" style="font-weight: bold; width: 110px; background-color: #dedede; text-align:center; border: 1px solid;">Stok Gudang</td>
-                                <td class="header" style="font-weight: bold; width: 110px; background-color: #dedede; text-align:center; border: 1px solid;">Qty Masuk</td>
-                                <td class="header" style="font-weight: bold; width: 120px; background-color: #dedede; text-align:center; border: 1px solid;">Rupiah Seluruh</td>
+                                <td class="header" style="font-weight: bold; width: 180px; background-color: #dedede; text-align:center; border: 1px solid;">Kelompok Barang</td>
+                                <td class="header" style="font-weight: bold; width: 80px; background-color: #dedede; text-align:center; border: 1px solid;">Stok Gudang</td>
+                                <td class="header" style="font-weight: bold; width: 80px; background-color: #dedede; text-align:center; border: 1px solid;">Qty Masuk</td>
+                                <td class="header" style="font-weight: bold; width: 110px; background-color: #dedede; text-align:center; border: 1px solid;">Rupiah Seluruh</td>
                             </tr>';
                 $footer = '</table>';
                 if($query->num_rows() > 0)
@@ -161,10 +161,10 @@ class Laporan extends Controller {
                     {
                         $temp .= '<tr>
                             <td style="width: 50px; border: 1px solid;">'.++$i.'</td>
-                            <td style="width: 110px; border: 1px solid;">'.$row->cat_code.'</td>
-                            <td style="width: 110px; border: 1px solid;text-align:right;">'.number_format($row->stok_gudang).' &nbsp; </td>
-                            <td style="width: 110px; border: 1px solid;text-align:right;">'.number_format($row->masuk).' &nbsp; </td>
-                            <td style="width: 120px; border: 1px solid;text-align:right;">'.number_format($row->rupiah).' &nbsp; </td>
+                            <td style="width: 180px; border: 1px solid;text-align:left;">'.$row->cat_code.' ('.ucwords(strtolower(substr($row->cat_name,0,30))).')</td>
+                            <td style="width: 80px; border: 1px solid;text-align:right;">'.number_format($row->stok_gudang).' &nbsp; </td>
+                            <td style="width: 80px; border: 1px solid;text-align:right;">'.number_format($row->masuk).' &nbsp; </td>
+                            <td style="width: 110px; border: 1px solid;text-align:right;">'.number_format($row->rupiah).' &nbsp; </td>
                         </tr>';
                         if($i%50 == 0)
                         {
@@ -176,10 +176,10 @@ class Laporan extends Controller {
                         $total_rupiah += $row->rupiah;
                     }
                     $row_total = '<tr>
-                        <td colspan="2" style="width: 160px; border: 1px solid;">TOTAL</td>
-                        <td style="width: 110px; border: 1px solid;text-align:right;">'.number_format($total_stok).' &nbsp; </td>
-                        <td style="width: 110px; border: 1px solid;text-align:right;">'.number_format($total_masuk).' &nbsp; </td>
-                        <td style="width: 120px; border: 1px solid;text-align:right;">'.number_format($total_rupiah).' &nbsp; </td>
+                        <td colspan="2" style="width: 230px; border: 1px solid;">TOTAL</td>
+                        <td style="width: 80px; border: 1px solid;text-align:right;">'.number_format($total_stok).' &nbsp; </td>
+                        <td style="width: 80px; border: 1px solid;text-align:right;">'.number_format($total_masuk).' &nbsp; </td>
+                        <td style="width: 110px; border: 1px solid;text-align:right;">'.number_format($total_rupiah).' &nbsp; </td>
                     </tr>';
                     $body[] = $temp;
                     $this->data['table'] = $head.$body[0].$row_total.$footer;
@@ -300,8 +300,8 @@ class Laporan extends Controller {
                                 <td class="header" style="font-weight: bold; width: 40px; background-color: #dedede; text-align:center; border: 1px solid;">No</td>
                                 <td class="header" style="font-weight: bold; width: 130px; background-color: #dedede; text-align:center; border: 1px solid;">Kelompok Barang</td>
                                 <td class="header" style="font-weight: bold; width: 50px; background-color: #dedede; text-align:center; border: 1px solid;">Qty</td>
-                                <td class="header" style="font-weight: bold; width: 110px; background-color: #dedede; text-align:center; border: 1px solid;">Rupiah</td>
-                                <td class="header" style="font-weight: bold; width: 190px; background-color: #dedede; text-align:center; border: 1px solid;">Keterangan</td>
+                                <td class="header" style="font-weight: bold; width: 80px; background-color: #dedede; text-align:center; border: 1px solid;">Rupiah</td>
+                                <td class="header" style="font-weight: bold; width: 220px; background-color: #dedede; text-align:center; border: 1px solid;">Keterangan</td>
                             </tr>';
                 $footer = '</table>';
                 if($query->num_rows() > 0)
@@ -314,10 +314,10 @@ class Laporan extends Controller {
                         //$sup = $this->supplier->get_sup_data($row->sup_code);
                         $temp .= '<tr>
                             <td style="width: 40px; border: 1px solid;">'.++$i.'</td>
-                            <td style="width: 130px; border: 1px solid;text-align:left;">'.$row->cat_code.'</td>
+                            <td style="width: 130px; border: 1px solid;text-align:left;">'.$row->cat_code.' ('.ucwords(strtolower(substr($row->cat_name,0,21))).')</td>
                             <td style="width: 50px; border: 1px solid;text-align:right;">'.number_format($row->qty).' &nbsp; </td>
-                            <td style="width: 110px; border: 1px solid;text-align:right;">'.number_format($row->rupiah).' &nbsp; </td>
-                            <td style="width: 190px; border: 1px solid;text-align:right;"></td>
+                            <td style="width: 80px; border: 1px solid;text-align:right;">'.number_format($row->rupiah).' &nbsp; </td>
+                            <td style="width: 220px; border: 1px solid;text-align:right;"></td>
                         </tr>';
                         if($i%50 == 0)
                         {
@@ -331,8 +331,8 @@ class Laporan extends Controller {
                     $row_total = '<tr>
                         <td colspan="2" style="width: 170px; border: 1px solid;">TOTAL</td>
                         <td style="width: 50px; border: 1px solid;text-align:right;">'.number_format($total_qty).' &nbsp; </td>
-                        <td style="width: 110px; border: 1px solid;text-align:right;">'.number_format($total_rupiah).' &nbsp; </td>
-                        <td style="width: 190px; border: 1px solid;">&nbsp;</td>
+                        <td style="width: 80px; border: 1px solid;text-align:right;">'.number_format($total_rupiah).' &nbsp; </td>
+                        <td style="width: 220px; border: 1px solid;">&nbsp;</td>
                     </tr>';
                     $this->data['table'] = $head.$body[0].$row_total.$footer;
                     if($this->input->post('submit_report_print'))
