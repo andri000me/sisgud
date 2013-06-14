@@ -6,7 +6,7 @@
 <script type="text/javascript">
     <!--//
     $(document).ready(function(){
-       <?php echo $script ?>
+       <?php echo isset($script)?$script:'' ?>
     });
     //-->
 </script>
