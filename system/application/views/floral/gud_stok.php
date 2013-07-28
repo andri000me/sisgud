@@ -32,6 +32,7 @@
                     <td class="header">Harga Jual (Rp)</td>
                     <?php } ?>
                     <td class="header">Stok (item)</td>
+                    <td class="header">Jumlah (Rp) </td>
                     <?php if($this->session->userdata('p_role') == 'supervisor' || $this->session->userdata('p_role') == 'operator') { ?>
                     <td class="header">Action</td>
                     <?php } ?>

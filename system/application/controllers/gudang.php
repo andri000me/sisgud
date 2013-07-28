@@ -2163,7 +2163,7 @@ class Gudang extends Controller {
         {
 	    if($this->session->userdata('keywords'))
 	    {
-		$keywords = $this->session->userdata('keywords');
+			$keywords = $this->session->userdata('keywords');
 	    }
 	    else 
 	    {
@@ -2233,15 +2233,17 @@ class Gudang extends Controller {
                                         '.$button_del.'
                                         '.form_close().'</td>';
                     }
+                    $jumlah = $row->item_hj*$row->item_qty_stock;
                     $this->data['row_data'] .= '<tr>
                                                     <td>'.++$i.'</td>
                                                     <td>'.$row->item_code.'</td>
                                                     <td class="left">'.ucwords($row->item_name).'</td>                                                    
-                                                    <td class="left">'.ucwords($row->cat_name).'</td>                                                    
+                                                    <td class="left">'.ucwords($row->cat_code).'</td>                                                    
                                                     <td class="left">'.ucwords($row->sup_name).'</td>                                                 
                                                     '.$hm.'
                                                     '.$hj.'
-                                                    <td>'.$row->item_qty_stock.'</td>                                                    
+                                                    <td>'.$row->item_qty_stock.'</td>   
+                                                    <td>'.number_format($jumlah,0,',','.').'</td>                                                 
                                                     '.$button_ubah.'                                                    
                                                 </tr>';
                 }
