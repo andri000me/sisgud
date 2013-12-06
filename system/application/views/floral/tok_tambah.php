@@ -24,7 +24,7 @@
                         <option value="2">MODIEST</option>
                         <option value="3">OBRAL</option>
                         <option value="4">RUSAK</option>
-                        <option value="5">GigiDent</option>
+                        <option value="5">Miss Kece</option>
                     </select>
                     <span class="note">*)</span></td>                                
                 </tr>

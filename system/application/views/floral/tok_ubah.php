@@ -24,6 +24,7 @@
                         <option value="2" <?php if($shop->shop_cat == 'MODIEST') echo 'selected="selected"'; ?> >MODIEST</option>                        
                         <option value="3" <?php if($shop->shop_cat == 'OBRAL') echo 'selected="selected"'; ?> >OBRAL</option>                        
                         <option value="4" <?php if($shop->shop_cat == 'RUSAK') echo 'selected="selected"'; ?> >RUSAK</option>
+                        <option value="5" <?php if($shop->shop_cat == 'Miss KeCe') echo 'selected="selected"'; ?> >RUSAK</option>
                     </select>
                     <span class="note">*)</span></td>                                
                 </tr>
