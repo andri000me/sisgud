@@ -40,7 +40,7 @@
                         echo '<tr>
                                 <td>'.++$i.'</td>
                                 <td>'.$cat_code.'</td>
-                                <td><input type="text" name="item_name[]" size="50" maxlength="25" onkeypress="checkForEnter(0,event,this)"/></td>
+                                <td><input type="text" name="item_name[]" size="50" maxlength="21" onkeypress="checkForEnter(0,event,this)"/></td>
                                 <td><input type="text" name="item_hp[]" size="20" onkeypress="checkForEnter(0,event,this)"/></td>
                                 <td><input type="text" name="item_qty[]" size="5" onkeypress="checkForEnter(0,event,this)"/></td>
                             </tr>';

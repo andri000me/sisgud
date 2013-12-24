@@ -56,7 +56,7 @@
                 <tr>
                     <td class="header" rowspan="2">No</td>
                     <td class="header" rowspan="2">Kode Label</td>                    
-                    <!-- <td class="header" rowspan="2">Nama</td> -->                    
+                    <td class="header" rowspan="2">Nama</td>                  
                     <td class="header" rowspan="2">Qty</td>                                       
                     <td class="header" colspan="<?php echo $jumlah_toko?>">Distribusi Toko</td>                                       
                     <td class="header" rowspan="2">Stok</td>

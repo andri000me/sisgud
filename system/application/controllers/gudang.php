@@ -218,8 +218,7 @@ class Gudang extends Controller {
                                     <td style="width: 100px;text-align: center;">'.$row->item_name.'</td>
                                     <td style="width: 25px;text-align: center">'.$row->qty.'</td>
                                     '.$row_shop;	
-                            //check barang medan atau luar kota
-                            $total += ($row->item_hp*$row->qty);
+                            //check barang medan atau luar kota                           
                             if(!$this->check_if_medan($row->sup_code))
                             {
                                 $hp = floor($row->item_hp + 0.15*$row->item_hp);
@@ -230,6 +229,7 @@ class Gudang extends Controller {
                                 $hp = $row->item_hp;
                                 $this->data['sup_region']='MDN';
                             }
+                            $total += ($hp*$row->qty);
                             $data .= '	<td style="width: 50px;text-align: right;">'.number_format($hp,'0',',','.').',-</td>
                                     <td style="width: 60px;text-align: center;"></td>		
                                     </tr>';                        
@@ -408,11 +408,11 @@ class Gudang extends Controller {
                     $jumlah_toko = $query->num_rows();
                     $this->data['shop_count'] = $query->num_rows();
                     $width = $jumlah_toko * 25;				
-                    $head .= '<table style="width: 600px;" border="1" cellpadding="3">
+                    $head .= '<table style="width: 620px;" border="1" cellpadding="3">
                             <tr>
                             <td style="width: 20px;text-align: center;" rowspan="2">No</td>
                             <td style="width: 60px;text-align: center; vertical-align: middle;" rowspan="2">Kode Label</td>
-                            <td style="width: 100px;text-align: center;" rowspan="2">Nama</td>
+                            <td style="width: 120px;text-align: center;" rowspan="2">Nama</td>
                             <td style="width: 25px;text-align: center;" rowspan="2">Qty</td>
                             <td style="width: '.$width.'px;text-align: center;" colspan="'.$jumlah_toko.'">Distribusi</td>
                             <td style="width: 25px;text-align: center;" rowspan="2">Stok</td>
@@ -437,6 +437,8 @@ class Gudang extends Controller {
                         $row_data = '';
                         $j = 0;
                         $this->load->model('item_distribution');
+                        $total = 0;
+                        $total_qty = 0;
                         foreach($query->result() as $row)
                         {
                             $qry = $this->item_distribution->get_item_distribution($row->item_code);
@@ -460,7 +462,7 @@ class Gudang extends Controller {
                             $data .='<tr>
                                     <td style="width: 20px;text-align: center;">'.++$j.'</td>
                                     <td style="width: 60px;text-align: center;">'.$row->item_code.'</td>
-                                    <td style="width: 100px;text-align: center;">'.$row->item_name.'</td>
+                                    <td style="width: 120px;text-align: center;">'.$row->item_name.'</td>
                                     <td style="width: 25px;text-align: center">'.$row->qty.'</td>
                                     '.$temp_row.'
                                     <td style="width: 25px;text-align: center">'.$row->item_qty_stock.'</td>';
@@ -475,7 +477,10 @@ class Gudang extends Controller {
                                 $hp = $row->item_hp;
                                 $this->data['sup_region'] = 'MDN';
                             }
-                            $data .= '	<td style="width: 50px;text-align: right;">'.number_format($hp,'0',',','.').',-</td>
+                            $total += $hp*$row->qty;
+                            $total_qty += $row->qty;
+                            
+                            $data .= '<td style="width: 50px;text-align: right;">'.number_format($hp,'0',',','.').',-</td>
                                     <td style="width: 60px;text-align: center;">'.number_format($row->item_hj,'0',',','.').',-</td>		
                                     </tr>';
                             if($jumlah_toko <=10 && $j%15==0)
@@ -494,7 +499,13 @@ class Gudang extends Controller {
                         {
                             $list_data[] =$data;
                         }
-                        $footer = '</table><br /><table style="text-align:center;">
+                        $footer = '<tr>
+                        				<td colspan="3" style="text-align:right;width: 200px;">TOTAL</td>
+                        				<td style="width:25px"></td>
+                        				<td colspan="'.($jumlah_toko+2).'" style="text-align:right; width: '.(25*$jumlah_toko+25+50).'px" >'.number_format($total).'</td>   
+                        				<td style="width:60px"></td>                     				
+                        			</tr>
+                        		</table><br /><table style="text-align:center;">
                                 <tr><td>(Bagian Mutasi Masuk)</td><td>(Bagian Distribusi)</td></tr>                            
                             </table>';
                         //ini diubah jumlah tokonya untuk triger ukuran kertas
@@ -523,11 +534,11 @@ class Gudang extends Controller {
                     $jumlah_toko = $query->num_rows();
                     $this->data['shop_count'] = $query->num_rows();
                     $width = $jumlah_toko * 25;				
-                    $head .= '<table style="width: 600px;" border="1" cellpadding="3">
+                    $head .= '<table style="width: 620px;" border="1" cellpadding="3">
                             <tr>
                             <td style="width: 20px;text-align: center;" rowspan="2">No</td>
                             <td style="width: 60px;text-align: center; vertical-align: middle;" rowspan="2">Kode Label</td>
-                            <td style="width: 100px;text-align: center;" rowspan="2">Nama</td>
+                            <td style="width: 120px;text-align: center;" rowspan="2">Nama</td>
                             <td style="width: 25px;text-align: center;" rowspan="2">Qty</td>
                             <td style="width: '.$width.'px;text-align: center;" colspan="'.$jumlah_toko.'">Distribusi</td>
                             <td style="width: 50px;text-align: center;" rowspan="2">HM (Rp)</td>
@@ -555,11 +566,11 @@ class Gudang extends Controller {
                             $data .='<tr>
                                     <td style="width: 20px;text-align: center;">'.++$j.'</td>
                                     <td style="width: 60px;text-align: center;">'.$row->item_code.'</td>
-                                    <td style="width: 100px;text-align: center;">'.$row->item_name.'</td>
+                                    <td style="width: 120px;text-align: center;">'.$row->item_name.'</td>
                                     <td style="width: 25px;text-align: center">'.$row->qty.'</td>
                                     '.$row_shop;
                             
-                            $total += ($row->item_hp*$row->qty);
+                            
                             if(!$this->check_if_medan($row->sup_code))
                             {
                                 $hp = floor($row->item_hp + 0.15*$row->item_hp);
@@ -570,6 +581,7 @@ class Gudang extends Controller {
                                 $hp = $row->item_hp;
                                 $this->data['sup_region']='MDN';
                             }
+                            $total += ($hp*$row->qty);
                             $data .= '	<td style="width: 50px;text-align: right;">'.number_format($hp,'0',',','.').',-</td>
                                     <td style="width: 60px;text-align: center;"></td>		
                                     </tr>';
@@ -590,7 +602,7 @@ class Gudang extends Controller {
                             $list_data[] =$data;
                         }
                         $footer = '<tr>
-                        				<td rowspan="4" style="text-align:right;width:205px;">T O T A L</td>
+                        				<td rowspan="4" style="text-align:right;width:225px;">T O T A L</td>
                         				<td rowspan="'.($jumlah_toko+1).'" style="text-align:right;width:'.($jumlah_toko*25+50).'px">'.number_format($total,'0',',','.').',-</td>
                         				<td style="width:60px;"></td>
                         			</tr>
@@ -3049,6 +3061,7 @@ class Gudang extends Controller {
     				$row_data .= '<tr>
     								<td>'.++$j.'</td>
     								<td>'.$item->item_code.'</td>
+    								<td style="min-width:130px">'.$item->item_name.'</td>
     								<td>'.$item->item_qty_total.'</td>
     								'.$row_shop_data.'
     								<td>'.$item->item_qty_stock.'</td>
