@@ -477,7 +477,7 @@ class Gudang extends Controller {
                                 $hp = $row->item_hp;
                                 $this->data['sup_region'] = 'MDN';
                             }
-                            $total += $row->item_hp*$row->qty;
+                            $total += ($row->item_hp*$row->qty);
                             $total_qty += $row->qty;
                             
                             $data .= '<td style="width: 50px;text-align: right;">'.number_format($hp,'0',',','.').',-</td>
