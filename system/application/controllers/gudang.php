@@ -229,7 +229,7 @@ class Gudang extends Controller {
                                 $hp = $row->item_hp;
                                 $this->data['sup_region']='MDN';
                             }
-                            $total += ($hp*$row->qty);
+                            $total += ($row->item_hp*$row->qty);
                             $data .= '	<td style="width: 50px;text-align: right;">'.number_format($hp,'0',',','.').',-</td>
                                     <td style="width: 60px;text-align: center;"></td>		
                                     </tr>';                        
