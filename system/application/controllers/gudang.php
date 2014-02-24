@@ -1128,7 +1128,8 @@ class Gudang extends Controller {
             for($i=0;$i<count($item_code);$i++)//mulai dari baris ke satu sampai abis
             {
                 $tmp_cat = substr($item_code[$i],0,3);
-                if($tmp_cat == config_item('hadiah') || $item_hj[$i] > 0)
+                $hadiah = config_item('hadiah');
+                if(in_array($tmp_cat, $hadiah) || $item_hj[$i] > 0)
                 {
                     $shop_initial='';
                     for($j=0;$j<count($shop);$j++)//looping semua toko

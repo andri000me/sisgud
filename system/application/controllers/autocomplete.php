@@ -66,7 +66,8 @@ class Autocomplete extends Controller {
     */
 	function autocomplete_hadiah($key="")
 	{
-        if($key == config_item('hadiah'))
+		$hadiah=config_item('hadiah');
+        if(in_array($key, $hadiah) );
         {
             $query = $this->autocomplete->get_item_for_mutasi_keluar($key);		
             foreach($query->result() as $row)
