@@ -29,7 +29,14 @@
                 <?php
                     if($this->uri->segment(4) == 'hadiah')
                     {
-                        $cat_code = '<input type="text" name="cat_code[]" size="12" maxlength="3" value="" onkeypress="destroyEnter(event)"/>';
+                       // $cat_code = '<input type="text" name="cat_code[]" size="12" maxlength="3" value="" onkeypress="destroyEnter(event)"/>';
+                       $hadiah=config_item('hadiah');
+                       $cat_code='<select name="cat_code[]"><option>Pilih Kelompok</option>';
+                       foreach($hadiah as $row)
+                       {
+                       		$cat_code .= '<option value="'.$row.'">'.$row.'</option>';
+                       }
+                       $cat_code .= '</select>';
                     }
                     else
                     {
