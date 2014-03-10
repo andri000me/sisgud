@@ -1267,16 +1267,18 @@ class Gudang extends Controller {
                                     //pengkodean harga modal
 				    if($row->item_hp == 0) 
 				    {
-					$tmp = array(0,0,0);
+						$tmp = array(0,0,0);
 				    }
 				    else
 				    {
-					$tmp = substr($row->item_hp,0,3);
+						$tmp = substr($row->item_hp,0,3);
 				    }                                    
                                     $kode = config_item('kode_hm');                                    
-                                    $kode_hm = $kode[$tmp[0]].$kode[$tmp[1]].$kode[$tmp[2]];                                   
+                                    $kode_hm = $kode[$tmp[0]].$kode[$tmp[1]].$kode[$tmp[2]];
+                                    $kode_bln = config_item('kode_bulan'); 
+                                    $kode_tgl = str_pad(date('d'), 3, '0', STR_PAD_LEFT).'-'.$kode_bln[date('n')];                                  
                                     $data_txt .= strtoupper($shop_cat).chr(9).strtoupper($row->item_name).chr(9).$row->item_code.chr(9).number_format($row->item_hj,0,',','.').',-'.chr(9).$kode_hm.chr(9).
-                                                strtoupper($row->sup_code).chr(9).date("dmy").chr(9).$row->shop_code .chr(10);
+                                                strtoupper($row->sup_code).chr(9).$kode_tgl.chr(9).$row->shop_code .chr(10);
                                                   
                                 }                        
                                 if( $row->quantity % 2 == 1)

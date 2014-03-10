@@ -31,3 +31,8 @@ $config['kode_hm'] = array('E','F','A','S','H','I','O','N','M','O','D');
  * Default timezone
  */
 $config['timezone'] = 'Asia/Jakarta';
+
+/**
+ * kode bulan
+ */
+$config['kode_bulan']=array('','O','P','Q','R','S','T','U','V','W','X','Y','Z');
