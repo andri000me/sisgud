@@ -14,7 +14,7 @@
                     <td>Kode Barang</td><td>: <input type="text" name="item_code" readonly="readonly" value="<?php echo $item->item_code ?>"/> <span class="note">*) </span></td>                                
                 </tr>
                 <tr>
-                    <td>Nama Barang</td><td>: <input type="text" name="item_name" value="<?php echo $item->item_name ?>"/> <span class="note"> *) </span></td>                                
+                    <td>Nama Barang</td><td>: <input type="text" maxlength="21" name="item_name" value="<?php echo $item->item_name ?>"/> <span class="note"> *) </span></td>                                
                 </tr> 
                 <tr>
                     <td>Kode Supplier</td><td>: <input type="text" name="sup_code" value="<?php echo $item->sup_code ?>" /> <span class="note"> *)</span></td>                                

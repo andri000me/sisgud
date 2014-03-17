@@ -21,14 +21,14 @@
             </ul>
             <?php } if($role == 'user') { ?>
             <ul class="sub">
-                <li><a href="<?php echo base_url() ?>gudang/mutasi/keluar">Mutasi Keluar</a></li>                                 
+                <li><a href="<?php echo base_url() ?>gudang/mutasi/keluar">Mutasi Keluar</a></li>   
+                <li><a href="<?php echo base_url() ?>gudang/mutasi/keluar/hadiah">Mutasi Keluar Hadiah</a></li>                              
                 <li><a href="<?php echo base_url() ?>gudang/export">Ekspor Data</a></li>                              
             </ul>
             <?php } if($role == 'operator_retur') { ?>
             <ul class="sub">
                 <li><a href="<?php echo base_url() ?>gudang/mutasi/masuk/hadiah">Mutasi Masuk Hadiah</a></li>                             
-                <li><a href="<?php echo base_url() ?>gudang/retur/tambah">Retur Barang</a></li>            
-                <li><a href="<?php echo base_url() ?>gudang/mutasi/keluar/hadiah">Mutasi Keluar Hadiah</a></li>                             
+                <li><a href="<?php echo base_url() ?>gudang/retur/tambah">Retur Barang</a></li>                                             
                 <li><a href="<?php echo base_url() ?>gudang/mutasi/rusak">Mutasi Barang Rusak</a></li>                             
                 <li><a href="<?php echo base_url() ?>gudang/mutasi/obral">Mutasi Barang Obral</a></li>                                  
             </ul>
@@ -111,8 +111,10 @@
                 <li><a href="<?php echo base_url() ?>laporan/masuk">Laporan Barang Masuk</a></li>
                 <li><a href="<?php echo base_url() ?>laporan/distribusi">Laporan Distribusi Barang</a></li>
             <?php } if($role=='operator_retur') { ?>
-            <ul class="sub">                              
-                <li><a href="<?php echo base_url() ?>gudang/stok">Stok Gudang</a></li>                
+            <ul class="sub">                
+                <li><a href="<?php echo base_url() ?>gudang/cetak/bon/rekap">Rekap Bon</a></li>
+                <li><a href="<?php echo base_url() ?>gudang/distribusi">Rekap Distribusi Barang</a></li>
+                <li><a href="<?php echo base_url() ?>gudang/stok">Stok Gudang</a></li>         
             </ul>
             <?php } ?>
         </div>
