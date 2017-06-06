@@ -1,0 +1,6 @@
+syntax: glob
+.idea/workspace.xml
+.idea/vcs.xml
+.idea/modules.xml
+.idea/sisgud.iml
+.idea/copyright/profiles_settings.xml
