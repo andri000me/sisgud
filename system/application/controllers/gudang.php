@@ -1114,7 +1114,7 @@ class Gudang extends Controller {
 	/**
     *Menyimpan data mutasi keluar ke dalam database (table item_distribution)
     **/
-    function insert_mutasi_keluar($item_code,$item_hj,$qty,$qty_stok,$item_disc)
+    function insert_mutasi_keluar($item_code,$item_hj,$qty,$qty_stok,$item_disc, $price='')
     {
         //ambil data semua toko        
         $query = $this->shop->get_all_shop();        
@@ -1144,9 +1144,11 @@ class Gudang extends Controller {
                                 'shop_code'=> $shop[$j]->shop_code,
                                 'dist_out'=> $now,
                                 'quantity'=> $quantity,
-                                'item_disc'=> $item_disc[$i],
+                                'item_disc'=> !empty($item_disc[$i]) ? $item_disc[$i] : 0,
                                 'status'=> 0
                             );
+                            if(isset($price[strtolower($shop[$j]->shop_initial)][$i]))
+                            	$data['price'] = $price[strtolower($shop[$j]->shop_initial)][$i];
                             //insert data ke table item_distribution 
                             if($this->item_distribution->insert_item_distribution($data))
                             {
@@ -1168,7 +1170,7 @@ class Gudang extends Controller {
             }            
             if(!empty($success))
             {
-                $success = 'Proses mutasi '.$this->data['opsi'].' untuk '.$success.' telah berhasil dilakukan';
+                $success = 'Proses mutasi khusus untuk '.$success.' telah berhasil dilakukan';
             }
             else
             {
@@ -1186,7 +1188,7 @@ class Gudang extends Controller {
             $form_notify .= '<span style="color:red">'.$failed.'</span>';
         }
         $this->session->set_userdata('form_notify',$form_notify);
-        redirect('/gudang/mutasi/'.$this->data['opsi'],'refresh');
+        redirect('/gudang/mutasi_keluar_khusus/','refresh');
     }
     /**
 	*Method for printing label an bon
@@ -1555,6 +1557,59 @@ class Gudang extends Controller {
             }
 		}
 	}
+	
+	function mutasi_keluar_khusus()
+	{
+		//loading model
+		$this->data['opsi'] = $this->uri->segment(3);
+		$this->load->model('shop');
+		//get all the  shop
+		$query = $this->shop->get_shop();
+		$shop_initial = array();
+		$shop_mark = array();
+		
+		if($query->num_rows() > 0)
+		{
+			//setting the initial shop,
+			$this->data['shop_count'] = $query->num_rows();
+			$shop = '';
+			$row_qty = '';
+			$i=0;
+			foreach($query->result() as $row)
+			{
+				$shop .= '<td class="header">'.strtoupper($row->shop_initial).'</td>';
+				$row_qty .= '<td>
+<input type="text" class="'.strtolower($row->shop_initial).'_marked" name="qty_'.strtolower($row->shop_initial).'[]" id="qty_'.strtolower($row->shop_initial).'_#" style="width: 25px;" onkeyup="countStok(#)" onkeypress="checkForEnter(2,event,this)"/>
+<input type="text" class="harga_marked" name="price_'.strtolower($row->shop_initial).'[]" id="price_'.strtolower($row->shop_initial).'_#" style="width: 75px" onkeypress="checkForEnter(2,event,this)"/>
+</td>';
+				$shop_mark[$i] = strtoupper($row->shop_initial);
+				$shop_initial[$i++] = strtolower($row->shop_initial);
+			}
+			$this->data['shop_name'] = $shop;
+			$this->data['row_qty'] = $row_qty;
+			$this->data['shop_initial'] = $shop_initial;
+			$this->data['shop_mark']=$shop_mark;
+		}
+		//processing data untuk mutasi keluar
+		if($this->input->post('submit_mutasi_keluar'))
+		{
+			$item_code = $this->input->post('item_code');
+			$item_hj = $this->input->post('item_hj');
+			$qty_stok = $this->input->post('qty_stok');
+			$item_disc = $this->input->post('item_disc');
+			$qty = array();
+			$price= array();
+			foreach($shop_initial as $row)
+			{
+				$qty[$row] = $this->input->post('qty_'.$row);
+				$price[$row] = $this->input->post('price_'.$row);
+			}
+			//insert mutasi keluar
+			$this->insert_mutasi_keluar($item_code,$item_hj,$qty,$qty_stok,$item_disc, $price);
+		}
+		$this->load->view(config_item('template').'gud_mutasikeluar_khusus',$this->data);
+	}
+	
     /**
     *Fungsi untuk generate kode bon toko
     */

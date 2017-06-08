@@ -67,10 +67,11 @@ class Item_distribution extends Model {
     */
     function get_item_for_printing($sup_code)
     {
-        $query = 'select sum(ids.quantity) as qty,ids.status,i.* 
+        $query = 'select sum(ids.quantity) as qty,ids.status,i.item_name, i.item_code,
+					(case when ids.price is null then i.item_hj else ids.price end) as item_hj
                     from item_distribution ids 
                     left join item i on ids.item_code=i.item_code where i.sup_code = "'.$sup_code.'" and ids.status != 1 
-                    group by ids.item_code order by ids.id';
+                    group by ids.item_code, ids.price order by ids.id';
         return $this->db->query($query);
     }
     /**
@@ -81,10 +82,14 @@ class Item_distribution extends Model {
     */
     function get_item_for_exporting($item_code)
     {
-        $query = 'select * from (select ids.dist_out,ids.shop_code,ids.quantity,i.* 
+        $query = 'select ids.dist_out,ids.shop_code,ids.quantity,
+					(case when ids.price is null then i.item_hj else ids.price end) as item_hj,
+					(case when ids.price is null then i.item_code else concat(i.item_code, shop.suffix) end) as item_code,
+					i.item_name, i.item_hm, i.item_hp, i.cat_code, i.sup_code
                     from item_distribution ids 
-                    left join item i on ids.item_code=i.item_code where i.item_code = "'.$item_code.'" and ids.status=2) as cetak
-                left join shop on cetak.shop_code = shop.shop_code';
+                    left join item i on ids.item_code=i.item_code
+					left join shop on ids.shop_code = shop.shop_code
+					where i.item_code = "'.$item_code.'" and ids.status=2';
                     
         return $this->db->query($query);
     }
