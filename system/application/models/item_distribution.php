@@ -83,9 +83,9 @@ class Item_distribution extends Model {
     function get_item_for_exporting($item_code)
     {
         $query = 'select ids.dist_out,ids.shop_code,ids.quantity,
-					(case when ids.price is null then i.item_hj else ids.price end) as item_hj,
-					(case when ids.price is null then i.item_code else concat(i.item_code, shop.suffix) end) as item_code,
-					i.item_name, i.item_hm, i.item_hp, i.cat_code, i.sup_code
+					(case when ids.price is null then i.item_hj else ids.price end) as item_hj, shop.shop_cat,
+					i.item_code, i.item_name, i.item_hm, i.item_hp, i.cat_code, i.sup_code,
+					(case when ids.price is null then " " else shop.suffix end) as suffix, shop.shop_code
                     from item_distribution ids 
                     left join item i on ids.item_code=i.item_code
 					left join shop on ids.shop_code = shop.shop_code

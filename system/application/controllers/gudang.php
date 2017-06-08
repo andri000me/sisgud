@@ -1242,7 +1242,7 @@ class Gudang extends Controller {
                 
                 if($query->num_rows() > 0)
                 {
-                    $data_txt = 'Cabang:'.chr(9).'Nama Barang :'.chr(9).'Kode Brg/Barcode :'.chr(9).'Input Harga :'.chr(9).'Harga Modal :'.chr(9).'Supplier :'.chr(9).'Tanggal :'.chr(9).'Kode Toko :'.chr(10);
+                    $data_txt = 'Cabang:'.chr(9).'Nama Barang :'.chr(9).'Kode Brg/Barcode :'.chr(9).'Input Harga :'.chr(9).'Harga Modal :'.chr(9).'Supplier :'.chr(9).'Tanggal :'.chr(9).'Kode Toko :'.chr(9).'Inisial: '.chr(10);
                     foreach($items as $row)
                     {
                         //ambil data barang yang akan dibuat label                
@@ -1280,12 +1280,12 @@ class Gudang extends Controller {
                                     $kode_bln = config_item('kode_bulan'); 
                                     $kode_tgl = str_pad(date('d'), 3, '0', STR_PAD_LEFT).'-'.$kode_bln[date('n')];                                  
                                     $data_txt .= strtoupper($shop_cat).chr(9).strtoupper($row->item_name).chr(9).$row->item_code.chr(9).number_format($row->item_hj,0,',','.').',-'.chr(9).$kode_hm.chr(9).
-                                                strtoupper($row->sup_code).chr(9).$kode_tgl.chr(9).$row->shop_code .chr(10);
+                                                strtoupper($row->sup_code).chr(9).$kode_tgl.chr(9).$row->shop_code.chr(9).$row->suffix.chr(10);
                                                   
                                 }                        
                                 if( $row->quantity % 2 == 1)
                                 {
-                                    $data_txt .= '====='.chr(9).'====='.chr(9).'====='.chr(9).'====='.chr(9).'====='.chr(9).'====='.chr(9).'====='.chr(10);                                
+                                    $data_txt .= '====='.chr(9).'====='.chr(9).'====='.chr(9).'====='.chr(9).'====='.chr(9).'====='.chr(9).'====='.chr(10);
                                 }
                                 
                             }               
