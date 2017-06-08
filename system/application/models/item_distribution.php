@@ -138,7 +138,9 @@ class Item_distribution extends Model {
     */
     function get_item_for_bon($shop_code,$dist_out)
     {
-        $query = 'select ids.*,i.*,sum(ids.quantity) as quantity from item_distribution ids left join item i on ids.item_code = i.item_code 
+        $query = 'select ids.*,i.item_code, i.sup_code, i.item_name,sum(ids.quantity) as quantity,
+ 				(case when ids.price is null then i.item_hj else ids.price end) as item_hj
+				from item_distribution ids left join item i on ids.item_code = i.item_code
                 where ids.shop_code = "'.$shop_code.'" and ids.dist_code="0" and ids.status=1 and dist_out="'.$dist_out.'" group by ids.id';
         return $this->db->query($query);
     }
@@ -147,9 +149,11 @@ class Item_distribution extends Model {
     */
     function get_item_for_pdf($param)
     {
-        $this->db->select('item_distribution.*,sum(quantity) as quantity');
-        $this->db->group_by('item_code')->order_by('item_code','asc');        
-        return $this->db->get_where('item_distribution',$param);
+        $this->db->select('ids.*, sum(quantity) as quantity,
+        (case when ids.price is null then i.item_hj else ids.price end) as item_hj');
+        $this->db->join('item i', 'ids.item_code = i.item_code');
+        $this->db->group_by('item_code')->order_by('item_code','asc');
+        return $this->db->get_where('item_distribution ids',$param);
     }
     /**
     *update status

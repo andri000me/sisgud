@@ -1435,7 +1435,7 @@ class Gudang extends Controller {
                     {
                         $temp = $this->item->get_item(array('item_code'=>$row->item_code));
                         $item = $temp->row();
-                        $jumlah = $item ->item_hj *(1 - $row->item_disc/100) * $row->quantity;
+                        $jumlah = $row ->item_hj *(1 - $row->item_disc/100) * $row->quantity;
                         $jumlah_item += $row->quantity;
                         $total += $jumlah;
                         if(!isset($list_item[$index]))
@@ -1449,7 +1449,7 @@ class Gudang extends Controller {
                             <td style="width: 50px;text-align: center;">'.$item->sup_code.'</td>
                             <td style="width: 110px;">'.strtoupper($item->item_name).'</td>
                             <td style="width: 50px;text-align: center;">'.$row->item_disc.'</td>                        
-                            <td style="width: 75px;text-align: right;">'.number_format($item->item_hj,'0',',','.').',-</td>
+                            <td style="width: 75px;text-align: right;">'.number_format($row->item_hj,'0',',','.').',-</td>
                             <td style="width: 40px;text-align:right">'.$row->quantity.'</td>
                             <td style="width: 75px;text-align: right;">'.number_format($jumlah,'0',',','.').',-</td>
                             </tr>';
