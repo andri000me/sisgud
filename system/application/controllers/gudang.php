@@ -321,7 +321,7 @@ class Gudang extends Controller {
 			$query = $this->supplier->get_supplier_have_mutasi($this->session->userdata('p_role'));
 			if($query->num_rows() > 0)
 			{
-				$this->data['list_sup'] = '<select name="sup_code">';
+				$this->data['list_sup'] = '<select name="sup_code" id="list_sup">';
 				foreach($query->result() as $row)
 				{
 					$this->data['list_sup'] .= '<option value="'.$row->sup_code.'">'.ucwords($row->sup_name).'</option>';
@@ -1765,6 +1765,81 @@ class Gudang extends Controller {
 		$pdf->Output('print_mutasi.pdf', 'I');   
 		
 	}
+	
+	function cetak_mutasi_khusus_pdf($head, $list_data, $footer)
+	{
+		require_once('lib/tcpdf/config/lang/eng.php');
+		require_once('lib/tcpdf/tcpdf.php');
+		$jumlah_toko = $this->data['shop_count'];
+		// create new PDF document
+		$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+		
+		// set document information
+		$pdf->SetCreator(PDF_CREATOR);
+		$pdf->SetAuthor('Nicola Asuni');
+		$pdf->SetTitle('TCPDF Example 006');
+		$pdf->SetSubject('TCPDF Tutorial');
+		$pdf->SetKeywords('TCPDF, PDF, example, test, guide');
+		
+		// set default header data
+		$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING);
+		
+		// set header and footer fonts
+		$pdf->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
+		$pdf->setFooterFont(Array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
+		
+		// set default monospaced font
+		$pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+		
+		//set margins (left,,right)
+		$pdf->SetMargins(9, 20, 9);
+		$pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
+		$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+		
+		//set auto page breaks
+		$pdf->SetAutoPageBreak(TRUE, 10);
+		$pdf->setPageUnit('mm');
+		if($jumlah_toko <= 10)
+		{
+			$size = array(216,165);
+		}
+		else
+		{
+			$width = 216 + (($jumlah_toko - 10)*20);
+			
+			$size = array($width,216);
+		}
+		$pdf->setPageFormat($size,'P');
+		//set image scale factor
+		$pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+		
+		//set some language-dependent strings
+		$pdf->setLanguageArray($l);
+		
+		// ----------------------------------------------------------------------------------
+		// set font
+		$pdf->SetFont('dejavusans', '', 8);
+		//print page
+		
+		foreach($list_data as $data)
+		{
+			$pdf->AddPage();
+			$pdf->writeHTML($head.$data.$footer, true, 0, true, 0);
+			if($jumlah_toko<=10)
+				$pdf->writeHTMLCell(30,15,188,5,'<span style="font-size:30pt">'.$this->data['sup_region'].'</span>','right');
+			else
+				$pdf->writeHTMLCell(30,15,210,5,
+					'<span style="font-size:30pt;">'.$this->data['sup_region'].'</span>',
+					'right');
+			
+		}
+		
+		//-------------------------------------------------------------------------------------
+		//Close and output PDF document
+		$pdf->Output('print_mutasi.pdf', 'I');
+		
+	}
+	
     /**
     *Fungsi retur barang
     */
@@ -3132,6 +3207,115 @@ class Gudang extends Controller {
     	}
     	$this->load->view(config_item('template').'gud_rekapdistribusi', $this->data);
     }
+    
+    function print_mutasi_khusus($sup_code)
+	{
+		//*print mutasi masuk dengan format
+		/*| Kode Label | Nama | Qty Awal | initial toko | HM +15% | HJ
+		*
+		*
+		*/
+		$this->load->model('supplier');
+		$this->load->model('shop');
+		$this->load->model('item_mutasi');
+		
+		
+		$query = $this->supplier->get_supplier($sup_code);
+		$sup = $query->row();
+		$query = $this->item_mutasi->get_item_mutasi(array('sup_code'=>$sup_code));
+		
+		if($query->num_rows() > 0) {
+			$data = $query->row();
+			$head = '<div style="margin-top: 5px;">
+							<h3 style="text-align: center;">BON ORDER BARANG</h3>
+							<table style="width: 700px;">
+							<tr><td style="width: 100px;">KODE MUTASI</td><td style="width:250px;">: ' . strtoupper($data->kode_mutasi) . '</td></tr>
+							<tr><td style="width: 100px;">SUPPLIER</td><td style="width:250px;">: ' . strtoupper($sup->sup_name) . '</td></tr>
+							<tr><td style="width: 100px;">TANGGAL BON</td><td style="width:250px;">: ' . date_to_string($data->date_bon) . '</td></tr>
+							<tr><td style="width: 100px;">TANGGAL MUTASI</td><td style="width:250px;">: ' . date_to_string($data->date_entry) . '</td></tr>
+							</table>
+						</div>';
+			
+			//retrieve data toko
+			$query = $this->shop->get_shop();
+			$jumlah_toko = $query->num_rows();
+			$this->data['shop_count'] = $query->num_rows();
+			$width = $jumlah_toko * 40;
+			$head .= '<br /><table style="width: 600px;" border="1" cellpadding="3" cellspacing="0">
+						<tr>
+						<td style="width: 20px;text-align: center;" rowspan="2">No</td>
+						<td style="width: 60px;text-align: center; vertical-align: middle;" rowspan="2">Kode Label</td>
+						<td style="width: 100px;text-align: center;" rowspan="2">Nama</td>
+						<td style="width: 25px;text-align: center;" rowspan="2">Qty</td>
+						<td style="width: ' . $width . 'px;text-align: center;" colspan="15">Distribusi</td>
+						<td style="width: 50px;text-align: center;" rowspan="2">HM</td>
+						<td style="width: 60px;text-align: center;" rowspan="2">Harga Jual</td>
+						</tr>
+						<tr>';
+			$row_shop = '';
+			$row_shop2 = '<tr>';
+			
+			foreach ($query->result() as $row) {
+				$head .= '<td style="width: 40px;text-align: center; font-size: 17px;">' . strtoupper($row->shop_initial) . '</td>';
+				$row_shop .= '<td style="width: 40px;text-align: center; font-size: 17px; color: #bbb;">' . strtoupper($row->shop_initial) . '</td>';
+				$row_shop2 .= '<td style="width: 40px;text-align: center; font-size: 17px; color: #bbb;">HJ ' . strtoupper($row->shop_initial) . '</td>';
+			}
+			$row_shop2 .= '</tr>';
+			$head .= '</tr>';
+			
+			//retrieving data item untuk diprint
+			$query = $this->item_mutasi->get_item_mutasi(array('sup_code' => $sup_code));
+			if ($query->num_rows() > 0) {
+				$j = 0;
+				$data = '';
+				$total = 0;
+				foreach ($query->result() as $row) {
+					$data .= '<tr>
+								<td style="width: 20px;text-align: center;" rowspan="2">' . ++$j . '</td>
+								<td style="width: 60px;text-align: center;" rowspan="2">' . $row->item_code . '</td>
+								<td style="width: 100px;text-align: center;" rowspan="2">' . $row->item_name . '</td>
+								<td style="width: 25px;text-align: center" rowspan="2">' . $row->qty . '</td>'.$row_shop;
+					//check barang medan atau luar kota
+					if (!$this->check_if_medan($row->sup_code)) {
+						$hp = floor($row->item_hp + 0.15 * $row->item_hp);
+						$this->data['sup_region'] = 'LMD';
+					} else {
+						$hp = $row->item_hp;
+						$this->data['sup_region'] = 'MDN';
+					}
+					$total += ($row->item_hp * $row->qty);
+					$data .= '	<td style="width: 50px;text-align: right;" rowspan="2">' . number_format($hp, '0', ',', '.') . ',-</td>
+								<td style="width: 60px;text-align: center;" rowspan="2"></td>
+								</tr>'.$row_shop2;
+					
+					if ($jumlah_toko <= 10 && $j % 15 == 0) {
+						$list_data[] = $data;
+						$data = '';
+					} else if ($jumlah_toko > 10 && $j % 25 == 0) {
+						$list_data[] = $data;
+						$data = '';
+					}
+				}
+				//klo data tak kosong, tambahkan
+				if (!empty($data)) {
+					$list_data[] = $data;
+				}
+				$footer = '<tr>
+									<td rowspan="4" style="text-align:right;width:205px;">T O T A L</td>
+									<td rowspan="' . ($jumlah_toko + 1) . '" style="text-align:right;width:' . ($jumlah_toko * 40 + 50) . 'px">' . number_format($total, '0', ',', '.') . ',-</td>
+									<td style="width:60px;"></td>
+								</tr>
+								</table><br /><table style="text-align:center;">
+							<tr><td>(Bagian Mutasi Masuk)</td><td>(Bagian Distribusi)</td></tr>
+						</table>';
+				//update status item yang udh pernah diprint mutasi jadi 1
+				$this->item_mutasi->update_status(array('sup_code'=>$this->input->post('sup_code')));
+				$this->cetak_mutasi_khusus_pdf($head, $list_data, $footer);
+			} else {
+				$this->data['notifikasi'] = 'Tidak ada data mutasi barang masuk pada tanggal tersebut';
+			}
+		}		//----------------------------------------------------
+	}
 }
 /* End of file gudang.php */
 /* Location: ./system/application/controllers/gudang.php */

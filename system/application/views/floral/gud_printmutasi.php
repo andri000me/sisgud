@@ -9,7 +9,7 @@
             <table class="table-form">                              
                 <tr>
                     <td>Nama Supplier</td>
-                    <td>: <?php if(isset($list_sup)) {echo $list_sup.' <span class="button"><input class="button" type="submit" name="submit_preview_mutasi" value="Preview"/></span><span class="button"><input class="button" type="submit" name="submit_print_mutasi" value="Cetak"/></span>';} else {echo '<select><option>Tidak Ada</option></select>';} ?> </td></tr>                
+                    <td>: <?php if(isset($list_sup)) {echo $list_sup.' <span class="button"><input class="button" type="submit" name="submit_preview_mutasi" value="Preview"/></span><span class="button"><input class="button" type="submit" name="submit_print_mutasi" value="Cetak"/> <input class="button" type="button" onclick="print_mutasi_khusus()" value="Cetak II"/> </span>';} else {echo '<select><option>Tidak Ada</option></select>';} ?> </td></tr>
             </table>                    
             <?php echo form_close() ?>
             <?php if(isset($row_data)) { ?>
