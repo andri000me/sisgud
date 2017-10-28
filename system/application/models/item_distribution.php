@@ -99,7 +99,7 @@ class Item_distribution extends Model {
     */
     function get_item_for_shop($shop_code)
     {
-        $query = 'select ids.item_code, i.item_name, i.cat_code,i.item_hj, ids.item_disc, sum(ids.quantity) as quantity 
+        $query = 'select ids.item_code, i.item_name, i.cat_code,(CASE WHEN ids.price IS NULL THEN i.item_hj ELSE ids.price END) AS item_hj, ids.price, ids.item_disc, sum(ids.quantity) as quantity 
                     from item_distribution ids left join item i on ids.item_code=i.item_code 
                     where ids.shop_code = "'.$shop_code.'" and ids.export=0 and dist_code != "0" 
         			group by ids.item_code order by ids.id';
@@ -121,13 +121,13 @@ class Item_distribution extends Model {
     {
         if(isset($param['export']))
         {
-            $query = 'select ids.item_code, i.item_name, i.cat_code,i.item_hj, ids.item_disc, sum(ids.quantity) as quantity 
+            $query = 'select ids.item_code, i.item_name, i.cat_code,(CASE WHEN ids.price IS NULL THEN i.item_hj ELSE ids.price END) AS item_hj, ids.item_disc, sum(ids.quantity) as quantity 
                         from item_distribution ids left join item i on ids.item_code=i.item_code 
                         where ids.export="'.$param['export'].'" group by ids.item_code order by ids.item_code';
         }
         else if(isset($param['dist_code']) && isset($param['shop_code']))
         {
-            $query = 'select ids.item_code, i.item_name, i.cat_code,i.item_hj, ids.item_disc, sum(ids.quantity) as quantity 
+            $query = 'select ids.item_code, i.item_name, i.cat_code,(CASE WHEN ids.price IS NULL THEN i.item_hj ELSE ids.price END) AS item_hj, ids.item_disc, sum(ids.quantity) as quantity 
                         from item_distribution ids left join item i on ids.item_code=i.item_code 
                         where ids.dist_code="'.$param['dist_code'].'" and ids.shop_code="'.$param['shop_code'].'" group by ids.item_code order by ids.item_code';
         }
