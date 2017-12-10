@@ -296,4 +296,10 @@ class Item_distribution extends Model {
         group by i.cat_code order by rupiah desc) tbl1 left join category c on tbl1.cat_code = c.cat_code';
         return $this->db->query($sql);
     }
+
+    function delete_item($items)
+    {
+        $this->db->where_in('item_code', $items);
+        return $this->db->delete('item_distribution');
+    }
 }

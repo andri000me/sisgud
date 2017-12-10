@@ -87,7 +87,22 @@
         <div class="tempatemo_right_bottom">
         </div>
     </div><!-- End of Right Section -->
-    
+
+    <div id="dialog-login-confirm" style="display: none" title="Otorisasi Supervisor">
+        <p>PERHATIAN!!! Aksi ini akan menghapus data mutasi, data distribusi, data retur dan data barang</p>
+        <table border="0">
+            <tr>
+                <td>Username</td>
+                <td><input type="text" id="spv_user" /></td>
+            </tr>
+            <tr>
+                <td>Password</td>
+                <td><input type="password" id="spv_passwd" /></td>
+            </tr>
+        </table>
+        <p style="color: red"><span id="login-error"></span></p>
+    </div>
+
     <div class="cleaner"></div>
 
 </div><!-- End Of Content area bottom -->

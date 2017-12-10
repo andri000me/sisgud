@@ -101,4 +101,9 @@ class Item_mutasi extends Model {
         return $this->db->query($sql);
     }
 
+    function delete_mutasi_by_code($code)
+    {
+        return $this->db->delete('item_mutasi', array('kode_mutasi'=>$code));
+    }
+
 }

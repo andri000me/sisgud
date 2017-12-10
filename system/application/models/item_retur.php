@@ -39,5 +39,11 @@ class Item_retur extends Model {
                     left join shop on retur.shop_code = shop.shop_code';
         return $this->db->query($query);
     }
+
+    function delete_item($items)
+    {
+        $this->db->where_in('item_code', $items);
+        return $this->db->delete('item_retur');
+    }
 }
 //End of item retur   

@@ -122,6 +122,12 @@ class Item extends Model {
     	//hapus di table item
         $this->db->where('item_code',$item_code);
         return $this->db->delete('item');
-    }    
+    }
+
+    function delete_item($items)
+    {
+        $this->db->where_in('item_code', $items);
+        return $this->db->delete('item');
+    }
 }
 //end of file gudang_model.php

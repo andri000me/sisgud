@@ -373,7 +373,10 @@ class Gudang extends Controller {
                                         <td>'.ucwords($row->sup_name).' ('.$row->sup_code.')</td>
                                         <td>'.$row->jml_barang.' macam</td>
                                         <td>'.date_to_string($row->date_entry).'</td>
-                                        <td><span class="button"><input type="button" class="button" value="Cetak" onclick="cetakMutasi('.$row->kode_mutasi.')"/></span></td>
+                                        <td>
+                                        <span class="button"><input type="button" class="button" value="Cetak" onclick="cetakMutasi('.$row->kode_mutasi.')"/></span>
+                                        <span class="button"><input type="button" class="button" value="Hapus" onclick="hapusMutasi('.$row->kode_mutasi.')"/></span>
+                                        </td>
                                     </tr>';
                     }
                     $this->data['row_data'] = $row_data;
@@ -1044,7 +1047,7 @@ class Gudang extends Controller {
                         }            
                         else //klo bblum ada mulai dari 00001
                         {
-                            $data['item_code'] = $cat_code.$thn.'00001';
+                            $data['item_code'] = $cat_code.$thn.'10001';
                         }
                         //save item to database
                         $this->load->model('item');
@@ -3316,6 +3319,50 @@ class Gudang extends Controller {
 			}
 		}		//----------------------------------------------------
 	}
+
+	function hapus_mutasi($code)
+    {
+        $username = $this->input->post('username');
+        $passwd = $this->input->post('password');
+        //check otorisasi supervisor
+        $this->load->model('pengguna');
+        $query = $this->pengguna->validate_pengguna($username, $passwd);
+        if (!empty($query) && $query->num_rows() > 0) {
+            $user = $query->row();
+            if ($user->p_role == 'supervisor') {
+                //get list of item
+                $this->load->model('item_mutasi');
+                $items = $this->item_mutasi->get_item_mutasi_by_code(array('kode_mutasi'=>$code));
+                $item_list = array();
+                if(!empty($items) && $items->num_rows() > 0) {
+                    foreach ($items->result() as $item) {
+                        $item_list[] = $item->item_code;
+                    }
+
+                    //delete retur based on item_code
+                    $this->load->model('item_retur');
+                    $this->item_retur->delete_item($item_list);
+
+                    //delete distribution based item_code
+                    $this->load->model('item_distribution');
+                    $this->item_distribution->delete_item($item_list);
+                    //delete mutasi based on code
+                    $this->item_mutasi->delete_mutasi_by_code($code);
+                    //delete item by code
+                    $this->load->model('item');
+                    if ($this->item->delete_item($item_list))
+                        echo 1;
+                }
+                else
+                    echo 'Sudah tidak ada data';
+            }
+            else
+                echo 'Otorisasi gagal, anda bukan supervisor';
+        }
+        else
+            echo 'Otorisasi gagal, invalid login';
+
+    }
 }
 /* End of file gudang.php */
 /* Location: ./system/application/controllers/gudang.php */
