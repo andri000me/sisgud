@@ -99,6 +99,7 @@
                 <li><a href="<?php echo base_url() ?>gudang/cetak/bon/rekap">Rekap Bon</a></li> 
                 <li><a href="<?php echo base_url() ?>gudang/obral/rekap">Rekap Bon Obral</a></li>                
                 <li><a href="<?php echo base_url() ?>gudang/rusak/rekap">Rekap Bon Rusak</a></li>
+                <li><a href="<?php echo base_url() ?>gudang/distribusi">Rekap Distribusi Barang</a></li>
                 <li><a href="<?php echo base_url() ?>gudang/stok">Stok Gudang</a></li>
             </ul>
             <?php } if($role=='supervisor') { ?>
