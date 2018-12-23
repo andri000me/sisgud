@@ -76,6 +76,7 @@
             </ul>
             <?php } if($role =='operator_retur') { ?>
             <ul class="sub">
+                <li><a href="<?php echo base_url() ?>gudang/mutasi/print">Cetak Mutasi Keluar</a></li>
                 <li><a href="<?php echo base_url() ?>gudang/cetak/label">Cetak Label</a></li>
                  <li><a href="<?php echo base_url() ?>gudang/cetak/bon">Cetak Bon</a></li>                
                 <li><a href="<?php echo base_url() ?>gudang/obral">Cetak Bon Obral</a></li>                
