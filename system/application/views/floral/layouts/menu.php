@@ -25,6 +25,7 @@
                 <li><a href="<?php echo base_url() ?>gudang/mutasi/keluar/hadiah">Mutasi Keluar Hadiah</a></li>                              
                 <li><a href="<?php echo base_url() ?>gudang/mutasi_keluar_khusus">Mutasi Keluar Khusus</a></li>
                 <li><a href="<?php echo base_url() ?>gudang/export">Ekspor Data</a></li>
+                <li><a href="<?php echo base_url() ?>gudang/mutasi/rekap">Rekap Mutasi Keluar</a></li>
             </ul>
             <?php } if($role == 'operator_retur') { ?>
             <ul class="sub">

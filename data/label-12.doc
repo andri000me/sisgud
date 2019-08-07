@@ -1,3 +1,7 @@
-Cabang:	Nama Barang :	Kode Brg/Barcode :	Input Harga :	Harga Modal :	Supplier :	Tanggal :	Kode Toko :
-MODE	OBL EVERLINK 1791	0011101570	57.900,-	SON	C003	010-Q	01
-MODE	OBL EVERLINK 1791	0011101570	57.900,-	SON	C003	010-Q	01
+Cabang:	Nama Barang :	Kode Brg/Barcode :	Input Harga :	Harga Modal :	Supplier :	Tanggal :	Kode Toko :	Inisial: 
+MODE	KTP AB TOPI 	0021100007	11.000.000,-	AFN	Z001	028-X	01	A
+=====	=====	=====	=====	=====	=====	=====
+MODE	KTP AB TOPI 	0021100007	10.100.000,-	AFN	Z001	028-X	02	B
+=====	=====	=====	=====	=====	=====	=====
+MODE	KTP AB TOPI 	0021100007	10.010.000,-	AFN	Z001	028-X	03	C
+=====	=====	=====	=====	=====	=====	=====
