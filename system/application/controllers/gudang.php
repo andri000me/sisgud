@@ -1639,19 +1639,19 @@ class Gudang extends Controller {
                 //kode lama numeric time, jadi mesti buat kode baru
                 if(is_numeric($last_code))
                 {
-                    $dist_code[0] = strtoupper($shop->shop_initial).date('y').'-0001';
+                    $dist_code[0] = 'PON-'.strtoupper($shop->shop_initial).date('y').'-0001';
                 }
                 else
                 {
                     $arr = explode('-',$last_code);
                     $num = ++$arr[1];
-                    $dist_code[0] = strtoupper($shop->shop_initial).date('y').'-'.str_pad($num, 4, '0',STR_PAD_LEFT);             
+                    $dist_code[0] = 'PON-'.strtoupper($shop->shop_initial).date('y').'-'.str_pad($num, 4, '0',STR_PAD_LEFT);
                 }
             }
             //klo belum ada bikin baru
             else
             {
-                $dist_code[0] = strtoupper($shop->shop_initial).date('y').'-0001';
+                $dist_code[0] = 'PON-'.strtoupper($shop->shop_initial).date('y').'-0001';
             } 
                      
             if($qry->num_rows()>0)
@@ -1661,7 +1661,7 @@ class Gudang extends Controller {
             	{
             		if($i>0)
             		{
-            			$dist_code[$i] = strtoupper($shop->shop_initial).date('y').'-'.str_pad(++$num, 4, '0',STR_PAD_LEFT);
+            			$dist_code[$i] = 'PON-'.strtoupper($shop->shop_initial).date('y').'-'.str_pad(++$num, 4, '0',STR_PAD_LEFT);
             		}
             		$dist_out[$i] = $row->dist_out;
             		$i++;
