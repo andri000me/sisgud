@@ -1643,7 +1643,7 @@ class Gudang extends Controller {
                 else
                 {
                     $arr = explode('-',$last_code);
-                    $num = ++$arr[1];
+                    $num = ++$arr[count($arr)-1];
                     $dist_code[0] = 'PON-'.strtoupper($shop->shop_initial).date('y').'-'.str_pad($num, 4, '0',STR_PAD_LEFT);
                 }
 
@@ -1653,7 +1653,6 @@ class Gudang extends Controller {
             {
                 $dist_code[0] = 'PON-'.strtoupper($shop->shop_initial).date('y').'-0001';
             }
-
 
             if($qry->num_rows()>0)
             {
