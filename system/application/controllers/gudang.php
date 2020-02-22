@@ -1339,10 +1339,6 @@ class Gudang extends Controller {
                 $bon = $this->generate_bon($this->input->post('shop_code'));
                 $this->data['tgl_bon'] = $bon['dist_out'];
                 $this->data['dist_code'] = $bon['dist_code'];
-                if(count($bon['dist_code']) > 1)
-                {
-                	
-                }
                 $rows = array();
                 $k=0;
                 foreach($bon['dist_out'] as $dist_out)
@@ -1555,7 +1551,7 @@ class Gudang extends Controller {
             else
             {
 			    $this->data['list_toko_bon'] = $this->list_toko('bon');               
-			    $this->data['page_title'] .= ' :. Mencetak Label';            
+			    $this->data['page_title'] .= ' :. Mencetak Bon';
 			    $this->load->view(config_item('template').'gud_cetakbon',$this->data);
             }
 		}
@@ -1633,9 +1629,12 @@ class Gudang extends Controller {
             //retrieve last dist code for shop
             $query = $this->item_distribution->get_last_dist_code($shop_code);
             //klo ada tinggal nerusin aja
+            $dist_code = array();
+            $dist_out = array();
             if($query->num_rows() >0)
             {
                 $last_code = $query->row()->dist_code;
+
                 //kode lama numeric time, jadi mesti buat kode baru
                 if(is_numeric($last_code))
                 {
@@ -1647,13 +1646,15 @@ class Gudang extends Controller {
                     $num = ++$arr[1];
                     $dist_code[0] = 'PON-'.strtoupper($shop->shop_initial).date('y').'-'.str_pad($num, 4, '0',STR_PAD_LEFT);
                 }
+
             }
             //klo belum ada bikin baru
             else
             {
                 $dist_code[0] = 'PON-'.strtoupper($shop->shop_initial).date('y').'-0001';
-            } 
-                     
+            }
+
+
             if($qry->num_rows()>0)
             {
             	$i=0;
@@ -1667,6 +1668,8 @@ class Gudang extends Controller {
             		$i++;
             	}
             }
+
+
             return array(
             	'dist_out'=>$dist_out,
             	'dist_code'=>$dist_code
